@@ -143,13 +143,14 @@ class LetsBegin extends React.Component {
                                     )
                                 })
                             }
+                            {loader && <ActivityIndicator size="large" color={"blue"} />}
                         </ScrollView>
 
-                        {loader &&
+                        {/* {loader &&
                             <View style={{ position: 'absolute', bottom: 1, zIndex: 10 }}>
                                 <ActivityIndicator size="large" color={"blue"} />
                             </View>
-                        }
+                        } */}
                     </View>
 
 

@@ -29,7 +29,7 @@ export async function speechToText() {
             let audioFile = await AudioRecord.stop();
             let a = await RNFS.readFile(`${audioFile}`, 'base64')
             let sttRes = await speechToTextApi({ "file": a, "lang": "ur", "srate": 16000 })
-            console.log("Speech To Text Respnse:", sttRes)
+            // console.log("Speech To Text Respnse:", sttRes)
             if (simplify(sttRes.response.status) == 'ok') {
 
                 chat_list.push({
@@ -40,7 +40,7 @@ export async function speechToText() {
 
 
                 let qs = await askQuestionApi({ "message": sttRes.response.text })
-                console.log("Query Ans Respnse:", qs)
+                // console.log("Query Ans Respnse:", qs)
                 qs.forEach(e => {
                     chat_list.push({ "is_question": false, "text": e.text })
                 });
@@ -49,7 +49,7 @@ export async function speechToText() {
 
                 if (qs.length > 0) {
                     let ttsRes = await textTotSpeechApi({ "text": qs[0].text, "voice": "CLE_Naghma1", "rate": 2, "volume": 100 })
-                    console.log("Text To Speech Respnse:", ttsRes)
+                    // console.log("Text To Speech Respnse:", ttsRes)
                     if (ttsRes && ttsRes.response && ttsRes.response.status == 'ok') {
                         this.playMessageHandler(ttsRes.response.encodedFile)
                     }
@@ -68,7 +68,7 @@ export async function playMessage(base64) {
         .then(() => {
             this.sound = new Sound(path, '', () => {
                 this.sound.play((r) => {
-                    console.log("message play success:", r)
+                    // console.log("message play success:", r)
                 })
             })
         })
