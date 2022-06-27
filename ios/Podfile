@@ -25,6 +25,8 @@ target 'websocket' do
 
   pod 'RNSound', :path => '../node_modules/react-native-sound'
 
+  pod 'react-native-tcp-socket', :path => '../node_modules/react-native-tcp-socket'
+
   target 'websocketTests' do
     inherit! :complete
     # Pods for testing

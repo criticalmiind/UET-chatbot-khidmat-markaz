@@ -13,6 +13,7 @@ import { speechToTextApi } from '../api';
 import { base64Audio } from '../constants/images';
 import Sound from 'react-native-sound';
 var RNFS = require('react-native-fs');
+import { ungzip } from 'pako';
 
 // const CLETOKEN = "af253b41-404c-4d78-be7f-6684dd52bcc2";
 // const SERVER = "wss://tech.cle.org.pk:9996/client/ws/speech?content-type=audio/x-raw,+layout=(string)interleaved,+rate=(int)16000,+format=(string)S16LE,+channels=(int)1,+token=af253b41-404c-4d78-be7f-6684dd52bcc2"
@@ -23,13 +24,28 @@ var RNFS = require('react-native-fs');
 // const CONTENT_TYPE = "content-type=audio/x-raw,+layout=(string)interleaved,+rate=(int)16000,+format=(string)S16LE,+channels=(int)1,+token=" + CLETOKEN;
 
 // const ws = new WebSocket("wss://demo.piesocket.com/v3/channel_1?api_key=VCXCEuvhGcBDP7XhiJJUDvR1e1D3eiVjgZ9VRiaV&notify_self");
-// const ws = new WebSocket("wss://202.142.147.156:3000");
-
 // const ws = new WebSocket(SERVER + '?' + CONTENT_TYPE);
+// const SERVER = "wss://202.142.147.156:3000/client/ws/speech?content-type=audio/x-raw,+layout=(string)interleaved,+rate=(int)16000,+format=(string)S16LE,+channels=(int)1,+token=af253b41-404c-4d78-be7f-6684dd52bcc2"
+
+// 852d4287-aaec-4298-bf32-f86d0d545ddf
+
+// Decode base64 zip
+// let req = "eJzdmt9v1DgQx9/7V+QdYTwez4wtrSohdJxOujvuBG+IhxwEaUV3F6VbhO6vv4ntBHpQ2LbZTVJVasfz4zsf21M/ZfVie7HeNr99at7ud+0vn/dt3RlP39Uf9/V+vdu+1D/NebV6tvk02Lnma8/Lj039oWl71+V5Vb2u3pytfr3Y/VNfXHOfVZUzyGiheQS2EiMoxM0jG6rHaNh6irqIFRhg8Zjsx95YL0h54Qx7ZMgLNN554LwAE639kka6KmnREEMsbZwBF7hIi7Eh+CHSickgDQKQI2CCBJKhBmKIfQSs99QTCMeAOUImCvosoGgoiUaSmEYkBRTTO3A5gCYyScgLMgIOuwjrMQFD2qZ0UuxcKLZwkEyvOR5sTH5nAsQYkj+aYCnkWjTOkuTOwfgYvO91dH+xoAbrqNd3QQ87+fV2KEYofhJgLvqMAlL8NgamXkfvhgoPWscu+dMEkIOoS3AVm6g7wDQNYHxAViSArjXFbhjUdkapHRU/Bceh2EEo9DaCDH4fAQYd62MY7NihJhsQXJ9j9RYw2d3lCmGZTohkOdlehzNCtlGP1wsl22kvTDodf4jOJVNPJXrJg0m6FUYscx0QOfu1FIHyqbD6pZx6MMwEWOYDLNic3/1/BPHJ9npjFkKy2agKcbEJQ3DJljTovVsnjovbOkQptrMoVDCjkOvl2ToXi02YpzIhRD3+gs9kpd+W6Ojmtrb713/e7v5t+gcivwZPvn04ysNTXofV9dfocr/eDI9QF/6rXe/aF+/fXzb784r0wvXAqtUf9ednu6utusDaavXn1eZ5W28aLdDV31f1u1ZF3r5q2s25Pj9Qnek9db+GP18Z18z/Lb5ZfsfxXdcNzhvdPwj8MPST4E/DByQclHJg0sFpt0i8Veotk2+dfoeCO5XcsejOZfcovFfpPYvvXT6CwCgSI4mMJjOi0KhSI4uNLncEwaNIHkn0aLJHFD6q9JHFjy5/ggYnaXGiJidrc8JGJ2114mYnbzdBw0laTtR0srYTNp609cTNJ28/A4BZIMwEYjYYMwKZFcrMYGaHM0OgWSLNFGq2WDMGmzXazOFmj7cAwEUgLgRyMZgLAl0U6sJgF4e7QOBFIi8UerHYCwZfNPrC4ReP/wA28CC28EA28WC20W3kzdnq9/W2qdv8nV/1evg+cGq2cX6+fD5549eRTw78lvs/mASdSQ=="
+// const gzippedString = 'H4sIAAAAAAAA//NIzcnJVyguSUzOzi9LLUrLyS/XUSjJSMzLLlZIyy9SSMwpT6wsVshIzSnIzEtXBACs78K6LwAAAA==';
+// const gzippedBuffer = new Buffer.from(req, 'base64');
+// const unzippedBuffer = ungzip(gzippedBuffer);
+// const unzippedString = new TextDecoder('utf8').decode(unzippedBuffer);
+// console.log(unzippedString)
+
+
+const BASE_URL = "wss://tech.cle.org.pk:9991/client/ws/speech?content-type=audio/x-raw,+layout=(string)interleaved,+rate=(int)16000,+format=(string)S16LE,+channels=(int)1,+token=af253b41-404c-4d78-be7f-6684dd52bcc2";
+// const BASE_URL = "wss://tech.cle.org.pk:9991/client/ws/speech";
+
 
 class LetsBegin extends React.Component {
     constructor(props) {
         super(props)
+        this.ws = new WebSocket(BASE_URL);
         this.speechToTextHandler = speechToText.bind(this);
         this.textToSpeechHandler = textToSpeech.bind(this);
         this.playMessageHandler = playMessage.bind(this);
@@ -38,6 +54,16 @@ class LetsBegin extends React.Component {
             "is_recording": false,
             "chat_list": []
         }
+    }
+
+    base64ToArrayBuffer(base64) {
+        var binary_string = atob(base64);
+        var len = binary_string.length;
+        var bytes = new Int16Array(len);
+        for (var i = 0; i < len; i++) {
+            bytes[i] = binary_string.charCodeAt(i);
+        }
+        return bytes.buffer;
     }
 
     UNSAFE_componentWillMount() {
@@ -50,54 +76,45 @@ class LetsBegin extends React.Component {
         };
         AudioRecord.init(options);
 
-        // let text = " السلام و علیکم.";
-
-        // this.textToSpeechHandler(text)
-
-        // let ttsRes = await textTotSpeech({ "text": sttRes.response.text, "voice" : "CLE_Naghma1", "rate":2, "volume":100 })
-        // console.log("Text To Speech Respnse:", ttsRes)
-
-
         AudioRecord.on('data', async (data) => {
-            // console.log(data)
-            // const byteCharacters = atob(data);
-            // const byteNumbers = new Array(byteCharacters.length);
-            // for (let i = 0; i < byteCharacters.length; i++) {
-            //     byteNumbers[i] = byteCharacters.charCodeAt(i);
-            // }
-            // const byteArray = new Uint8Array(byteNumbers);
-            // const blob = new Blob([byteArray], { type: 'audio/wav' });
+            const b64toBlob = (base64, type = 'application/octet-stream') => fetch(`data:${type};base64,${base64}`).then(res => res.blob())
+            const chunk = await b64toBlob(data)
 
+            // console.log(chunk);
 
-            // let sttRes = await speechToTextApi({ "file": data, "lang": "ur", "srate": 16000 })
-            // console.log("Speech To Text Respnse:", sttRes)
-
-            // let chunk = Buffer.from(data, 'base64');
-            // console.log(chunk)
-
-            // ws.send(blob)
+            if(this.ws.readyState == 1){
+                this.ws.send(chunk)
+            }else{
+                this.ws = new WebSocket(BASE_URL);
+                this.ws.send(chunk)
+            }
         });
 
+        // console.log(this.ws)
 
-        // ws.onmessage = function (e) {
-        //     var data = e.data;
-        //     console.log("On Message:", e)
-        // }
+        if(this.ws){
+            this.ws.onopen = function (e) {
+                console.log("On Open:", e)
+            };
 
-        // ws.onopen = function (e) {
-        //     console.log("On Open:", e)
+            this.ws.onmessage = function (e) {
+                var data = e.data;
+                var res = JSON.parse(data);
+                console.log("On Message:",res)
+            }
 
-        // };
+            this.ws.onclose = function (e) {
+                console.log("On Close:", e)
+            };
 
-        // ws.onclose = function (e) {
-        //     console.log("On Close:", e)
-        // };
+            this.ws.onerror = function (e) {
+                var data = e.data;
+                console.log("On Error:", e)
+            }
+        }
 
-        // ws.onerror = function (e) {
-        //     var data = e.data;
-        //     console.log("On Error:", e)
-        // }
     }
+
 
     render() {
         const { is_recording, chat_list, loader } = this.state;

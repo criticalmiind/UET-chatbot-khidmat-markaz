@@ -27,6 +27,8 @@ export async function speechToText() {
             AudioRecord.start();
         } else {
             let audioFile = await AudioRecord.stop();
+            this.ws.send("EOS")
+            return
             let a = await RNFS.readFile(`${audioFile}`, 'base64')
             let sttRes = await speechToTextApi({ "file": a, "lang": "ur", "srate": 16000 })
             // console.log("Speech To Text Respnse:", sttRes)
@@ -66,6 +68,7 @@ export async function playMessage(base64) {
     const path = `${RNFS.DocumentDirectoryPath}/test_audio_file.wav`;
     await RNFS.writeFile(path, base64.replace("data:audio/wav;base64,", ""), 'base64')
         .then(() => {
+            console.log("Path:", path)
             this.sound = new Sound(path, '', () => {
                 this.sound.play((r) => {
                     // console.log("message play success:", r)
