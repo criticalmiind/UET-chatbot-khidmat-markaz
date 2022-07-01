@@ -1,24 +1,23 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, ScrollView, ActivityIndicator, NativeModules } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, View, ScrollView, ActivityIndicator } from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from './../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from './../constants/theme';
-import { hp, uid, wp } from './../utils';
+import { hp, wp } from './../utils';
 import AudioRecord from 'react-native-audio-record';
-import { base64ToBlob, checkMicrophone, getQueriesAnswers, playMessage, speechToText, textToSpeech } from '../api/methods';
+import { base64ToBlob, onAudioPressIn, onAudioPressOut, playMessage, speechToText, textToSpeech } from '../api/methods';
 import { decode as atob, encode as btoa } from 'base-64'
 var RNFS = require('react-native-fs');
-const { RNAudioRecord } = NativeModules;
-// const BASE_URL = "wss://tech.cle.org.pk:9991/client/ws/speech?content-type=audio/x-raw,+layout=(string)interleaved,+rate=(int)16000,+format=(string)S16LE,+channels=(int)1,+token=852d4287-aaec-4298-bf32-f86d0d545ddf";
-const BASE_URL = "wss://tech.cle.org.pk:9991/client/ws/speech?content-type=audio/x-raw,+layout=(string)interleaved,+rate=(int)16000,+format=(string)S16LE,+channels=(int)1,+token=852d4287-aaec-4298-bf32-f86d0d545ddf";
+
+const BASE_URL = "wss://tech.cle.org.pk:9991/client/ws/speech?content-type=audio/x-raw,+layout=(string)interleaved,+rate=(int)16000,+format=(string)S16LE,+channels=(int)1,+token=af253b41-404c-4d78-be7f-6684dd52bcc2";
 
 
 class LetsBegin extends React.Component {
     constructor(props) {
         super(props)
-        // this.ws = new WebSocket(BASE_URL);
-        this.ws = { readyState:3 };
-        this.getQueriesAnswers = getQueriesAnswers.bind(this);
+        this.ws = new WebSocket(BASE_URL);
+        this.onAudioPressIn = onAudioPressIn.bind(this);
+        this.onAudioPressOut = onAudioPressOut.bind(this);
 
         this.speechToTextHandler = speechToText.bind(this);
         this.textToSpeechHandler = textToSpeech.bind(this);
@@ -26,11 +25,7 @@ class LetsBegin extends React.Component {
         this.state = {
             "loader": false,
             "is_recording": false,
-            "socket_status": 3,
-            "last_id":false,
-            "last_ids_list":{},
-            "chat_list": {},
-            "last_unread_msgs":{}
+            "chat_list": []
         }
     }
 
@@ -44,7 +39,7 @@ class LetsBegin extends React.Component {
         return bytes.buffer;
     }
 
-    async UNSAFE_componentWillMount() {
+    UNSAFE_componentWillMount() {
         const options = {
             sampleRate: 16000,  // default 44100
             channels: 1,        // 1 or 2, default 1
@@ -52,11 +47,8 @@ class LetsBegin extends React.Component {
             audioSource: 6,     // android only (see below)
             wavFile: 'onMessage.wav' // default 'audio.wav'
         };
-        let audioPermission = await checkMicrophone();
         AudioRecord.init(options);
 
-        // console.log(RNAudioRecord.getConstants())
-        
         AudioRecord.on('data', async (data) => {
             const chunk = await base64ToBlob(data)
 
@@ -64,6 +56,7 @@ class LetsBegin extends React.Component {
                 if(this.ws.readyState == 1){
                     this.ws.send(chunk)
                 }else{
+                    console.log(this.ws)
                     if(this.ws.readyState == 3){
                         this.ws = null
                         this.ws = new WebSocket(BASE_URL);
@@ -81,65 +74,53 @@ class LetsBegin extends React.Component {
 
     socketListners(){
         if(this.ws){
-            this.ws.onopen = this.onOpen.bind(this);
+            this.ws.onopen = function (e) {
+                console.log("On Open:", e)
+            };
+            
             this.ws.onmessage = this.onMessage.bind(this)
-            this.ws.onerror = this.onError.bind(this);
-            this.ws.onclose = this.onClose.bind(this);
+
+            this.ws.onclose = function (e) {
+                console.log("On Close:", e)
+            };
+
+            this.ws.onerror = function (e) {
+                var data = e.data;
+                console.log("On Error:", e)
+            }
         }
     }
 
     onMessage(e) {
-        const { chat_list, last_id, last_ids_list } = this.state;
+        const { chat_list } = this.state;
         var data = e.data;
-        var res = JSON.parse(data);
-        if(res.result){
-            const { final=false, hypotheses=[] } = res.result;
-            let msgObj = hypotheses[0]
-
-            const unique_id = last_id?last_id:uid();
-            chat_list[unique_id] = { "is_question": true, "text": msgObj.transcript }
-            last_ids_list[unique_id] = chat_list[unique_id];
-
-            this.setState({
-                "chat_list":chat_list,
-                "last_id":final?false:unique_id,
-                "last_ids_list":last_ids_list
-            })
-            if(final) this.ws.close();
+        var { status=0, result=null } = JSON.parse(data);
+        if(result){
+            const { final=false, hypotheses=[] } = result;
+            if(final){
+                let msgObj = hypotheses[0]
+                chat_list.push({
+                    "is_question": true,
+                    "text": msgObj.transcript
+                })
+                this.setState({ chat_list })
+            }
         }
+        // console.log("On Message:",res)
     }
 
-    onOpen(e) {
-        console.log("On Open:", e)
-        this.setState({ "socket_status":1 })
-    }
+    onWriteMsg(){
 
-    onError(e) {
-        console.log("On Open:", e)
-        this.setState({ "socket_status":2 })
-    }
-
-    onClose(e) {
-        console.log("On Open:", e)
-        this.setState({ "socket_status":3 })
-    }
-
-    getStatus(id){
-        let status = 'CONNECTING';
-        if(id == 1) status = 'CONNECTED'
-        if(id == 2) status = 'CLOSING'
-        if(id == 3) status = 'CLOSED'
-        return status
     }
 
     render() {
-        const { is_recording, chat_list, loader, socket_status } = this.state;
+        const { is_recording, chat_list, loader } = this.state;
 
         return (<>
             <View style={styles.safeArea}>
                 <View style={styles.mainView}>
                     <Text style={styles.letsBeginText}>{"Lets Begin"}</Text>
-                    <Text style={styles.notesText}>{"By start button to ask"}{`(${this.getStatus(socket_status)})`}</Text>
+                    <Text style={styles.notesText}>{"By start button to ask"}</Text>
 
                     <View style={{ height: hp('2', '1') }} />
 
@@ -155,11 +136,10 @@ class LetsBegin extends React.Component {
                                 if (this.scrollViewRef) this.scrollViewRef.scrollToEnd({ animated: true })
                             }}>
                             {
-                                Object.entries(chat_list).map((arr, i) => {
-                                    let a = arr[0], c = arr[1];
+                                (chat_list ?? []).map((c, i) => {
                                     let is = c.is_question;
                                     return (
-                                        <View style={styles.chatRow(is)} key={a}>
+                                        <View style={styles.chatRow(is)} key={i}>
                                             {!is ? <>
                                                 <View style={styles.chatViewIcon(is)} />
                                                 <View style={{ width: wp('2') }} />
@@ -187,22 +167,17 @@ class LetsBegin extends React.Component {
                     <View style={styles.askBtnView}>
                         <TouchableOpacity
                             style={styles.autoDetectBtn(is_recording)}
-                            // onPress={async () => {
-                            //     // this.setState({ loader: true })
-                            //     await this.speechToTextHandler()
-                            //     // this.setState({ loader: false })
+                            // onPressIn={()=>{
+                            //     this.onAudioPressIn()
                             // }}
-                            onPressIn={async()=>{
-                                this.setState({ loader: true })
+                            // onPressOut={()=>{
+                            //     this.onAudioPressOut()
+                            // }}
+                            onPress={async () => {
+                                // this.setState({ loader: true })
                                 await this.speechToTextHandler()
-                                this.setState({ loader: false })
-                            }}
-                            onPressOut={async()=>{
-                                this.setState({ loader: true })
-                                await this.speechToTextHandler()
-                                this.setState({ loader: false })
-                            }}
-                            >
+                                // this.setState({ loader: false })
+                            }}>
                             <View style={styles.autoDetectBtnInnerRow}>
                                 <Text style={styles.autoDetectBtnText(is_recording)}>{is_recording ? "Stop" : "Ask?"}</Text>
                             </View>
