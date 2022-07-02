@@ -29,7 +29,8 @@ class LetsBegin extends React.Component {
             "socket_status": 3,
             "last_id":false,
             "last_ids_list":{},
-            "chat_list": {},
+            "chat_list": {
+            },
             "last_unread_msgs":{}
         }
     }
@@ -145,14 +146,16 @@ class LetsBegin extends React.Component {
 
                     <View style={styles.v01}>
                         <ScrollView
-                            contentContainerStyle={{
-                                justifyContent: 'flex-end',
-                                height: '100%',
-                            }}
+                            // contentContainerStyle={{
+                                // justifyContent: 'flex-end',
+                                // height: '100%',
+                            // }}
+                            contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', flexDirection: 'column' }}
+
                             style={{ width: wp('98') }}
                             ref={(ref) => { this.scrollViewRef = ref }}
                             onContentSizeChange={() => {
-                                if (this.scrollViewRef) this.scrollViewRef.scrollToEnd({ animated: true })
+                                if (this.scrollViewRef) this.scrollViewRef.scrollToEnd({ animated: false })
                             }}>
                             {
                                 Object.entries(chat_list).map((arr, i) => {
@@ -165,9 +168,13 @@ class LetsBegin extends React.Component {
                                                 <View style={{ width: wp('2') }} />
                                             </> : <></>
                                             }
-                                            <View style={styles.chatTextView(is)}>
+                                            <TouchableOpacity
+                                                style={styles.chatTextView(is)}
+                                                onPress={()=>{
+
+                                                }}>
                                                 <Text style={styles.chatTxt(is)}>{c.text}</Text>
-                                            </View>
+                                            </TouchableOpacity>
                                             {is ? <>
                                                 <View style={{ width: wp('2') }} />
                                                 <View style={styles.chatViewIcon(is)} />
@@ -193,14 +200,12 @@ class LetsBegin extends React.Component {
                             //     // this.setState({ loader: false })
                             // }}
                             onPressIn={async()=>{
-                                this.setState({ loader: true })
+                                // this.setState({ loader: true })
                                 await this.speechToTextHandler()
-                                this.setState({ loader: false })
                             }}
                             onPressOut={async()=>{
-                                this.setState({ loader: true })
                                 await this.speechToTextHandler()
-                                this.setState({ loader: false })
+                                // this.setState({ loader: false })
                             }}
                             >
                             <View style={styles.autoDetectBtnInnerRow}>

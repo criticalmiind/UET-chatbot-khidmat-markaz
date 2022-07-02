@@ -28,6 +28,7 @@ export async function speechToText() {
         this.setState({ "is_recording": !is_recording })
         if (!is_recording) {
             AudioRecord.start();
+            if(this.sound) this.sound.stop()
         } else {
             let audioFile = await AudioRecord.stop();
             this.ws.send("EOS")
@@ -47,14 +48,12 @@ export async function getQueriesAnswers(){
     let ids_list = Object.entries(last_ids_list).map(e=>({ "id":e[0], ...e[1] }))
     ids_list.forEach(async(el) => {
         const qs = await askQuestionApi({ "message": el.text })
-        // console.log("Query Ans Respnse:", qs)
-    
         if (qs.length > 0) {
             const unique_id = uid();
             chat_list[unique_id] = { "is_question": false, "text": qs[0].text }
             this.setState({ "chat_list":chat_list })
 
-            let ttsRes = await textTotSpeechApi({ "text": qs[0].text, "voice": "CLE_Naghma1", "rate": 2, "volume": 100 })
+            let ttsRes = await textTotSpeechApi({ "text": qs[0].text, "voice": "CLE_Naghma1", "rate": 1, "volume": 100 })
 
             if (ttsRes && ttsRes.response && ttsRes.response.status == 'ok') {
 
@@ -70,6 +69,18 @@ export async function getQueriesAnswers(){
         }, 500);
     });
 }
+
+// export async function textReadAndSpeach(text){
+//     let ttsRes = await textTotSpeechApi({ "text": text, "voice": "CLE_Naghma1", "rate": 2, "volume": 100 })
+
+//     if (ttsRes && ttsRes.response && ttsRes.response.status == 'ok') {
+
+//         last_unread_msgs[el.id] = { "is_question": false, "encodedFile": ttsRes.response.encodedFile }
+//         setTimeout(() => {
+//             this.playMessageHandler(ttsRes.response.encodedFile)
+//         },500)
+//     }
+// }
 
 // export async function speechToText() {
 
