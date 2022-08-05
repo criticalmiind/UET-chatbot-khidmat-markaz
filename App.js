@@ -3,7 +3,7 @@ import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/es/integration/react";
 import configureStore from "./app/redux/store/index";
 const { persistor, store } = configureStore();
-// import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
+import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 import EntryPoint from "./app/EntryPoint";
 import { LogBox } from "react-native";
 
@@ -18,7 +18,6 @@ class App extends Component {
   async UNSAFE_componentWillMount(){
     this._isMounted = true;
     if(this._isMounted){
-      // console.disableYellowBox = true;
       LogBox.ignoreAllLogs(true)
     }
   }
@@ -39,5 +38,4 @@ class App extends Component {
 }
 
 
-// export default gestureHandlerRootHOC(App)
-export default App
+export default gestureHandlerRootHOC(App)

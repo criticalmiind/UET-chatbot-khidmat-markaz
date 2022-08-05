@@ -1,6 +1,7 @@
 import { createStore } from 'redux';
 import { persistStore, persistCombineReducers } from 'redux-persist';
 import { AsyncStorage } from 'react-native'
+
 import rootReducer from '../reducers/index' 
 
 const config = {

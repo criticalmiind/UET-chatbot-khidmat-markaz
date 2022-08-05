@@ -1,2 +1,3 @@
 export const initialState = {
+    userData:{}
 }

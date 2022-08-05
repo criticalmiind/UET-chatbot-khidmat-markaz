@@ -1,48 +1,39 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, ScrollView, ActivityIndicator, NativeModules } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, View, ScrollView, ActivityIndicator, Image, Platform } from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from './../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from './../constants/theme';
 import { hp, uid, wp } from './../utils';
 import AudioRecord from 'react-native-audio-record';
-import { base64ToBlob, checkMicrophone, getQueriesAnswers, playMessage, speechToText, textToSpeech } from '../api/methods';
-import { decode as atob, encode as btoa } from 'base-64'
-var RNFS = require('react-native-fs');
-const { RNAudioRecord } = NativeModules;
-// const BASE_URL = "wss://tech.cle.org.pk:9991/client/ws/speech?content-type=audio/x-raw,+layout=(string)interleaved,+rate=(int)16000,+format=(string)S16LE,+channels=(int)1,+token=852d4287-aaec-4298-bf32-f86d0d545ddf";
-const BASE_URL = "wss://tech.cle.org.pk:9991/client/ws/speech?content-type=audio/x-raw,+layout=(string)interleaved,+rate=(int)16000,+format=(string)S16LE,+channels=(int)1,+token=852d4287-aaec-4298-bf32-f86d0d545ddf";
+import { base64ToBlobFetch, checkMicrophone, getQueriesAnswers, playMessage, run_scripts, onMicClick, textToSpeech } from '../api/methods';
+import { Logo, MicIcon } from '../constants/images';
+import { B64ANDROID } from '../api/test';
+import { decode as atob } from 'base-64';
+const utf8 = require('utf8');
 
+const BASE_URL = "wss://tech.cle.org.pk:9991/client/ws/speech?content-type=audio/x-raw,+layout=(string)interleaved,+rate=(int)16000,+format=(string)S16LE,+channels=(int)1,+token=852d4287-aaec-4298-bf32-f86d0d545ddf";
 
 class LetsBegin extends React.Component {
     constructor(props) {
         super(props)
-        // this.ws = new WebSocket(BASE_URL);
-        this.ws = { readyState:3 };
+        this.ws = { readyState: 3 };
+        this.sound = null;
+        this.ws = new WebSocket(BASE_URL);
         this.getQueriesAnswers = getQueriesAnswers.bind(this);
 
-        this.speechToTextHandler = speechToText.bind(this);
+        this.onMicClickHandler = onMicClick.bind(this);
         this.textToSpeechHandler = textToSpeech.bind(this);
         this.playMessageHandler = playMessage.bind(this);
         this.state = {
             "loader": false,
             "is_recording": false,
             "socket_status": 3,
-            "last_id":false,
-            "last_ids_list":{},
+            "last_id": false,
+            "last_ids_list": {},
             "chat_list": {
             },
-            "last_unread_msgs":{}
+            "last_unread_msgs": {}
         }
-    }
-
-    base64ToArrayBuffer(base64) {
-        var binary_string = atob(base64);
-        var len = binary_string.length;
-        var bytes = new Int16Array(len);
-        for (var i = 0; i < len; i++) {
-            bytes[i] = binary_string.charCodeAt(i);
-        }
-        return bytes.buffer;
     }
 
     async UNSAFE_componentWillMount() {
@@ -50,38 +41,23 @@ class LetsBegin extends React.Component {
             sampleRate: 16000,  // default 44100
             channels: 1,        // 1 or 2, default 1
             bitsPerSample: 16,  // 8 or 16, default 16
-            audioSource: 6,     // android only (see below)
+            // audioSource: 6,     // android only (see below)
             wavFile: 'onMessage.wav' // default 'audio.wav'
         };
         let audioPermission = await checkMicrophone();
         AudioRecord.init(options);
-
-        // console.log(RNAudioRecord.getConstants())
-        
-        AudioRecord.on('data', async (data) => {
-            const chunk = await base64ToBlob(data)
-
-            try {
-                if(this.ws.readyState == 1){
-                    this.ws.send(chunk)
-                }else{
-                    if(this.ws.readyState == 3){
-                        this.ws = null
-                        this.ws = new WebSocket(BASE_URL);
-                        this.socketListners()
-                        this.ws.send(chunk)
-                    }
-                }
-            } catch (error) {
-                console.log(error)
-            }
-        });
-
+        AudioRecord.on('data', this.onAudioStreaming.bind(this));
         this.socketListners()
     }
 
-    socketListners(){
-        if(this.ws){
+    async componentWillUnmount(){
+        this.ws = { readyState: 3 };
+        this.sound = null;
+        await AudioRecord.stop()
+    }
+
+    socketListners() {
+        if (this.ws) {
             this.ws.onopen = this.onOpen.bind(this);
             this.ws.onmessage = this.onMessage.bind(this)
             this.ws.onerror = this.onError.bind(this);
@@ -89,48 +65,123 @@ class LetsBegin extends React.Component {
         }
     }
 
+    async onAudioStreaming(data) {
+        try {
+            var chunk = null
+            if(Platform.OS == 'android'){
+                chunk = await run_scripts(data);
+            }else{
+                chunk = await base64ToBlobFetch(data);
+            }
+            // const chunk = await Platform.OS === 'ios' ? base64ToBlobFetch(data) : run_scripts(data)
+            console.log(chunk)
+            // const chunk = await run_scripts(data)
+            if(chunk){
+                if (this.ws.readyState == 1) {
+                    this.ws.send(chunk)
+                } else {
+                    if (this.ws.readyState == 3) {
+                        this.ws = null
+                        this.ws = new WebSocket(BASE_URL);
+                        this.socketListners()
+                        this.ws.send(chunk)
+                    }
+                }
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     onMessage(e) {
         const { chat_list, last_id, last_ids_list } = this.state;
         var data = e.data;
         var res = JSON.parse(data);
-        if(res.result){
-            const { final=false, hypotheses=[] } = res.result;
+        console.log("On Message: ", res)
+
+        if (res.result) {
+            const { final = false, hypotheses = [] } = res.result;
             let msgObj = hypotheses[0]
 
-            const unique_id = last_id?last_id:uid();
+            const unique_id = last_id ? last_id : uid();
             chat_list[unique_id] = { "is_question": true, "text": msgObj.transcript }
             last_ids_list[unique_id] = chat_list[unique_id];
 
             this.setState({
-                "chat_list":chat_list,
-                "last_id":final?false:unique_id,
-                "last_ids_list":last_ids_list
+                "chat_list": chat_list,
+                "last_id": final ? false : unique_id,
+                "last_ids_list": last_ids_list
             })
-            if(final) this.ws.close();
+            if (final) this.ws.close();
         }
+    }
+
+    utf8_from_str(s) {
+        for(var i=0, enc = encodeURIComponent(s), a = []; i < enc.length;) {
+            if(enc[i] === '%') {
+                a.push(parseInt(enc.substr(i+1, 2), 16))
+                i += 3
+            } else {
+                a.push(enc.charCodeAt(i++))
+            }
+        }
+        return a
     }
 
     onOpen(e) {
         console.log("On Open:", e)
-        this.setState({ "socket_status":1 })
+        this.setState({ "socket_status": 1 })
+
+        // B64ANDROID.forEach(async (el) => {
+
+        //     // console.log(el.toString("utf8"))
+
+        //     // const a = await base64ToBlobFetch(el)
+
+        //     // const byteCharacters = atob(utf8.encode(string));
+        //     // const byteCharacters = atob(el);
+        //     // // console.log(byteCharacters)
+        //     // const byteNumbers = new Array(byteCharacters.length);
+        //     // for (let i = 0; i < byteCharacters.length; i++) {
+        //     //     byteNumbers[i] = byteCharacters.charCodeAt(i);
+        //     // }
+        //     // const byteArray = new Uint16Array(this.utf8_from_str(el));
+        //     const blob = new Blob([this.utf8_from_str(el)], { type: 'audio/x-raw' });
+
+        //     // const blob = await run_scripts(el)
+        //     // const blob = this.utf8_from_str(el)
+        //     console.log(blob)
+        //     this.ws.send(blob)
+        //     if (B64ANDROID.length == 14) {
+        //         ws.send("EOS")
+        //     }
+        // });
     }
 
     onError(e) {
-        console.log("On Open:", e)
-        this.setState({ "socket_status":2 })
+        console.log("On Error:", e)
+        this.setState({ "socket_status": 2 })
     }
 
     onClose(e) {
-        console.log("On Open:", e)
-        this.setState({ "socket_status":3 })
+        console.log("On Close:", e)
+        this.setState({ "socket_status": 3 })
     }
 
-    getStatus(id){
+    getStatus(id) {
         let status = 'CONNECTING';
-        if(id == 1) status = 'CONNECTED'
-        if(id == 2) status = 'CLOSING'
-        if(id == 3) status = 'CLOSED'
+        if (id == 1) status = 'CONNECTED'
+        if (id == 2) status = 'CLOSING'
+        if (id == 3) status = 'CLOSED'
         return status
+    }
+
+    getStatusIcon(id) {
+        let color = 'yellow';
+        if (id == 1) color = 'green'
+        if (id == 2) color = 'orange'
+        if (id == 3) color = 'red'
+        return <View style={{ height: hp('3'), width: hp(3), borderRadius: 100, backgroundColor: color }} />
     }
 
     render() {
@@ -139,16 +190,31 @@ class LetsBegin extends React.Component {
         return (<>
             <View style={styles.safeArea}>
                 <View style={styles.mainView}>
-                    <Text style={styles.letsBeginText}>{"Lets Begin"}</Text>
-                    <Text style={styles.notesText}>{"By start button to ask"}{`(${this.getStatus(socket_status)})`}</Text>
+                    <View style={styles.v02}>
+                        <View style={{ width: wp('78'), justifyContent:'center', }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
+                                {this.getStatusIcon(socket_status)}<Text style={styles.letsBeginText}>{"ای خدمت مرکز"} </Text>
+                            </View>
+                            {/* <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'flex-end' }}>
+                                <Text style={styles.notesText}>{`(${this.getStatus(socket_status)})`} </Text>{this.getStatusIcon(socket_status)}
+                                
+                            </View> */}
+                        </View>
 
+                        <TouchableOpacity
+                            onPress={() => {
+                                this.props.navigation.goBack()
+                            }}>
+                            <Image source={Logo} style={{ height: wp('18'), width: wp('18') }} />
+                        </TouchableOpacity>
+                    </View>
                     <View style={{ height: hp('2', '1') }} />
 
                     <View style={styles.v01}>
                         <ScrollView
                             // contentContainerStyle={{
-                                // justifyContent: 'flex-end',
-                                // height: '100%',
+                            // justifyContent: 'flex-end',
+                            // height: '100%',
                             // }}
                             contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', flexDirection: 'column' }}
 
@@ -170,7 +236,7 @@ class LetsBegin extends React.Component {
                                             }
                                             <TouchableOpacity
                                                 style={styles.chatTextView(is)}
-                                                onPress={()=>{
+                                                onPress={() => {
 
                                                 }}>
                                                 <Text style={styles.chatTxt(is)}>{c.text}</Text>
@@ -188,28 +254,23 @@ class LetsBegin extends React.Component {
                         </ScrollView>
                     </View>
 
-
                     <View style={{ height: hp('2', '1') }} />
 
                     <View style={styles.askBtnView}>
                         <TouchableOpacity
                             style={styles.autoDetectBtn(is_recording)}
                             // onPress={async () => {
-                            //     // this.setState({ loader: true })
-                            //     await this.speechToTextHandler()
-                            //     // this.setState({ loader: false })
+                            //     await this.onMicClickHandler()
                             // }}
                             onPressIn={async()=>{
-                                // this.setState({ loader: true })
-                                await this.speechToTextHandler()
+                                await this.onMicClickHandler()
                             }}
                             onPressOut={async()=>{
-                                await this.speechToTextHandler()
-                                // this.setState({ loader: false })
-                            }}
-                            >
+                                await this.onMicClickHandler()
+                            }}>
                             <View style={styles.autoDetectBtnInnerRow}>
-                                <Text style={styles.autoDetectBtnText(is_recording)}>{is_recording ? "Stop" : "Ask?"}</Text>
+                                {/* <Text style={styles.autoDetectBtnText(is_recording)}>{is_recording ? "Stop" : "Ask?"}</Text> */}
+                                <Image source={MicIcon} style={styles.autoDetectBtnIcon(is_recording)} />
                             </View>
                         </TouchableOpacity>
                     </View>
@@ -237,18 +298,23 @@ const styles = StyleSheet.create({
         alignItems: 'flex-end',
         flexDirection: 'row'
     },
+    v02: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-around',
+    },
     letsBeginText: {
         fontSize: 45,
-        alignSelf: 'center',
+        textAlign: 'right',
         color: theme.primary,
         marginTop: hp('4', '0.5'),
+        fontFamily:theme.font01
     },
     notesText: {
         fontSize: 16,
         fontWeight: '500',
-        alignSelf: 'center',
+        textAlign: 'right',
         color: theme.quinary,
-        marginTop: hp('1', '0.5'),
     },
     autoDetectBtn: (is) => ({
         height: hp('10'),
@@ -266,10 +332,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         width: '100%'
     },
-    autoDetectBtnText: (is) => ({
-        color: is ? 'red' : theme.designColor,
-        fontSize: 20,
-    }),
+    autoDetectBtnIcon: is => ({ width: wp('10'), height: wp('10'), resizeMode: 'contain', tintColor: is ? 'red' : theme.designColor }),
     v01: {
         height: hp('68'),
         width: wp('98'),

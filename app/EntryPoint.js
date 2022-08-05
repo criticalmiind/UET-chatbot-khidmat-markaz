@@ -1,9 +1,8 @@
 import React from 'react';
-import { View, Text } from 'react-native';
 import { connect } from 'react-redux';
-// import MainNav from './navigators/screenStackNavigators';
+import { AuthNavContainer, MainNavContainer } from './navigators/screenStackNavigators';
 import { mapDispatchToProps, mapStateToProps } from './redux/actions/userActions';
-import LetsBegin from './screens/LetsBegin';
+import { isObjEmpty } from './utils';
 
 class Home extends React.Component{
     constructor(props){
@@ -12,12 +11,13 @@ class Home extends React.Component{
     }
     
     UNSAFE_componentWillMount(){
+    
     }
-
+    
     render(){
-        return (<>
-            <LetsBegin />
-        </>);
+        const { userData } = this.props;
+        if(isObjEmpty(userData)) return <AuthNavContainer />
+        else return <MainNavContainer/>
     }
 }
 
