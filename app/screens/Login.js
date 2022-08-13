@@ -60,6 +60,7 @@ class Login extends React.Component {
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
+                <Text style={styles.version}>V.1.0.1</Text>
             </View>
         </>);
     }
@@ -106,5 +107,12 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontFamily:theme.font01
     },
-    logo:{ height:wp('50'), width:wp('50'), alignSelf:'center' }
+    logo:{ height:wp('50'), width:wp('50'), alignSelf:'center' },
+    version:{
+        fontSize:16,
+        position:'absolute',
+        bottom:hp('1.5'),
+        alignSelf:'center',
+        fontFamily:theme.font01
+    }
 });

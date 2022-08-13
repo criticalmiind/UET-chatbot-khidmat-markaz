@@ -1,6 +1,6 @@
 import { PermissionsAndroid, Alert, Platform, NativeModules } from 'react-native';
 import AudioRecord from "react-native-audio-record";
-import { simplify, uid } from "../utils";
+import { isNullRetNull, simplify, uid } from "../utils";
 import { askQuestionApi, speechToTextApi, textTotSpeechApi } from './index';
 import Sound from "react-native-sound";
 var RNFS = require('react-native-fs');
@@ -30,9 +30,7 @@ export async function onMicClick() {
             if(this.sound) this.sound.stop()
         } else {
             let audioFile = await AudioRecord.stop();
-            // console.log(audioFile)
-            // this.playMessageHandler(audioFile, true)
-            if(this.ws.readyState == 1) this.ws.send("EOS")
+            // if(this.ws.readyState == 1) this.ws.send("EOS")
             setTimeout(() => {
                 this.getQueriesAnswers()
             }, 500);
@@ -48,16 +46,18 @@ export async function getQueriesAnswers(){
 
     let ids_list = Object.entries(last_ids_list).map(e=>({ "id":e[0], ...e[1] }))
     ids_list.forEach(async(el) => {
-        console.log("qs", el)
+        // console.log("el", el)
         const qs = await askQuestionApi({ "message": el.text })
         console.log("qs", qs)
 
         if (qs.length > 0) {
+            let cleared_text = isNullRetNull(qs[0].text,"").split("!")[0]
+
             const unique_id = uid();
-            chat_list[unique_id] = { "is_question": false, "text": qs[0].text }
+            chat_list[unique_id] = { "is_question": false, "text": cleared_text }
             this.setState({ "chat_list":chat_list })
 
-            const ttsRes = await textTotSpeechApi({ "text": qs[0].text, "voice": "CLE_Naghma1", "rate": 0, "volume": 100 })
+            const ttsRes = await textTotSpeechApi({ "text": cleared_text, "voice": "CLE_Naghma1", "rate": 0, "volume": 100 })
             console.log("ttsRes", ttsRes)
 
             if (ttsRes && ttsRes.response && ttsRes.response.status == 'ok') {
@@ -65,7 +65,7 @@ export async function getQueriesAnswers(){
                 last_unread_msgs[el.id] = { "is_question": false, "encodedFile": ttsRes.response.encodedFile }
                 setTimeout(() => {
                     this.setState({ "last_unread_msgs":last_unread_msgs })
-                    this.playMessageHandler(ttsRes.response.encodedFile)
+                    this.playMessageHandler(ttsRes.response.encodedFile, false)
                 },500)
             }
         }
@@ -75,12 +75,21 @@ export async function getQueriesAnswers(){
     });
 }
 
-export async function playMessage(url, is_path=false) {
+export async function onClickChatTextPanel(text){
+    const ttsRes = await textTotSpeechApi({ "text": text, "voice": "CLE_Naghma1", "rate": 0, "volume": 100 })
+    if (ttsRes && ttsRes.response && ttsRes.response.status == 'ok') {
+        setTimeout(() => {
+            this.playMessageHandler(ttsRes.response.encodedFile, false, )
+        },500)
+    }
+}
+
+export async function playMessageHandler(url, is_path=false) {
     if(!is_path){
         const path = `${RNFS.DocumentDirectoryPath}/test_audio_file.wav`;
         await RNFS.writeFile(path, url.replace("data:audio/wav;base64,", ""), 'base64')
             .then(() => {
-                console.log("Path:", path)
+                if(this.sound) this.sound.stop()
                 this.sound = new Sound(path, '', () => {
                     this.sound.play((r) => {
                         // console.log("message play success:", r)
@@ -88,6 +97,7 @@ export async function playMessage(url, is_path=false) {
                 })
             })
     }else{
+        if(this.sound) this.sound.stop()
         this.sound = new Sound(url, '', () => {
             this.sound.play((r) => {
                 // console.log("message play success:", r)

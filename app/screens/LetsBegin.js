@@ -5,10 +5,8 @@ import { connect } from 'react-redux';
 import { theme } from './../constants/theme';
 import { hp, uid, wp } from './../utils';
 import AudioRecord from 'react-native-audio-record';
-import { base64ToBlobFetch, checkMicrophone, getQueriesAnswers, playMessage, run_scripts, onMicClick, textToSpeech } from '../api/methods';
+import { base64ToBlobFetch, checkMicrophone, getQueriesAnswers, playMessageHandler, run_scripts, onMicClick, textToSpeech, onClickChatTextPanel } from '../api/methods';
 import { Logo, MicIcon } from '../constants/images';
-import { B64ANDROID } from '../api/test';
-import { decode as atob } from 'base-64';
 const utf8 = require('utf8');
 
 const BASE_URL = "wss://tech.cle.org.pk:9991/client/ws/speech?content-type=audio/x-raw,+layout=(string)interleaved,+rate=(int)16000,+format=(string)S16LE,+channels=(int)1,+token=852d4287-aaec-4298-bf32-f86d0d545ddf";
@@ -16,14 +14,15 @@ const BASE_URL = "wss://tech.cle.org.pk:9991/client/ws/speech?content-type=audio
 class LetsBegin extends React.Component {
     constructor(props) {
         super(props)
-        this.ws = { readyState: 3 };
+        // this.ws = { readyState: 3 };
         this.sound = null;
         this.ws = new WebSocket(BASE_URL);
         this.getQueriesAnswers = getQueriesAnswers.bind(this);
+        this.onClickChatTextPanel = onClickChatTextPanel.bind(this);
 
         this.onMicClickHandler = onMicClick.bind(this);
         this.textToSpeechHandler = textToSpeech.bind(this);
-        this.playMessageHandler = playMessage.bind(this);
+        this.playMessageHandler = playMessageHandler.bind(this);
         this.state = {
             "loader": false,
             "is_recording": false,
@@ -31,8 +30,11 @@ class LetsBegin extends React.Component {
             "last_id": false,
             "last_ids_list": {},
             "chat_list": {
+                // "asdadsadasdasas": { "recipient_id": "2", "is_question": true, "text": "ای خدمت میں خوش آمدید۔ آپ کو کس سروس سے متعلق معلومات  چاہئیں؟" },
+                // "asdadsadasdas": { "recipient_id": "1", "text": "ای خدمت میں خوش آمدید۔ آپ کو کس سروس سے متعلق معلومات  چاہئیں؟" }
             },
-            "last_unread_msgs": {}
+            "last_unread_msgs": {},
+            "play_text_id":false
         }
     }
 
@@ -50,7 +52,7 @@ class LetsBegin extends React.Component {
         this.socketListners()
     }
 
-    async componentWillUnmount(){
+    async componentWillUnmount() {
         this.ws = { readyState: 3 };
         this.sound = null;
         await AudioRecord.stop()
@@ -68,15 +70,12 @@ class LetsBegin extends React.Component {
     async onAudioStreaming(data) {
         try {
             var chunk = null
-            if(Platform.OS == 'android'){
+            if (Platform.OS == 'android') {
                 chunk = await run_scripts(data);
-            }else{
+            } else {
                 chunk = await base64ToBlobFetch(data);
             }
-            // const chunk = await Platform.OS === 'ios' ? base64ToBlobFetch(data) : run_scripts(data)
-            console.log(chunk)
-            // const chunk = await run_scripts(data)
-            if(chunk){
+            if (chunk) {
                 if (this.ws.readyState == 1) {
                     this.ws.send(chunk)
                 } else {
@@ -116,46 +115,9 @@ class LetsBegin extends React.Component {
         }
     }
 
-    utf8_from_str(s) {
-        for(var i=0, enc = encodeURIComponent(s), a = []; i < enc.length;) {
-            if(enc[i] === '%') {
-                a.push(parseInt(enc.substr(i+1, 2), 16))
-                i += 3
-            } else {
-                a.push(enc.charCodeAt(i++))
-            }
-        }
-        return a
-    }
-
     onOpen(e) {
         console.log("On Open:", e)
         this.setState({ "socket_status": 1 })
-
-        // B64ANDROID.forEach(async (el) => {
-
-        //     // console.log(el.toString("utf8"))
-
-        //     // const a = await base64ToBlobFetch(el)
-
-        //     // const byteCharacters = atob(utf8.encode(string));
-        //     // const byteCharacters = atob(el);
-        //     // // console.log(byteCharacters)
-        //     // const byteNumbers = new Array(byteCharacters.length);
-        //     // for (let i = 0; i < byteCharacters.length; i++) {
-        //     //     byteNumbers[i] = byteCharacters.charCodeAt(i);
-        //     // }
-        //     // const byteArray = new Uint16Array(this.utf8_from_str(el));
-        //     const blob = new Blob([this.utf8_from_str(el)], { type: 'audio/x-raw' });
-
-        //     // const blob = await run_scripts(el)
-        //     // const blob = this.utf8_from_str(el)
-        //     console.log(blob)
-        //     this.ws.send(blob)
-        //     if (B64ANDROID.length == 14) {
-        //         ws.send("EOS")
-        //     }
-        // });
     }
 
     onError(e) {
@@ -164,8 +126,14 @@ class LetsBegin extends React.Component {
     }
 
     onClose(e) {
+        const { is_recording } = this.state;
         console.log("On Close:", e)
         this.setState({ "socket_status": 3 })
+        // if (!is_recording) {
+        //     setTimeout(() => {
+        //         this.ws = new WebSocket(BASE_URL);
+        //     }, 1000)
+        // }
     }
 
     getStatus(id) {
@@ -185,20 +153,16 @@ class LetsBegin extends React.Component {
     }
 
     render() {
-        const { is_recording, chat_list, loader, socket_status } = this.state;
+        const { is_recording, chat_list, loader, socket_status, play_text_id } = this.state;
 
         return (<>
             <View style={styles.safeArea}>
                 <View style={styles.mainView}>
                     <View style={styles.v02}>
-                        <View style={{ width: wp('78'), justifyContent:'center', }}>
+                        <View style={{ width: wp('78'), justifyContent: 'center', }}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
                                 {this.getStatusIcon(socket_status)}<Text style={styles.letsBeginText}>{"ای خدمت مرکز"} </Text>
                             </View>
-                            {/* <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'flex-end' }}>
-                                <Text style={styles.notesText}>{`(${this.getStatus(socket_status)})`} </Text>{this.getStatusIcon(socket_status)}
-                                
-                            </View> */}
                         </View>
 
                         <TouchableOpacity
@@ -212,10 +176,6 @@ class LetsBegin extends React.Component {
 
                     <View style={styles.v01}>
                         <ScrollView
-                            // contentContainerStyle={{
-                            // justifyContent: 'flex-end',
-                            // height: '100%',
-                            // }}
                             contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', flexDirection: 'column' }}
 
                             style={{ width: wp('98') }}
@@ -237,9 +197,11 @@ class LetsBegin extends React.Component {
                                             <TouchableOpacity
                                                 style={styles.chatTextView(is)}
                                                 onPress={() => {
-
+                                                    // this.setState({ "play_text_id":a });
+                                                    this.onClickChatTextPanel(c.text)
                                                 }}>
                                                 <Text style={styles.chatTxt(is)}>{c.text}</Text>
+                                                {/* { a == play_text_id && <ActivityIndicator color={"#fff"}/> } */}
                                             </TouchableOpacity>
                                             {is ? <>
                                                 <View style={{ width: wp('2') }} />
@@ -259,17 +221,13 @@ class LetsBegin extends React.Component {
                     <View style={styles.askBtnView}>
                         <TouchableOpacity
                             style={styles.autoDetectBtn(is_recording)}
-                            // onPress={async () => {
-                            //     await this.onMicClickHandler()
-                            // }}
-                            onPressIn={async()=>{
+                            onPressIn={async () => {
                                 await this.onMicClickHandler()
                             }}
-                            onPressOut={async()=>{
+                            onPressOut={async () => {
                                 await this.onMicClickHandler()
                             }}>
                             <View style={styles.autoDetectBtnInnerRow}>
-                                {/* <Text style={styles.autoDetectBtnText(is_recording)}>{is_recording ? "Stop" : "Ask?"}</Text> */}
                                 <Image source={MicIcon} style={styles.autoDetectBtnIcon(is_recording)} />
                             </View>
                         </TouchableOpacity>
@@ -308,7 +266,7 @@ const styles = StyleSheet.create({
         textAlign: 'right',
         color: theme.primary,
         marginTop: hp('4', '0.5'),
-        fontFamily:theme.font01
+        fontFamily: theme.font01
     },
     notesText: {
         fontSize: 16,
@@ -362,7 +320,12 @@ const styles = StyleSheet.create({
         backgroundColor: is ? 'pink' : 'green',
         padding: hp('1')
     }),
-    chatTxt: (is) => ({ fontSize: 14, textAlign: is ? 'right' : 'left', color: is ? '#333' : 'white' }),
+    chatTxt: (is) => ({
+        fontSize: 18,
+        textAlign: 'right',
+        color: is ? '#333' : 'white',
+        fontFamily: theme.font01
+    }),
     askBtnView: {
         width: '100%',
         position: 'absolute',

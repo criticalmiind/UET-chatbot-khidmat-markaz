@@ -25,6 +25,8 @@ target 'EKhidmatMarkaz' do
 
   pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-community/async-storage'
 
+  pod 'CodePush', :path => '../node_modules/react-native-code-push'
+
   target 'EKhidmatMarkazTests' do
     inherit! :complete
     # Pods for testing
