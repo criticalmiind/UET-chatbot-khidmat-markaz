@@ -1,25 +1,42 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, ScrollView, ActivityIndicator, Image, Platform } from 'react-native';
+import {
+    TouchableOpacity,
+    StyleSheet,
+    Text,
+    View,
+    ScrollView,
+    ActivityIndicator,
+    Image,
+    Platform
+} from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from './../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from './../constants/theme';
-import { hp, uid, wp } from './../utils';
-import AudioRecord from 'react-native-audio-record';
-import { base64ToBlobFetch, checkMicrophone, getQueriesAnswers, playMessageHandler, run_scripts, onMicClick, textToSpeech, onClickChatTextPanel } from '../api/methods';
+import { hp, isNullRetNull, uid, wp } from './../utils';
+import AudioRecord from 'react-native-audio-recording-stream';
+import {
+    base64ToBlobFetch,
+    checkMicrophone,
+    getQueriesAnswers,
+    playMessageHandler,
+    run_scripts,
+    onMicClick,
+    textToSpeech,
+    onClickChatTextPanel
+} from '../api/methods';
 import { Logo, MicIcon } from '../constants/images';
-const utf8 = require('utf8');
-
-const BASE_URL = "wss://tech.cle.org.pk:9991/client/ws/speech?content-type=audio/x-raw,+layout=(string)interleaved,+rate=(int)16000,+format=(string)S16LE,+channels=(int)1,+token=852d4287-aaec-4298-bf32-f86d0d545ddf";
+import { SOCKET_URL } from '../api';
+import { B64ANDROID } from '../api/test';
+import { Buffer } from 'buffer'
 
 class LetsBegin extends React.Component {
     constructor(props) {
         super(props)
         // this.ws = { readyState: 3 };
         this.sound = null;
-        this.ws = new WebSocket(BASE_URL);
+        this.ws = new WebSocket(SOCKET_URL);
         this.getQueriesAnswers = getQueriesAnswers.bind(this);
         this.onClickChatTextPanel = onClickChatTextPanel.bind(this);
-
         this.onMicClickHandler = onMicClick.bind(this);
         this.textToSpeechHandler = textToSpeech.bind(this);
         this.playMessageHandler = playMessageHandler.bind(this);
@@ -29,12 +46,10 @@ class LetsBegin extends React.Component {
             "socket_status": 3,
             "last_id": false,
             "last_ids_list": {},
-            "chat_list": {
-                // "asdadsadasdasas": { "recipient_id": "2", "is_question": true, "text": "ای خدمت میں خوش آمدید۔ آپ کو کس سروس سے متعلق معلومات  چاہئیں؟" },
-                // "asdadsadasdas": { "recipient_id": "1", "text": "ای خدمت میں خوش آمدید۔ آپ کو کس سروس سے متعلق معلومات  چاہئیں؟" }
-            },
+            "chat_list": {},
             "last_unread_msgs": {},
-            "play_text_id":false
+            "play_text_id": false,
+            "temp_text": ""
         }
     }
 
@@ -44,9 +59,11 @@ class LetsBegin extends React.Component {
             channels: 1,        // 1 or 2, default 1
             bitsPerSample: 16,  // 8 or 16, default 16
             // audioSource: 6,     // android only (see below)
-            wavFile: 'onMessage.wav' // default 'audio.wav'
+            wavFile: 'onMessage.wav', // default 'audio.wav'
+            chunkSize: 4096, //8192
         };
         let audioPermission = await checkMicrophone();
+
         AudioRecord.init(options);
         AudioRecord.on('data', this.onAudioStreaming.bind(this));
         this.socketListners()
@@ -75,13 +92,14 @@ class LetsBegin extends React.Component {
             } else {
                 chunk = await base64ToBlobFetch(data);
             }
+            // console.log({ "size":chunk.size, "chunk": chunk, "data": data })
             if (chunk) {
                 if (this.ws.readyState == 1) {
                     this.ws.send(chunk)
                 } else {
                     if (this.ws.readyState == 3) {
-                        this.ws = null
-                        this.ws = new WebSocket(BASE_URL);
+                        this.ws = { readyState: 3 };
+                        this.ws = new WebSocket(SOCKET_URL);
                         this.socketListners()
                         this.ws.send(chunk)
                     }
@@ -93,25 +111,29 @@ class LetsBegin extends React.Component {
     }
 
     onMessage(e) {
-        const { chat_list, last_id, last_ids_list } = this.state;
+        const { chat_list, last_id, last_ids_list, temp_text, is_recording } = this.state;
+        if (!is_recording) return;
         var data = e.data;
-        var res = JSON.parse(data);
-        console.log("On Message: ", res)
+        var json = JSON.parse(data);
+        if (json.result) {
+            console.log("On Message: ", json)
+            const { final, hypotheses = [] } = json.result;
+            let res = hypotheses[0]
 
-        if (res.result) {
-            const { final = false, hypotheses = [] } = res.result;
-            let msgObj = hypotheses[0]
+            let text = `${temp_text} ${res.transcript}`
+            let final_text = final ? `${temp_text} ${res.transcript}` : isNullRetNull(temp_text, res.transcript)
 
             const unique_id = last_id ? last_id : uid();
-            chat_list[unique_id] = { "is_question": true, "text": msgObj.transcript }
+            chat_list[unique_id] = { "is_question": true, "text": final ? final_text : text }
             last_ids_list[unique_id] = chat_list[unique_id];
 
             this.setState({
+                "temp_text": final ? text : temp_text,
                 "chat_list": chat_list,
-                "last_id": final ? false : unique_id,
+                "last_id": unique_id,
                 "last_ids_list": last_ids_list
             })
-            if (final) this.ws.close();
+            // if (final) this.ws.close();
         }
     }
 
@@ -126,14 +148,8 @@ class LetsBegin extends React.Component {
     }
 
     onClose(e) {
-        const { is_recording } = this.state;
         console.log("On Close:", e)
         this.setState({ "socket_status": 3 })
-        // if (!is_recording) {
-        //     setTimeout(() => {
-        //         this.ws = new WebSocket(BASE_URL);
-        //     }, 1000)
-        // }
     }
 
     getStatus(id) {
@@ -225,7 +241,9 @@ class LetsBegin extends React.Component {
                                 await this.onMicClickHandler()
                             }}
                             onPressOut={async () => {
-                                await this.onMicClickHandler()
+                                setTimeout(async () => {
+                                    await this.onMicClickHandler()
+                                }, 100)
                             }}>
                             <View style={styles.autoDetectBtnInnerRow}>
                                 <Image source={MicIcon} style={styles.autoDetectBtnIcon(is_recording)} />

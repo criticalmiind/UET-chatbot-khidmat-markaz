@@ -27,6 +27,9 @@ target 'EKhidmatMarkaz' do
 
   pod 'CodePush', :path => '../node_modules/react-native-code-push'
 
+
+  pod 'RNAudioRecord', :path => '../node_modules/react-native-audio-recording-stream'
+
   target 'EKhidmatMarkazTests' do
     inherit! :complete
     # Pods for testing

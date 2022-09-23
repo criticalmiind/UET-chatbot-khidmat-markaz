@@ -1,7 +1,7 @@
 import { PermissionsAndroid, Alert, Platform, NativeModules } from 'react-native';
-import AudioRecord from "react-native-audio-record";
+import AudioRecord from "react-native-audio-recording-stream";
 import { isNullRetNull, simplify, uid } from "../utils";
-import { askQuestionApi, speechToTextApi, textTotSpeechApi } from './index';
+import { askQuestionApi, textTotSpeechApi } from './index';
 import Sound from "react-native-sound";
 var RNFS = require('react-native-fs');
 
@@ -24,16 +24,21 @@ export async function onMicClick() {
     const { is_recording } = this.state;
     let audioPermission = await checkMicrophone();
     if (audioPermission) {
-        this.setState({ "is_recording": !is_recording })
         if (!is_recording) {
-            AudioRecord.start();
+            this.setState({ "is_recording": !is_recording, "last_id":uid() })
             if(this.sound) this.sound.stop()
+            AudioRecord.start();
         } else {
+            this.setState({
+                "is_recording": false,
+                "last_id":false,
+                "temp_text":""
+            })
             let audioFile = await AudioRecord.stop();
             // if(this.ws.readyState == 1) this.ws.send("EOS")
             setTimeout(() => {
                 this.getQueriesAnswers()
-            }, 500);
+            }, 200);
         }
     } else {
         Alert.alert("Please Allow audio permission and try again!")
@@ -46,10 +51,7 @@ export async function getQueriesAnswers(){
 
     let ids_list = Object.entries(last_ids_list).map(e=>({ "id":e[0], ...e[1] }))
     ids_list.forEach(async(el) => {
-        // console.log("el", el)
         const qs = await askQuestionApi({ "message": el.text })
-        console.log("qs", qs)
-
         if (qs.length > 0) {
             let cleared_text = isNullRetNull(qs[0].text,"").split("!")[0]
 
@@ -58,7 +60,6 @@ export async function getQueriesAnswers(){
             this.setState({ "chat_list":chat_list })
 
             const ttsRes = await textTotSpeechApi({ "text": cleared_text, "voice": "CLE_Naghma1", "rate": 0, "volume": 100 })
-            console.log("ttsRes", ttsRes)
 
             if (ttsRes && ttsRes.response && ttsRes.response.status == 'ok') {
 
@@ -70,7 +71,11 @@ export async function getQueriesAnswers(){
             }
         }
         setTimeout(() => {
-            this.setState({ "last_ids_list":{} })
+            this.setState({
+                "last_ids_list":{},
+                "last_id":false,
+                "temp_text":""
+            })
         }, 500);
     });
 }
@@ -92,7 +97,6 @@ export async function playMessageHandler(url, is_path=false) {
                 if(this.sound) this.sound.stop()
                 this.sound = new Sound(path, '', () => {
                     this.sound.play((r) => {
-                        // console.log("message play success:", r)
                     })
                 })
             })
@@ -100,7 +104,6 @@ export async function playMessageHandler(url, is_path=false) {
         if(this.sound) this.sound.stop()
         this.sound = new Sound(url, '', () => {
             this.sound.play((r) => {
-                // console.log("message play success:", r)
             })
         })
     }
@@ -109,7 +112,6 @@ export async function playMessageHandler(url, is_path=false) {
 export async function textToSpeech(text, voice = 'CLE_Naghma1') {
     const { chat_list } = this.state;
     let ttsRes = await textTotSpeechApi({ "text": text, "voice": voice, "rate": 0, "volume": 100 })
-    console.log("Text To Speech Respnse:", ttsRes)
     if (simplify(ttsRes.response.status) == 'ok') {
         chat_list.push({
             "is_question": false,

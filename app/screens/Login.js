@@ -60,7 +60,7 @@ class Login extends React.Component {
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
-                <Text style={styles.version}>V.1.0.1</Text>
+                <Text style={styles.version}>V.1.0.0</Text>
             </View>
         </>);
     }
