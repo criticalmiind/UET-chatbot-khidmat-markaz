@@ -62,6 +62,14 @@ subprojects { subproject ->
 ```
 
 
+## Author
+
+* **GitHub** - [Shawal Ahmad Mohmand](https://github.com/criticalmiind)
+* **YouTube** - [Shawal Ahmad Mohmand Official](https://www.youtube.com/c/ShawalAhmadMohmandOfficail)
+* **LinkedIn** - [Shawal Ahmad Mohmand](https://www.linkedin.com/in/shawalahmad/)
+* **Facebook Page** - [Shawal Ahmad Mohmand Official](https://web.facebook.com/ShawalAhmadOfficialPage)
+
+
 
 
 
