@@ -1,4 +1,4 @@
-# UET-chatbot-khidmat-markaz
+ # UET-chatbot-khidmat-markaz
 
 ## React Native Development Env Requirements:
 1. VS code
@@ -15,12 +15,25 @@
 ## Project Setup:
 1. Clone Project From Github: ```https://github.com/criticalmiind/UET-chatbot-khidmat-markaz.git```
 2. cd project directory ``` cd  UET-chatbot-khidmat-markaz ```
-3. execute commands one by one to run project:
+3. execute commands one by one to install dependancies:
     ```bash
     npm install # install packages
     react-native link # link libraries
+
+    # For IOS dependancies
     cd ios && pod install && cd ../ # goto ios folder and install pod packages if you want to run ios
+    ```
+
+## Run Project:
+1. Follow instraction to run project:
+    ```bash
+    npm run start # run packager in terminal and then open new terminal
+    # To Run Project on Android:
+    # Open android Studio and run emulator and then execute:
     npm run android # run project on android device or simulator
+    
+    
+    # To Run Project on IOS:
     npm run ios # run project on ios device or simulator
     ```
 
@@ -32,7 +45,7 @@
     # apk file path will be: EKhidmatMarkaz/android/app/build/outputs/apk/release/app-release.apk
 
     # or
-    ./gradlew assembleRelease # for for building abb file
+    ./gradlew bundleRelease # for for building abb file
     ```
 
 ## Android Issues:
