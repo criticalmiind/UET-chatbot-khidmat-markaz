@@ -74,3 +74,5 @@ subprojects { subproject ->
 
 
 # Junks
+
+<!-- adb shell input keyevent 82 -->

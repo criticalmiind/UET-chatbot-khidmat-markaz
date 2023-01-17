@@ -7,39 +7,43 @@ import {
     ScrollView,
     ActivityIndicator,
     Image,
-    Platform
+    Platform,
+    BackHandler
 } from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from './../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from './../constants/theme';
-import { hp, isNullRetNull, uid, wp } from './../utils';
+import { getAsrLink, get_resource, hp, isNullRetNull, notify, uid, wp } from './../utils';
 import AudioRecord from 'react-native-audio-recording-stream';
 import {
-    base64ToBlobFetch,
-    checkMicrophone,
-    getQueriesAnswers,
-    playMessageHandler,
-    run_scripts,
-    onMicClick,
-    textToSpeech,
-    onClickChatTextPanel
+    base64_into_blob,
+    check_microphone,
+    get_query_answers,
+    play_message_handler,
+    on_mic_click,
+    text_to_speech,
+    on_click_chat_text_panel,
+    close_connection
 } from '../api/methods';
 import { Logo, MicIcon } from '../constants/images';
-import { SOCKET_URL } from '../api';
-import { B64ANDROID } from '../api/test';
-import { Buffer } from 'buffer'
+import { call_asr_manager, dialogue_manager, method, run_scripts, tts_manager } from '../api';
+import Loader from '../components/Loader';
 
 class LetsBegin extends React.Component {
     constructor(props) {
         super(props)
-        // this.ws = { readyState: 3 };
+        this.get_resource = get_resource.bind(this);
+        this.tts_manager = tts_manager.bind(this);
+        this.close_connection = close_connection.bind(this);
+        this.dialogue_manager = dialogue_manager.bind(this);
         this.sound = null;
-        this.ws = new WebSocket(SOCKET_URL);
-        this.getQueriesAnswers = getQueriesAnswers.bind(this);
-        this.onClickChatTextPanel = onClickChatTextPanel.bind(this);
-        this.onMicClickHandler = onMicClick.bind(this);
-        this.textToSpeechHandler = textToSpeech.bind(this);
-        this.playMessageHandler = playMessageHandler.bind(this);
+        this.ws = { readyState: 3 };
+        // this.ws = new WebSocket(this.get_resource('asr'));
+        this.get_query_answers = get_query_answers.bind(this);
+        this.on_click_chat_text_panel = on_click_chat_text_panel.bind(this);
+        this.on_mic_click = on_mic_click.bind(this);
+        this.text_to_speech = text_to_speech.bind(this);
+        this.play_message_handler = play_message_handler.bind(this);
         this.state = {
             "loader": false,
             "is_recording": false,
@@ -54,6 +58,18 @@ class LetsBegin extends React.Component {
     }
 
     async UNSAFE_componentWillMount() {
+
+        BackHandler.addEventListener('hardwareBackPress', (async function () {
+            this.setState({ "screen_loader":true, "loader_message":"Closing Connection" })
+            const res = await this.close_connection()
+            this.setState({ "screen_loader":false, "loader_message":false })
+            notify({"title":res.resultFlag?'Success':'Failed', "message":`${res.message}`})
+            this.props.updateRedux({ resources:{} })
+            this.props.navigation.goBack()
+            // return false;
+        }).bind(this));
+        
+
         const options = {
             sampleRate: 16000,  // default 44100
             channels: 1,        // 1 or 2, default 1
@@ -62,7 +78,7 @@ class LetsBegin extends React.Component {
             wavFile: 'onMessage.wav', // default 'audio.wav'
             chunkSize: 4096, //8192
         };
-        let audioPermission = await checkMicrophone();
+        let audioPermission = await check_microphone();
 
         AudioRecord.init(options);
         AudioRecord.on('data', this.onAudioStreaming.bind(this));
@@ -90,7 +106,7 @@ class LetsBegin extends React.Component {
             if (Platform.OS == 'android') {
                 chunk = await run_scripts(data);
             } else {
-                chunk = await base64ToBlobFetch(data);
+                chunk = await base64_into_blob(data);
             }
             // console.log({ "size":chunk.size, "chunk": chunk, "data": data })
             if (chunk) {
@@ -99,14 +115,14 @@ class LetsBegin extends React.Component {
                 } else {
                     if (this.ws.readyState == 3) {
                         this.ws = { readyState: 3 };
-                        this.ws = new WebSocket(SOCKET_URL);
+                        this.ws = new WebSocket(this.get_resource('asr'));
                         this.socketListners()
                         this.ws.send(chunk)
                     }
                 }
             }
         } catch (error) {
-            console.log(error)
+            console.log("onAudioStreaming", error)
         }
     }
 
@@ -116,7 +132,7 @@ class LetsBegin extends React.Component {
         var data = e.data;
         var json = JSON.parse(data);
         if (json.result) {
-            console.log("On Message: ", json)
+            // console.log("On Message: ", json)
             const { final, hypotheses = [] } = json.result;
             let res = hypotheses[0]
 
@@ -139,7 +155,7 @@ class LetsBegin extends React.Component {
 
     onOpen(e) {
         console.log("On Open:", e)
-        this.setState({ "socket_status": 1 })
+        this.setState({ "socket_status": 1, "loader": false })
     }
 
     onError(e) {
@@ -169,9 +185,11 @@ class LetsBegin extends React.Component {
     }
 
     render() {
-        const { is_recording, chat_list, loader, socket_status, play_text_id } = this.state;
+        const { is_recording, chat_list, screen_loader=false, loader_message=false, loader, socket_status, play_text_id } = this.state;
+        const { resources } = this.props;
 
         return (<>
+            <Loader isShow={screen_loader} mesasge={loader_message}/>
             <View style={styles.safeArea}>
                 <View style={styles.mainView}>
                     <View style={styles.v02}>
@@ -214,7 +232,7 @@ class LetsBegin extends React.Component {
                                                 style={styles.chatTextView(is)}
                                                 onPress={() => {
                                                     // this.setState({ "play_text_id":a });
-                                                    this.onClickChatTextPanel(c.text)
+                                                    this.on_click_chat_text_panel(c.text)
                                                 }}>
                                                 <Text style={styles.chatTxt(is)}>{c.text}</Text>
                                                 {/* { a == play_text_id && <ActivityIndicator color={"#fff"}/> } */}
@@ -229,6 +247,7 @@ class LetsBegin extends React.Component {
                                 })
                             }
                             {loader && <ActivityIndicator size="large" color={"blue"} />}
+                            {(is_recording && !loader) && <Text style={{ textAlign:'center' }}>Speak Now</Text>}
                         </ScrollView>
                     </View>
 
@@ -238,12 +257,29 @@ class LetsBegin extends React.Component {
                         <TouchableOpacity
                             style={styles.autoDetectBtn(is_recording)}
                             onPressIn={async () => {
-                                await this.onMicClickHandler()
+                                this.setState({ "loader": true })
+                                let res = await call_asr_manager({ "function": method["openAsrConnection"], "connectionId": this.get_resource("cid") })
+                                if (res.resultFlag) {
+                                    this.ws = new WebSocket(getAsrLink(res.asrModel), this.get_resource("cid"));
+                                    resources['asrModel'] = res.asrModel
+                                    this.props.updateRedux({ "resources": resources })
+                                    setTimeout(() => {
+                                        // this.setState({ "loader" :false})
+                                        this.on_mic_click()
+                                    }, 500)
+                                } else {
+                                    notify({ "title": "Failed!", "message": res.message, "success": false })
+                                    this.props.navigation.goBack()
+                                }
                             }}
                             onPressOut={async () => {
                                 setTimeout(async () => {
-                                    await this.onMicClickHandler()
+                                    await this.on_mic_click()
                                 }, 100)
+                                // setTimeout(async () => {
+                                //     resources['asrModel'] = false
+                                //     this.props.updateRedux({ "resources":resources })
+                                // },300)
                             }}>
                             <View style={styles.autoDetectBtnInnerRow}>
                                 <Image source={MicIcon} style={styles.autoDetectBtnIcon(is_recording)} />

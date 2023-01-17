@@ -1,11 +1,11 @@
-import { PermissionsAndroid, Alert, Platform, NativeModules } from 'react-native';
+import { PermissionsAndroid, Alert, Platform } from 'react-native';
 import AudioRecord from "react-native-audio-recording-stream";
-import { isNullRetNull, simplify, uid } from "../utils";
-import { askQuestionApi, textTotSpeechApi } from './index';
+import { isNullRetNull, jsonParse, simplify, uid } from "../utils";
 import Sound from "react-native-sound";
+import { call_application_manager, method } from '.';
 var RNFS = require('react-native-fs');
 
-export const checkMicrophone = async () => {
+export const check_microphone = async () => {
     if (Platform.OS == 'android') {
         var result = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
         if (!result) {
@@ -18,26 +18,26 @@ export const checkMicrophone = async () => {
     }
 };
 
-export const base64ToBlobFetch = (base64, type = 'audio/x-raw') => fetch(`data:${type};base64,${base64}`).then(res => res.blob())
+export const base64_into_blob = (base64, type = 'audio/x-raw') => fetch(`data:${type};base64,${base64}`).then(res => res.blob())
 
-export async function onMicClick() {
+export async function on_mic_click() {
     const { is_recording } = this.state;
-    let audioPermission = await checkMicrophone();
+    let audioPermission = await check_microphone();
     if (audioPermission) {
         if (!is_recording) {
-            this.setState({ "is_recording": !is_recording, "last_id":uid() })
-            if(this.sound) this.sound.stop()
+            this.setState({ "is_recording": !is_recording, "last_id": uid() })
+            if (this.sound) this.sound.stop()
             AudioRecord.start();
         } else {
+            this.ws.send("eos")
             this.setState({
                 "is_recording": false,
-                "last_id":false,
-                "temp_text":""
+                "last_id": false,
+                "temp_text": ""
             })
             let audioFile = await AudioRecord.stop();
-            // if(this.ws.readyState == 1) this.ws.send("EOS")
             setTimeout(() => {
-                this.getQueriesAnswers()
+                this.get_query_answers()
             }, 200);
         }
     } else {
@@ -46,62 +46,69 @@ export async function onMicClick() {
     return false
 }
 
-export async function getQueriesAnswers(){
+export async function get_query_answers() {
     const { last_unread_msgs, chat_list, last_ids_list } = this.state;
 
-    let ids_list = Object.entries(last_ids_list).map(e=>({ "id":e[0], ...e[1] }))
-    ids_list.forEach(async(el) => {
-        const qs = await askQuestionApi({ "message": el.text })
-        if (qs.length > 0) {
-            let cleared_text = isNullRetNull(qs[0].text,"").split("!")[0]
+    let ids_list = Object.entries(last_ids_list).map(e => ({ "id": e[0], ...e[1] }))
+    ids_list.forEach(async (el) => {
+        const qs = await this.dialogue_manager({ "message": el.text })
+        if (qs.resultFlag) {
+            // let cleared_text = isNullRetNull(qs.textResponse,"").split("!")[0]
+            let cleared_text = isNullRetNull(qs.textResponse, "")
 
             const unique_id = uid();
             chat_list[unique_id] = { "is_question": false, "text": cleared_text }
-            this.setState({ "chat_list":chat_list })
+            this.setState({ "chat_list": chat_list })
 
-            const ttsRes = await textTotSpeechApi({ "text": cleared_text, "voice": "CLE_Naghma1", "rate": 0, "volume": 100 })
+            const ttsRes = await this.tts_manager({ "message": cleared_text })
 
-            if (ttsRes && ttsRes.response && ttsRes.response.status == 'ok') {
+            if (ttsRes.resultFlag) {
+                let audioResponse = jsonParse(ttsRes.audioResponse)
 
-                last_unread_msgs[el.id] = { "is_question": false, "encodedFile": ttsRes.response.encodedFile }
+                console.log(audioResponse)
+
+                let encodedFile = audioResponse.response.encodedFile
+                last_unread_msgs[el.id] = { "is_question": false, "encodedFile": encodedFile }
                 setTimeout(() => {
-                    this.setState({ "last_unread_msgs":last_unread_msgs })
-                    this.playMessageHandler(ttsRes.response.encodedFile, false)
-                },500)
+                    this.setState({ "last_unread_msgs": last_unread_msgs })
+                    this.play_message_handler(encodedFile, false)
+                }, 500)
             }
         }
         setTimeout(() => {
             this.setState({
-                "last_ids_list":{},
-                "last_id":false,
-                "temp_text":""
+                "last_ids_list": {},
+                "last_id": false,
+                "temp_text": ""
             })
         }, 500);
     });
 }
 
-export async function onClickChatTextPanel(text){
-    const ttsRes = await textTotSpeechApi({ "text": text, "voice": "CLE_Naghma1", "rate": 0, "volume": 100 })
+export async function on_click_chat_text_panel(text) {
+    const ttsRes = await this.tts_manager({ "text": text })
     if (ttsRes && ttsRes.response && ttsRes.response.status == 'ok') {
         setTimeout(() => {
-            this.playMessageHandler(ttsRes.response.encodedFile, false, )
-        },500)
+            this.play_message_handler(ttsRes.response.encodedFile, false,)
+        }, 500)
     }
 }
 
-export async function playMessageHandler(url, is_path=false) {
-    if(!is_path){
+export async function play_message_handler(url, is_path = false) {
+    const { is_recording } = this.state
+    if (!is_recording) return
+    if (!is_path) {
         const path = `${RNFS.DocumentDirectoryPath}/test_audio_file.wav`;
         await RNFS.writeFile(path, url.replace("data:audio/wav;base64,", ""), 'base64')
             .then(() => {
-                if(this.sound) this.sound.stop()
+                if (this.sound) this.sound.stop()
                 this.sound = new Sound(path, '', () => {
                     this.sound.play((r) => {
                     })
                 })
             })
-    }else{
-        if(this.sound) this.sound.stop()
+    } else {
+        if (this.sound) this.sound.stop()
         this.sound = new Sound(url, '', () => {
             this.sound.play((r) => {
             })
@@ -109,25 +116,22 @@ export async function playMessageHandler(url, is_path=false) {
     }
 }
 
-export async function textToSpeech(text, voice = 'CLE_Naghma1') {
+export async function text_to_speech(text) {
     const { chat_list } = this.state;
-    let ttsRes = await textTotSpeechApi({ "text": text, "voice": voice, "rate": 0, "volume": 100 })
+    let ttsRes = await this.tts_manager({ "text": text })
     if (simplify(ttsRes.response.status) == 'ok') {
-        chat_list.push({
-            "is_question": false,
-            "text": text
-        })
+        chat_list.push({ "is_question": false, "text": text })
         this.setState({ chat_list })
     }
 }
 
-export async function run_scripts(string) {
-    const rawResponse = await fetch(`http://lovopyda.pythonanywhere.com/`, {
-    // const rawResponse = await fetch(`http://192.168.1.193:8000/`, {
-        method: 'POST',
-        headers: { 'Content-Type':'application/json' },
-        body: JSON.stringify({ "base64": string })
-    })
-    const content = await rawResponse.blob();
-    return content;
+export async function close_connection() {
+    const { session } = this.props.userData;
+    let obj = { "function": method["closeConnection"], "sessionId":session, "connectionId":this.get_resource('cid') }
+    try {
+        let res = await call_application_manager(obj)
+        return res
+    } catch (error) {
+        return { "resultFlag":false, "message":`${error}` }
+    }
 }

@@ -1,6 +1,29 @@
 import { Alert, Platform } from "react-native";
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
 
+export function getAsrLink(asrModel, connectionId) {
+  return `${asrModel}content-type=audio/x-raw,+layout=(string)interleaved,+rate=(int)16000,+format=(string)S16LE,+channels=(int)1,+token=${connectionId}`
+}
+export function get_resource(key) {
+  const { asrModel, connectionId, dialogueManager, ttsManager } = this.props.resources;
+  if(key == 'asr') return asrModel?`${asrModel}?content-type=audio/x-raw,+layout=(string)interleaved,+rate=(int)16000,+format=(string)S16LE,+channels=(int)1,+token=${connectionId}`:''
+  if(key == 'dm') return filter_url(dialogueManager)
+  if(key == 'tts') return filter_url(ttsManager)
+  if(key == 'cid') return connectionId
+}
+
+export function filter_url(str){
+  let arr = str.split("//")
+    return `https://${arr[1]}`
+}
+
+export function jsonParse(str) {
+  try {
+    return JSON.parse(str)
+  } catch (e) {
+    return {}
+  }
+}
 
 export function wp(ios, android, ipad) {
   if (Platform.isPad && ipad) {
@@ -56,18 +79,22 @@ export function splitArrayIntoChunks(array, lenght) {
   return chunks;
 }
 
-export async function askUser(is, callback) {
-  if (is) return callback(is)
-  Alert.alert(
-    "Cowafera Would like to use your location to find nearest salons!",
-    "Are you sure want to allow location access on your device?",
-    [
-      { text: "No", onPress: () => callback(false) },
-      { text: "Yes", onPress: async () => callback(true) }
-    ],
-    { cancelable: false }
-  );
+export async function notify({title='', message='', success}) {
+  Alert.alert(title, message)
 }
+
+// export async function askUser(is, callback) {
+//   if (is) return callback(is)
+//   Alert.alert(
+//     "Cowafera Would like to use your location to find nearest salons!",
+//     "Are you sure want to allow location access on your device?",
+//     [
+//       { text: "No", onPress: () => callback(false) },
+//       { text: "Yes", onPress: async () => callback(true) }
+//     ],
+//     { cancelable: false }
+//   );
+// }
 
 export function search(list, keyword = '', key1 = 'name', key2) {
   let matched = [];

@@ -3,21 +3,87 @@ import { TouchableOpacity, StyleSheet, Text, View, TextInput, Image, ScrollView 
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
-import { hp, wp } from '../utils';
+import { hp, notify, wp } from '../utils';
 import { Logo } from '../constants/images';
+import { call_application_manager, method } from '../api';
+import RadioButton from '../components/RadioButton';
+import Loader from '../components/Loader';
 
 class Register extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
             "loader": false,
+            'name': 'Atta',
+            'userName': '03345354727',
+            'password': '12345678',
+            'city': 'Charsadda',
+            'country': 'pakistan',
+            'secretQuestion': 'password',
+            'secretAnswer': 'password',
+            'gender': 'Male'
         }
     }
 
+    async register() {
+        const {
+            name,
+            userName,
+            password,
+            confirm_password,
+            city,
+            country,
+            secretQuestion,
+            secretAnswer,
+            gender
+        } = this.state;
+        if(password !== confirm_password){
+            notify({ "title": "Failed!", "message": "Passwords doesn't match!", "success": false })
+            return
+        }
+        this.setStateObj({ loader: true })
+        let obj = {
+            'function': method['signUpUser'],
+            'name': name,
+            'userName':userName,
+            'password': password,
+            'city': city,
+            'country': country,
+            'secretQuestion': 'password',
+            'secretAnswer': 'password',
+            'gender': gender
+        }
+        let res = await call_application_manager(obj)
+        this.setStateObj({ loader: false })
+        if (res.resultFlag) {
+            notify({ "title": "Success!", "message": "Registered Successfully! Now please login!", "success": true })
+            this.props.navigation.navigate("Login")
+        } else {
+            notify({ "title": "Failed!", "message": res.message, "success": false })
+        }
+    }
+
+    setStateObj(data) {
+        this.setState({ ...this, ...data })
+    }
+
     render() {
-        const { loader, username = "", password = "", confirm_password = "", email = "" } = this.state;
+        const {
+            loader,
+
+            name,
+            userName,
+            password,
+            confirm_password,
+            city,
+            country,
+            secretQuestion,
+            secretAnswer,
+            gender,
+        } = this.state;
 
         return (<>
+            <Loader isShow={loader}/>
             <View style={styles.safeArea}>
                 <ScrollView>
                     <View style={styles.mainView}>
@@ -27,18 +93,46 @@ class Register extends React.Component {
                         <TextInput
                             style={styles.textInput}
                             placeholder={"صارف نام"}
-                            value={username}
+                            value={name}
                             onChangeText={(str) => {
-                                this.setState({ "username": str })
+                                this.setState({ "name": str })
                             }} />
 
                         <View style={{ height: hp("3") }} />
                         <TextInput
                             style={styles.textInput}
-                            placeholder={"ای میل اڈریس"}
-                            value={email}
+                            placeholder={"لاگ ان ID"}
+                            value={userName}
                             onChangeText={(str) => {
-                                this.setState({ "email": str })
+                                this.setState({ "userName": str })
+                            }} />
+
+                        <View style={{ height: hp("3") }} />
+                        <TextInput
+                            style={styles.textInput}
+                            placeholder={"شہر"}
+                            value={city}
+                            onChangeText={(str) => {
+                                this.setState({ "city": str })
+                            }} />
+
+                        <View style={{ height: hp("3") }} />
+                        <TextInput
+                            style={styles.textInput}
+                            placeholder={"ملک"}
+                            value={country}
+                            onChangeText={(str) => {
+                                this.setState({ "country": str })
+                            }} />
+
+                        <View style={{ height: hp("3") }} />
+                        <RadioButton
+                            mainStyle={{ width: wp('90') }}
+                            title="صنف منتخب کریں۔"
+                            buttonsList={[{ "title": "Male" }, { "title": "Female" }]}
+                            selectedValue={gender}
+                            onChange={(d) => {
+                                this.setState({ "gender": d.title })
                             }} />
 
                         <View style={{ height: hp("3") }} />
@@ -65,7 +159,8 @@ class Register extends React.Component {
                         <TouchableOpacity
                             style={styles.autoDetectBtn()}
                             onPress={async () => {
-                                this.props.updateRedux({ userData:{ "id":1, "name":"Shawal Ahmad" } })
+                                this.register()
+                                // this.props.updateRedux({ userData: { "id": 1, "name": "Shawal Ahmad" } })
                             }}>
                             <Text style={styles.autoDetectBtnText()}>رجسٹر کریں</Text>
                         </TouchableOpacity>
@@ -78,6 +173,7 @@ class Register extends React.Component {
                             <Text style={styles.autoDetectBtnText()}>لاگ ان کریں</Text>
                         </TouchableOpacity>
                     </View>
+                    <View style={{ height: hp("4") }} />
                 </ScrollView>
             </View>
         </>);
@@ -109,10 +205,10 @@ const styles = StyleSheet.create({
     autoDetectBtnText: (is) => ({
         color: is ? 'red' : theme.designColor,
         fontSize: 20,
-        fontFamily:theme.font01
+        fontFamily: theme.font01
     }),
     textInput: {
-        textAlign:'right',
+        textAlign: 'right',
         height: hp('7'),
         width: wp('90'),
         alignSelf: 'center',
@@ -123,7 +219,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingHorizontal: wp('4'),
         fontSize: 16,
-        fontFamily:theme.font01
+        fontFamily: theme.font01
     },
     logo: { height: wp('40'), width: wp('40'), alignSelf: 'center' }
 });

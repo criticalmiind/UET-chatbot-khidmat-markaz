@@ -1,7 +1,8 @@
 export const mapStateToProps = (state) => {
     let store = state.userReducer;
     return {
-        "userData": store.userData
+        ...store
+        // "userData": store.userData,
     }
 };
 

@@ -1,12 +1,12 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, TextInput, Image, ScrollView } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, View, Image, ScrollView } from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
-import { hp, wp } from '../utils';
+import { hp, notify, wp } from '../utils';
 import { Logo } from '../constants/images';
-import { B64ANDROID } from '../api/test';
-const utf8 = require('utf8');
+import { call_application_manager, method } from '../api';
+import Loader from '../components/Loader';
 
 class Start extends React.Component {
     constructor(props) {
@@ -16,68 +16,44 @@ class Start extends React.Component {
         }
     }
 
-
-convertURIToBinary(dataURI) {
-    let BASE64_MARKER = ';base64,';
-    let base64Index = dataURI.indexOf(BASE64_MARKER) + BASE64_MARKER.length;
-    let base64 = dataURI.substring(base64Index);
-    let raw = window.atob(base64);
-    let rawLength = raw.length;
-    let arr = new Uint8Array(new ArrayBuffer(rawLength));
-
-    for (let i = 0; i < rawLength; i++) {
-      arr[i] = raw.charCodeAt(i);
+    UNSAFE_componentWillMount() {
+        // console.log(this.props.resources)
     }
-    return arr;
-  }
 
-    UNSAFE_componentWillMount(){
-        // let a = "Não";
-        // var uint8array = new TextEncoder().encode(B64ANDROID[0]);
-        // // var str = new TextDecoder().decode(uint8array);
-        // const blob = new Blob([uint8array], { type: 'audio/x-raw' });
-
-
-        // let binary = this.convertURIToBinary(`data:application/octet-stream;base64,${B64ANDROID[0]}`);
-        // let blob = new Blob([binary], {
-        //   type: 'audio/ogg'
-        // });
-        // console.log(blob)
-
-        // console.log(uint8array, blob)
-
-        // fetch('http://192.168.10.6:8000/', {
-        //     method: 'POST',
-        //     headers: {
-        //       'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify({ base64:B64ANDROID[0] }),
-        //   })
-        //     .then(response => response.blob())
-        //     .then(data => {
-        //       console.log('Success:', data);
-        //     })
-        //     .catch((error) => {
-        //       console.error('Error:', error);
-        //     });
+    async get_resources(session){
+        this.setState({ loader:true })
+        let obj = { 'function': method['startService'], 'sessionId':session }
+        let res = await call_application_manager(obj)
+        if(res.resultFlag){
+            this.props.updateRedux({ "resources":res })
+            setTimeout(()=>{
+                this.setState({ loader:false })
+                this.props.navigation.navigate("LetsBegin")
+            },300)
+        }else{
+            this.setState({ loader:false })
+            notify({ "title":"Failed!", "message":res.message, "success":false })
+        }
     }
 
     render() {
-        const { loader, username = "", password = "" } = this.state;
+        const { loader } = this.state;
+        const { session } = this.props.userData;
 
         return (<>
+            <Loader isShow={loader}/>
             <View style={styles.safeArea}>
                 <ScrollView>
                     <View style={styles.mainView}>
                         <View style={{ height: hp("5") }} />
-                        <Image source={Logo} style={styles.logo}/>
+                        <Image source={Logo} style={styles.logo} />
                         <View style={{ height: hp("7") }} />
-                        
+
                         <View style={{ height: hp("4") }} />
                         <TouchableOpacity
                             style={styles.autoDetectBtn()}
                             onPress={async () => {
-                                this.props.navigation.navigate("LetsBegin")
+                                this.get_resources(session)
                             }}>
                             <Text style={styles.autoDetectBtnText()}>شروع کریں</Text>
                         </TouchableOpacity>
@@ -85,7 +61,7 @@ convertURIToBinary(dataURI) {
                         <TouchableOpacity
                             style={styles.autoDetectBtn()}
                             onPress={async () => {
-                                this.props.updateRedux({ userData:{} })
+                                this.props.updateRedux({ "userData":{}, "resources":{} })
                             }}>
                             <Text style={styles.autoDetectBtnText()}>لاگ آوٹ</Text>
                         </TouchableOpacity>
@@ -121,10 +97,10 @@ const styles = StyleSheet.create({
     autoDetectBtnText: (is) => ({
         color: is ? 'red' : theme.designColor,
         fontSize: 20,
-        fontFamily:theme.font01,
+        fontFamily: theme.font01,
     }),
     textInput: {
-        textAlign:'right',
+        textAlign: 'right',
         height: hp('7'),
         width: wp('90'),
         alignSelf: 'center',
@@ -136,5 +112,5 @@ const styles = StyleSheet.create({
         paddingHorizontal: wp('4'),
         fontSize: 16
     },
-    logo:{ height:wp('50'), width:wp('50'), alignSelf:'center' }
+    logo: { height: wp('50'), width: wp('50'), alignSelf: 'center' }
 });

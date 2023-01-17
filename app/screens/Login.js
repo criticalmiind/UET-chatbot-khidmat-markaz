@@ -3,21 +3,44 @@ import { TouchableOpacity, StyleSheet, Text, View, TextInput, Image, ScrollView 
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
-import { hp, wp } from '../utils';
+import { hp, notify, wp } from '../utils';
 import { Logo } from '../constants/images';
+import { call_application_manager, method } from '../api';
+import Loader from '../components/Loader';
 
 class Login extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
             "loader": false,
+            'userName': 'cleUser',
+            'password': "cle@Password"
         }
     }
 
+    async login(){
+        const { userName, password } = this.state;
+        this.setStateObj({ loader:true })
+        let obj = { 'function': method['loginUser'], 'userName':userName, 'password': password }
+        let res = await call_application_manager(obj)
+        if(res.resultFlag){
+            notify({ "title":"Success!", "message":"Login Successfully!", "success":true })
+            this.props.updateRedux({ "userData":res })
+        }else{
+            this.setStateObj({ loader:false })
+            notify({ "title":"Failed!", "message":"Login Failed!", "success":false })
+        }
+    }
+
+    setStateObj(data){
+        this.setState({ ...this, ...data })
+    }
+
     render() {
-        const { loader, username = "", password = "" } = this.state;
+        const { loader, userName, password } = this.state;
 
         return (<>
+            <Loader isShow={loader}/>
             <View style={styles.safeArea}>
                 <ScrollView>
                     <View style={styles.mainView}>
@@ -27,9 +50,9 @@ class Login extends React.Component {
                         <TextInput
                             style={styles.textInput}
                             placeholder={"ای میل/فون نمبر/صارف نام"}
-                            value={username}
+                            value={userName}
                             onChangeText={(str) => {
-                                this.setState({ "username": str })
+                                this.setState({ "userName": str })
                             }} />
 
                         <View style={{ height: hp("3") }} />
@@ -46,7 +69,7 @@ class Login extends React.Component {
                         <TouchableOpacity
                             style={styles.autoDetectBtn()}
                             onPress={async () => {
-                                this.props.updateRedux({ userData:{ "id":1, "name":"Shawal Ahmad" } })
+                                this.login()
                             }}>
                             <Text style={styles.autoDetectBtnText()}>لاگ ان کریں</Text>
                         </TouchableOpacity>

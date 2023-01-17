@@ -1,48 +1,68 @@
-const TOKEN = "852d4287-aaec-4298-bf32-f86d0d545ddf";
-const SOCKET_URL = `wss://tech.cle.org.pk:9991/client/ws/speech?content-type=audio/x-raw,+layout=(string)interleaved,+rate=(int)16000,+format=(string)S16LE,+channels=(int)1,+token=${TOKEN}`;
-const base_url = "https://api.cle.org.pk";
-const query_answer = "https://f016-202-142-159-37.ngrok.io/webhooks/rest/webhook";
-const uri = {
-    "asr": "/v1/asr",
-    "synth": "/v1/synth"
+const main_base_url = "https://bot.cle.org.pk/"
+
+export const uri = {
+    "asr_manager":"asrManager",
+    "app_manager":"applicationManager",
+    "converter":"converter",
 }
 
-export {
-    SOCKET_URL
+export const method = {
+    "loginUser": "loginUser",
+    "signUpUser": "signUpUser",
+    "startService": "startService",
+    "rasaInput": "rasaInput",
+    "doSynthesis": "doSynthesis",
+    "openAsrConnection": "openAsrConnection", // payload = {"function":"openAsrConnection","connectionId": connectionId}
+    "closeConnection": "closeConnection", // payload = {"function":"closeConnection","connectionId": connectionId,"sessionId":sessionId}
 }
 
-export async function speechToTextApi(base64) {
-    let payload = { file: base64, token: TOKEN, lang: "ur", srate: "0" };
-    const rawResponse = await fetch(`${base_url}${uri.asr}`, {
+export async function run_scripts(string) {
+    const rawResponse = await fetch(`http://kamaljankamal4.pythonanywhere.com`, {
+    // const rawResponse = await fetch(`http://lovopyda.pythonanywhere.com/`, {
+    // const rawResponse = await fetch(`${main_base_url}${uri["converter"]}/`, {
         method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify({ "base64": string })
+    })
+    const content = await rawResponse.blob();
+    return content;
+}
+
+export async function call_application_manager(payload){
+    const rawResponse = await fetch(`${main_base_url}${uri["app_manager"]}/`, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     });
     const content = await rawResponse.json();
     return content;
 }
 
-export async function textTotSpeechApi(obj) {
-    obj["token"] = TOKEN;
-    const rawResponse = await fetch(`${base_url}${uri.synth}`, {
+export async function call_asr_manager(payload){
+    const rawResponse = await fetch(`${main_base_url}${uri["asr_manager"]}/`, {
         method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(obj)
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
     });
     const content = await rawResponse.json();
     return content;
 }
 
-export async function askQuestionApi(obj) {
-    const rawResponse = await fetch(`${query_answer}`, {
+export async function tts_manager(obj) {
+    const rawResponse = await fetch(`${this.get_resource('tts')}`, {
         method: 'POST',
-        body: JSON.stringify({ "sender": 1, ...obj })
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ "function":method['doSynthesis'], "connectionId": this.get_resource('cid'), ...obj })
+    });
+    const content = await rawResponse.json();
+    return content;
+}
+
+export async function dialogue_manager(obj) {
+    const rawResponse = await fetch(`${this.get_resource('dm')}`, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ "function":method['rasaInput'], "connectionId": this.get_resource('cid'), ...obj })
     });
     const content = await rawResponse.json();
     return content;
