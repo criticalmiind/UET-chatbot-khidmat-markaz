@@ -5,9 +5,12 @@
 2. Android Studio
 3. Android SDK
 4. Install JDK
-5. Node JS
-6. NPM
-7. React native cli
+    ```openjdk version "11" 2018-09-25
+    OpenJDK Runtime Environment 18.9 (build 11+28)
+    OpenJDK 64-Bit Server VM 18.9 (build 11+28, mixed mode)```
+5. Node JS ```(v14.17.1)```
+6. NPM ```(6.14.13)```
+7. React native cli ```(7.0.4)```
 
 <i>For Requirements Installation Please Follow This <a href="https://www.stackoverlode.com/blogs/single/how-to-install-and-setup-react-native-on-ubuntu-20-04-2-0-lts.asp" target="_blank">Article</a>.</i>
 
