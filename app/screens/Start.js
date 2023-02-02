@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, Image, ScrollView } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, View, Image, ScrollView, BackHandler } from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
@@ -15,8 +15,13 @@ class Start extends React.Component {
             "loader": false,
         }
     }
-
+    componentDidMount() {
+        // BackHandler.removeEventListener('hardwareBackPress', function () {
+        //     console.log("Test")
+        // })
+    }
     UNSAFE_componentWillMount() {
+        // console.log(BackHandler)
         // console.log(this.props.resources)
     }
 
@@ -67,6 +72,7 @@ class Start extends React.Component {
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
+                <Text style={styles.version}>V.1.0.0</Text>
             </View>
         </>);
     }
@@ -112,5 +118,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: wp('4'),
         fontSize: 16
     },
-    logo: { height: wp('50'), width: wp('50'), alignSelf: 'center' }
+    logo: { height: wp('50'), width: wp('50'), alignSelf: 'center' },
+    version:{
+        fontSize:16,
+        position:'absolute',
+        bottom:hp('1.5'),
+        alignSelf:'center',
+        fontFamily:theme.font01
+    }
 });

@@ -4,35 +4,38 @@ import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userAction
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
 import { hp, notify, wp } from '../utils';
-import { Logo } from '../constants/images';
+import { Logo, Logo01 } from '../constants/images';
 import { call_application_manager, method } from '../api';
 import Loader from '../components/Loader';
+import { translate } from '../i18n';
 
 class Login extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
             "loader": false,
-            'userName': 'cleUser',
-            'password': "cle@Password"
+            'userName': '',
+            'password': ""
+            // 'userName': 'cleUser',
+            // 'password': "cle@Password"
         }
     }
 
-    async login(){
+    async login() {
         const { userName, password } = this.state;
-        this.setStateObj({ loader:true })
-        let obj = { 'function': method['loginUser'], 'userName':userName, 'password': password }
+        this.setStateObj({ loader: true })
+        let obj = { 'function': method['loginUser'], 'userName': userName, 'password': password }
         let res = await call_application_manager(obj)
-        if(res.resultFlag){
-            notify({ "title":"Success!", "message":"Login Successfully!", "success":true })
-            this.props.updateRedux({ "userData":res })
-        }else{
-            this.setStateObj({ loader:false })
-            notify({ "title":"Failed!", "message":"Login Failed!", "success":false })
+        if (res.resultFlag) {
+            notify({ "title": "Success!", "message": "Login Successfully!", "success": true })
+            this.props.updateRedux({ "userData": res })
+        } else {
+            this.setStateObj({ loader: false })
+            notify({ "title": "Failed!", "message": "Login Failed!", "success": false })
         }
     }
 
-    setStateObj(data){
+    setStateObj(data) {
         this.setState({ ...this, ...data })
     }
 
@@ -40,16 +43,21 @@ class Login extends React.Component {
         const { loader, userName, password } = this.state;
 
         return (<>
-            <Loader isShow={loader}/>
+            <Loader isShow={loader} />
             <View style={styles.safeArea}>
                 <ScrollView>
                     <View style={styles.mainView}>
-                        <View style={{ height: hp("5") }} />
-                        <Image source={Logo} style={styles.logo}/>
-                        <View style={{ height: hp("7") }} />
+                        <View style={{ height: hp("9") }} />
+                        <View style={{ justifyContent:'center' }}>
+                            <Image source={Logo} style={styles.logo_bg}/>
+                            <Image source={Logo} style={styles.logo}/>
+                        </View>
+                        {/* <View style={{ height: hp("1") }} /> */}
+                        <Text style={styles.title}>{translate('e-service')}</Text>
+                        <View style={{ height: hp("4") }} />
                         <TextInput
                             style={styles.textInput}
-                            placeholder={"ای میل/فون نمبر/صارف نام"}
+                            placeholder={translate('phone-placeholder')}
                             value={userName}
                             onChangeText={(str) => {
                                 this.setState({ "userName": str })
@@ -58,32 +66,56 @@ class Login extends React.Component {
                         <View style={{ height: hp("3") }} />
                         <TextInput
                             style={styles.textInput}
-                            placeholder={"پاس ورڈ"}
+                            placeholder={translate("password")}
                             value={password}
                             secureTextEntry
                             onChangeText={(str) => {
                                 this.setState({ "password": str })
                             }} />
 
-                        <View style={{ height: hp("4") }} />
+                        <View style={{ height: hp("1") }} />
                         <TouchableOpacity
-                            style={styles.autoDetectBtn()}
-                            onPress={async () => {
-                                this.login()
+                            style={styles.forgot_pwd_btn}
+                            onPress={()=>{
+                                notify({title:"Sorry!",message:"this feature is under construction"})
                             }}>
-                            <Text style={styles.autoDetectBtnText()}>لاگ ان کریں</Text>
+                            <Text style={styles.forgot_pwd_txt}>{translate("forgot-password")}</Text>
                         </TouchableOpacity>
                         <View style={{ height: hp("2") }} />
                         <TouchableOpacity
-                            style={styles.autoDetectBtn()}
+                            style={styles.btn}
+                            onPress={async () => {
+                                this.login()
+                            }}>
+                            <Text style={styles.btnTxt}>{translate('login')}</Text>
+                        </TouchableOpacity>
+                        <View style={{ height: hp("2") }} />
+                        <TouchableOpacity
+                            style={styles.btn}
                             onPress={async () => {
                                 this.props.navigation.navigate("Register")
                             }}>
-                            <Text style={styles.autoDetectBtnText()}>رجسٹر کریں</Text>
+                            <Text style={styles.btnTxt}>{translate('create_new_account')}</Text>
                         </TouchableOpacity>
                     </View>
+                    <View style={{ height: hp("9") }} />
+
+                    <Text style={styles.powered_txt}>{translate('powered')}</Text>
+                    <View style={{ height: hp("1") }} />
+                    <View style={styles.powered_view}>
+                        <Image source={Logo} style={styles.footer_logo} />
+                        <Image source={Logo01} style={styles.footer_logo} />
+                    </View>
                 </ScrollView>
-                <Text style={styles.version}>V.1.0.0</Text>
+                <View style={styles.helpView}>
+                    <TouchableOpacity
+                        style={styles.helpBtn}
+                        onPress={()=>{
+                            notify({title:"Sorry!",message:"this feature is under construction"})
+                        }}>
+                        <Text style={{ fontSize:16, color:"#21347E" }}>?</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         </>);
     }
@@ -101,41 +133,92 @@ const styles = StyleSheet.create({
         backgroundColor: theme.tertiary,
         flex: 1,
     },
-    autoDetectBtn: (is) => ({
-        height: hp('7'),
-        width: wp('90'),
+    btn: {
+        height: hp('6'),
+        width: wp('50'),
         alignSelf: 'center',
-        borderWidth: 2,
         borderRadius: 100,
-        borderColor: is ? 'red' : theme.designColor,
         alignItems: 'center',
         justifyContent: 'center',
-    }),
-    autoDetectBtnText: (is) => ({
-        color: is ? 'red' : theme.designColor,
-        fontSize: 22,
-        fontFamily:theme.font01
-    }),
+        backgroundColor: "#21347E"
+    },
+    btnTxt: {
+        color: "#fff",
+        fontSize: 16,
+        fontFamily: theme.font01
+    },
     textInput: {
-        textAlign:'right',
-        height: hp('7'),
+        textAlign: 'right',
+        height: hp('6'),
         width: wp('90'),
         alignSelf: 'center',
-        borderWidth: 2,
-        borderRadius: 100,
-        borderColor: "#a3a3a3",
+        borderBottomWidth: 2,
+        borderColor: "#7A7A7A",
+        backgroundColor: "#E8E8E8",
         alignItems: 'center',
         justifyContent: 'center',
         paddingHorizontal: wp('4'),
-        fontSize: 16,
-        fontFamily:theme.font01
+        fontSize: 14,
+        fontFamily: theme.font01
     },
-    logo:{ height:wp('50'), width:wp('50'), alignSelf:'center' },
-    version:{
-        fontSize:16,
+
+    logo: {
+        height: wp('35'),
+        width: wp('35'),
+        alignSelf: 'center'
+    },
+    logo_bg: {
+        height: wp('60'),
+        width: wp('60'),
+        alignSelf: 'center',
         position:'absolute',
-        bottom:hp('1.5'),
-        alignSelf:'center',
-        fontFamily:theme.font01
+        opacity:0.05
+    },
+    title: {
+        alignSelf: 'center',
+        borderColor: "#a3a3a3",
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: theme.font01,
+        fontSize: 36
+    },
+    forgot_pwd_btn: {
+        width: wp('90'),
+        alignItems: 'flex-start',
+        alignSelf: 'center'
+    },
+    forgot_pwd_txt: {
+        fontFamily: "#21347E"
+    },
+    powered_view: {
+        width: wp('40'),
+        alignSelf: 'center',
+        flexDirection: 'row',
+        justifyContent: 'space-around'
+    },
+    powered_txt: {
+        alignSelf: 'center',
+        borderColor: "#a3a3a3",
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: theme.font01,
+        fontSize: 12,
+        lineHeight: 15,
+        letterSpacing: 6
+    },
+    footer_logo: { height: wp('13'), width: wp('13'), alignSelf: 'center' },
+    helpView:{
+        position:'absolute',
+        bottom:hp('2'),
+        right:hp('2')
+    },
+    helpBtn:{
+        width:hp('4'),
+        height:hp('4'),
+        borderWidth:1,
+        borderColor:"#21347E",
+        borderRadius:100,
+        alignItems:'center',
+        justifyContent:'center'
     }
 });

@@ -14,13 +14,20 @@ class Register extends React.Component {
         super(props)
         this.state = {
             "loader": false,
-            'name': 'Atta',
-            'userName': '03345354727',
-            'password': '12345678',
-            'city': 'Charsadda',
-            'country': 'pakistan',
-            'secretQuestion': 'password',
-            'secretAnswer': 'password',
+            'name': '',
+            'userName': '',
+            'password': '',
+            'city': '',
+            'country': '',
+            'secretQuestion': '',
+            'secretAnswer': '',
+            // 'name': 'Atta',
+            // 'userName': '03345354727',
+            // 'password': '12345678',
+            // 'city': 'Charsadda',
+            // 'country': 'pakistan',
+            // 'secretQuestion': 'password',
+            // 'secretAnswer': 'password',
             'gender': 'Male'
         }
     }

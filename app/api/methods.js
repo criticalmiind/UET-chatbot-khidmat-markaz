@@ -95,8 +95,8 @@ export async function on_click_chat_text_panel(text) {
 }
 
 export async function play_message_handler(url, is_path = false) {
-    const { is_recording } = this.state
-    if (!is_recording) return
+    // const { is_recording } = this.state
+    // if (!is_recording) return
     if (!is_path) {
         const path = `${RNFS.DocumentDirectoryPath}/test_audio_file.wav`;
         await RNFS.writeFile(path, url.replace("data:audio/wav;base64,", ""), 'base64')

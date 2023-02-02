@@ -45,6 +45,7 @@ class LetsBegin extends React.Component {
         this.text_to_speech = text_to_speech.bind(this);
         this.play_message_handler = play_message_handler.bind(this);
         this.state = {
+            "isLoaded":false,
             "loader": false,
             "is_recording": false,
             "socket_status": 3,
@@ -58,17 +59,7 @@ class LetsBegin extends React.Component {
     }
 
     async UNSAFE_componentWillMount() {
-
-        BackHandler.addEventListener('hardwareBackPress', (async function () {
-            this.setState({ "screen_loader":true, "loader_message":"Closing Connection" })
-            const res = await this.close_connection()
-            this.setState({ "screen_loader":false, "loader_message":false })
-            notify({"title":res.resultFlag?'Success':'Failed', "message":`${res.message}`})
-            this.props.updateRedux({ resources:{} })
-            this.props.navigation.goBack()
-            // return false;
-        }).bind(this));
-        
+        this.setState({ "isLoaded":true })
 
         const options = {
             sampleRate: 16000,  // default 44100
@@ -83,9 +74,39 @@ class LetsBegin extends React.Component {
         AudioRecord.init(options);
         AudioRecord.on('data', this.onAudioStreaming.bind(this));
         this.socketListners()
+        
+        BackHandler.addEventListener('hardwareBackPress', (async function () {
+            if(this.state.isLoaded){
+                this.setState({ "screen_loader":true, "loader_message":"Closing Connection" })
+                const res = await this.close_connection()
+                this.setState({ "screen_loader":false, "loader_message":false })
+                notify({"title":res.resultFlag?'Success':'Failed', "message":`${res.message}`})
+                this.props.updateRedux({ resources:{} })
+                this.props.navigation.goBack(null)
+            }
+            return true;
+        }).bind(this));
     }
 
     async componentWillUnmount() {
+        this.setState({ "isLoaded":false })
+        // BackHandler.removeEventListener('hardwareBackPress');
+        BackHandler.addEventListener('hardwareBackPress', (async function () {
+            BackHandler.exitApp()
+        }))
+
+        // function addEventListener(eventName, handler) {
+        //     if (_backPressSubscriptions.indexOf(handler) === -1) {
+        //       _backPressSubscriptions.push(handler);
+        //     }
+      
+        //     return {
+        //       remove: function remove() {
+        //         return BackHandler.removeEventListener(eventName, handler);
+        //       }
+        //     };
+        //   }
+
         this.ws = { readyState: 3 };
         this.sound = null;
         await AudioRecord.stop()
