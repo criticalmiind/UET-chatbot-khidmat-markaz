@@ -1,13 +1,16 @@
 import React from 'react';
 import { TouchableOpacity, StyleSheet, Text, View, TextInput, Image, ScrollView } from 'react-native';
+import SelectDropdown from 'react-native-select-dropdown'
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
-import { hp, notify, wp } from '../utils';
-import { Logo } from '../constants/images';
+import { hp, isNullRetNull, notify, wp } from '../utils';
+import { Logo, Logo01, SvgCity, SvgFemaleOff, SvgFemaleOn, SvgHelp, SvgMaleOff, SvgMaleOn, SvgOtherOff, SvgOtherOn, SvgPhone, SvgPwd, SvgUser } from '../constants/images';
 import { call_application_manager, method } from '../api';
-import RadioButton from '../components/RadioButton';
 import Loader from '../components/Loader';
+import { translate } from '../i18n';
+import cities from './../constants/cities.json';
+import Input from '../components/Input';
 
 class Register extends React.Component {
     constructor(props) {
@@ -21,13 +24,6 @@ class Register extends React.Component {
             'country': '',
             'secretQuestion': '',
             'secretAnswer': '',
-            // 'name': 'Atta',
-            // 'userName': '03345354727',
-            // 'password': '12345678',
-            // 'city': 'Charsadda',
-            // 'country': 'pakistan',
-            // 'secretQuestion': 'password',
-            // 'secretAnswer': 'password',
             'gender': 'Male'
         }
     }
@@ -44,7 +40,7 @@ class Register extends React.Component {
             secretAnswer,
             gender
         } = this.state;
-        if(password !== confirm_password){
+        if (password !== confirm_password) {
             notify({ "title": "Failed!", "message": "Passwords doesn't match!", "success": false })
             return
         }
@@ -52,7 +48,7 @@ class Register extends React.Component {
         let obj = {
             'function': method['signUpUser'],
             'name': name,
-            'userName':userName,
+            'userName': userName,
             'password': password,
             'city': city,
             'country': country,
@@ -83,105 +79,155 @@ class Register extends React.Component {
             password,
             confirm_password,
             city,
-            country,
-            secretQuestion,
             secretAnswer,
             gender,
         } = this.state;
 
+        let disabled_reg = () => {
+            if(isNullRetNull(name, 1) == 1) return true
+            if(isNullRetNull(userName, 1) == 1) return true
+            if(isNullRetNull(password, 1) == 1) return true
+            if(isNullRetNull(confirm_password, 1) == 1) return true
+            if(password != confirm_password) return true
+            if(isNullRetNull(city, 1) == 1) return true
+            if(isNullRetNull(secretAnswer, 1) == 1) return true
+            if(isNullRetNull(gender, 1) == 1) return true
+            return false
+        }
+
+
         return (<>
-            <Loader isShow={loader}/>
+            <Loader isShow={loader} />
             <View style={styles.safeArea}>
                 <ScrollView>
                     <View style={styles.mainView}>
-                        <View style={{ height: hp("4") }} />
-                        <Image source={Logo} style={styles.logo} />
                         <View style={{ height: hp("6") }} />
-                        <TextInput
-                            style={styles.textInput}
-                            placeholder={"صارف نام"}
+                        <View style={{ justifyContent: 'center' }}>
+                            <Image source={Logo} style={styles.logo_bg} />
+                            <Image source={Logo} style={styles.logo} />
+                        </View>
+                        <Text style={styles.title}>{translate('e-service')}</Text>
+                        <View style={{ height: hp("2") }} />
+                        <Input
+                            Icon={SvgUser}
+                            // style={styles.textInput}
+                            placeholder={translate('Full Name')}
                             value={name}
                             onChangeText={(str) => {
                                 this.setState({ "name": str })
                             }} />
 
-                        <View style={{ height: hp("3") }} />
-                        <TextInput
-                            style={styles.textInput}
-                            placeholder={"لاگ ان ID"}
+                        <View style={{ height: hp("2") }} />
+                        <Input
+                            Icon={SvgPhone}
+                            // style={styles.textInput}
+                            placeholder={translate('phone-placeholder')}
                             value={userName}
                             onChangeText={(str) => {
                                 this.setState({ "userName": str })
                             }} />
 
-                        <View style={{ height: hp("3") }} />
-                        <TextInput
-                            style={styles.textInput}
-                            placeholder={"شہر"}
-                            value={city}
-                            onChangeText={(str) => {
-                                this.setState({ "city": str })
-                            }} />
-
-                        <View style={{ height: hp("3") }} />
-                        <TextInput
-                            style={styles.textInput}
-                            placeholder={"ملک"}
-                            value={country}
-                            onChangeText={(str) => {
-                                this.setState({ "country": str })
-                            }} />
-
-                        <View style={{ height: hp("3") }} />
-                        <RadioButton
-                            mainStyle={{ width: wp('90') }}
-                            title="صنف منتخب کریں۔"
-                            buttonsList={[{ "title": "Male" }, { "title": "Female" }]}
-                            selectedValue={gender}
-                            onChange={(d) => {
-                                this.setState({ "gender": d.title })
-                            }} />
-
-                        <View style={{ height: hp("3") }} />
-                        <TextInput
-                            style={styles.textInput}
-                            placeholder={"پاس ورڈ"}
+                        <View style={{ height: hp("2") }} />
+                        <Input
+                            Icon={SvgPwd}
+                            // style={styles.textInput}
+                            placeholder={translate("Confirm Password")}
                             value={password}
                             secureTextEntry
                             onChangeText={(str) => {
                                 this.setState({ "password": str })
                             }} />
 
-                        <View style={{ height: hp("3") }} />
-                        <TextInput
-                            style={styles.textInput}
-                            placeholder={"پاس ورڈ کی تصدیق کریں۔"}
+                        <View style={{ height: hp("2") }} />
+                        <Input
+                            Icon={SvgPwd}
+                            // style={styles.textInput}
+                            placeholder={translate("Confirm Password")}
                             value={confirm_password}
                             secureTextEntry
                             onChangeText={(str) => {
                                 this.setState({ "confirm_password": str })
                             }} />
 
-                        <View style={{ height: hp("4") }} />
-                        <TouchableOpacity
-                            style={styles.autoDetectBtn()}
-                            onPress={async () => {
-                                this.register()
-                                // this.props.updateRedux({ userData: { "id": 1, "name": "Shawal Ahmad" } })
-                            }}>
-                            <Text style={styles.autoDetectBtnText()}>رجسٹر کریں</Text>
-                        </TouchableOpacity>
+                        <View style={{ height: hp("2") }} />
+                        <SelectDropdown
+                            renderSearchInputLeftIcon={()=><SvgCity/>}
+                            renderDropdownIcon={()=><SvgCity/>}
+                            data={cities}
+                            buttonStyle={{ width: wp('90'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
+                            buttonTextStyle={{ fontFamily: theme.font01, textAlign: 'right', color: "#a3a3a3" }}
+                            defaultButtonText={translate('City')}
+                            search={true}
+                            defaultValue={city}
+                            onSelect={(selectedItem) => {
+                                this.setStateObj({ city:selectedItem.name })
+                            }}
+                            buttonTextAfterSelection={(selectedItem) => selectedItem.name }
+                            rowTextForSelection={(item) => item.name }
+                        />
+
+                        <View style={{ height: hp("2") }} />
+                        <Input
+                            // Icon={SvgCity}
+                            // style={styles.textInput}
+                            placeholder={translate('Secret String')}
+                            value={secretAnswer}
+                            onChangeText={(str) => {
+                                this.setState({ "secretAnswer": str })
+                            }} />
+                        <View style={{ height: hp("2") }} />
+                        <View style={styles.v01}>
+                            <Text style={styles.txt01}>{translate('Gender')}</Text>
+                            <View style={styles.v02}>
+                                {
+                                    [
+                                        {name:"Male",icon_on:<SvgMaleOn/>,icon_off:<SvgMaleOff/>},
+                                        {name:"Female",icon_on:<SvgFemaleOn/>,icon_off:<SvgFemaleOff/>},
+                                        {name:"Other",icon_on:<SvgOtherOn/>,icon_off:<SvgOtherOff/>}
+                                    ].map((e) => {
+                                        let is = e.name == gender
+                                        return (
+                                            <TouchableOpacity
+                                                key={e.name}
+                                                style={styles.v03(is)}
+                                                onPress={() => { this.setState({ "gender": e.name }) }}>
+                                                {/* <Text style={{ color: is ? "#fff" : "#21347E" }}>{e}</Text> */}
+                                                {is?e.icon_on:e.icon_off}
+                                            </TouchableOpacity>
+                                        )
+                                    })
+                                }
+                            </View>
+                        </View>
                         <View style={{ height: hp("2") }} />
                         <TouchableOpacity
-                            style={styles.autoDetectBtn()}
+                            disabled={disabled_reg()}
+                            style={{...styles.btn, opacity:disabled_reg()?0.8:1}}
                             onPress={async () => {
-                                this.props.navigation.navigate("Login")
+                                this.register()
                             }}>
-                            <Text style={styles.autoDetectBtnText()}>لاگ ان کریں</Text>
+                            <Text style={styles.btnTxt}>{translate('register')}</Text>
                         </TouchableOpacity>
                     </View>
-                    <View style={{ height: hp("4") }} />
+                    <View style={{ height: hp("5") }} />
+
+                    <Text style={styles.powered_txt}>{translate('powered')}</Text>
+                    <View style={{ height: hp("1") }} />
+                    <View style={styles.powered_view}>
+                        <Image source={Logo} style={styles.footer_logo} />
+                        <Image source={Logo01} style={styles.footer_logo} />
+                    </View>
+                    <View style={{ height: hp("6") }} />
                 </ScrollView>
+                <View style={styles.helpView}>
+                    <TouchableOpacity
+                        style={styles.helpBtn}
+                        onPress={() => {
+                            notify({ title: "Sorry!", message: "this feature is under construction" })
+                        }}>
+                        <SvgHelp/>
+                    </TouchableOpacity>
+                </View>
             </View>
         </>);
     }
@@ -199,34 +245,111 @@ const styles = StyleSheet.create({
         backgroundColor: theme.tertiary,
         flex: 1,
     },
-    autoDetectBtn: (is) => ({
-        height: hp('7'),
-        width: wp('90'),
+    btn: {
+        height: hp('6'),
+        width: wp('50'),
         alignSelf: 'center',
-        borderWidth: 2,
         borderRadius: 100,
-        borderColor: is ? 'red' : theme.designColor,
         alignItems: 'center',
         justifyContent: 'center',
-    }),
-    autoDetectBtnText: (is) => ({
-        color: is ? 'red' : theme.designColor,
-        fontSize: 20,
-        fontFamily: theme.font01
-    }),
-    textInput: {
-        textAlign: 'right',
-        height: hp('7'),
-        width: wp('90'),
-        alignSelf: 'center',
-        borderWidth: 2,
-        borderRadius: 100,
-        borderColor: "#a3a3a3",
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingHorizontal: wp('4'),
+        backgroundColor: "#21347E"
+    },
+    btnTxt: {
+        color: "#fff",
         fontSize: 16,
         fontFamily: theme.font01
     },
-    logo: { height: wp('40'), width: wp('40'), alignSelf: 'center' }
+    txt01: {
+        color: "#21347E",
+        fontSize: 16,
+        fontFamily: theme.font01
+    },
+    textInput: {
+        textAlign: 'right',
+        height: hp('6'),
+        width: wp('90'),
+        alignSelf: 'center',
+        borderBottomWidth: 2,
+        borderColor: "#7A7A7A",
+        backgroundColor: "#E8E8E8",
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: wp('4'),
+        fontSize: 14,
+        fontFamily: theme.font01
+    },
+
+    logo: {
+        height: wp('35'),
+        width: wp('35'),
+        alignSelf: 'center'
+    },
+    logo_bg: {
+        height: wp('60'),
+        width: wp('60'),
+        alignSelf: 'center',
+        position: 'absolute',
+        opacity: 0.05
+    },
+    title: {
+        alignSelf: 'center',
+        borderColor: "#a3a3a3",
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: theme.font01,
+        fontSize: 36
+    },
+    powered_view: {
+        width: wp('40'),
+        alignSelf: 'center',
+        flexDirection: 'row',
+        justifyContent: 'space-around'
+    },
+    powered_txt: {
+        alignSelf: 'center',
+        borderColor: "#a3a3a3",
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: theme.font01,
+        fontSize: 12,
+        lineHeight: 15,
+        letterSpacing: 6
+    },
+    footer_logo: { height: wp('13'), width: wp('13'), alignSelf: 'center' },
+    helpView: {
+        position: 'absolute',
+        bottom: hp('2'),
+        right: hp('2')
+    },
+    helpBtn: {
+        width: hp('4'),
+        height: hp('4'),
+        borderWidth: 1,
+        borderColor: "#21347E",
+        borderRadius: 100,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    v01: {
+        width: wp('90'),
+        alignSelf: 'center',
+        flexDirection: 'row-reverse',
+        justifyContent: "space-around"
+    },
+    v02: {
+        alignSelf: 'center',
+        flexDirection: 'row-reverse',
+        justifyContent: 'space-around',
+        width: "86%"
+    },
+    v03: (is) => ({
+        // borderWidth: 3,
+        // borderColor: "#21347E",
+        borderRadius: 100,
+        width: wp('15'),
+        height: wp('15'),
+        alignItems: 'center',
+        justifyContent: 'center',
+        // backgroundColor: is ? "rgba(33, 52, 126, 1)" : "#fff"
+    }),
 });

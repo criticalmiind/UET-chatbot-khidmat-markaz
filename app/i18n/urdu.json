@@ -1,9 +1,18 @@
 {
-    "e-service":"ای سروسز سسٹم",
-    "phone-placeholder":"03XX-XXXXXXX",
-    "password":"پاس ورڈ",
-    "forgot-password":"پاس ورڈ بھول گئے؟",
-    "login":"لاگ ان کریں",
-    "create_new_account":"نیا اکاؤنٹ بنائیں",
-    "powered":"POWERED BY"
+    "e-service": "ای سروسزسسٹم",
+    "phone-placeholder": "03XX-XXXXXXX",
+    "password": "پاس ورڈ",
+    "forgot-password": "پاس ورڈ بھول گئے؟",
+    "login": "لاگ ان کریں",
+    "create_new_account": "نیا اکاؤنٹ بنائیں",
+    "powered": "POWERED BY",
+    "register": "رجسٹر کریں",
+    "Full Name": "پورا نام",
+    "Confirm Password": "پاس ورڈ کی تصدیق کریں",
+    "City": "شہر",
+    "Secret String": "کوئی بھی خفیہ نام لکھیں۔",
+    "Gender": "جنس",
+    "Contact": "رابطہ کریں",
+    "Logout": "لاگ آؤٹ کریں",
+    "Delete Account": "اپنا اکاؤنٹ ڈیلیٹ کریں"
 }

@@ -21,7 +21,7 @@ class App extends Component {
     this._isMounted = true;
     if(this._isMounted){
       LogBox.ignoreAllLogs(true)
-      await this.checkForUpdate();
+      // await this.checkForUpdate();
     }
   }
 

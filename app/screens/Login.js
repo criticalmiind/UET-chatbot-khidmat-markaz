@@ -3,21 +3,22 @@ import { TouchableOpacity, StyleSheet, Text, View, TextInput, Image, ScrollView 
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
-import { hp, notify, wp } from '../utils';
-import { Logo, Logo01 } from '../constants/images';
+import { hp, isNullRetNull, notify, wp } from '../utils';
+import { Logo, Logo01, SvgHelp, SvgPhone, SvgPwd } from '../constants/images';
 import { call_application_manager, method } from '../api';
 import Loader from '../components/Loader';
 import { translate } from '../i18n';
+import Input from '../components/Input';
 
 class Login extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
             "loader": false,
-            'userName': '',
-            'password': ""
-            // 'userName': 'cleUser',
-            // 'password': "cle@Password"
+            // 'userName': '',
+            // 'password': ""
+            'userName': 'cleUser',
+            'password': "cle@Password"
         }
     }
 
@@ -41,6 +42,9 @@ class Login extends React.Component {
 
     render() {
         const { loader, userName, password } = this.state;
+        let disabled_login = (isNullRetNull(userName, 1) == 1 || isNullRetNull(password, 1) == 1)
+        
+        // this.props.updateRedux({ "userData": { "a":"test" } })
 
         return (<>
             <Loader isShow={loader} />
@@ -52,20 +56,20 @@ class Login extends React.Component {
                             <Image source={Logo} style={styles.logo_bg}/>
                             <Image source={Logo} style={styles.logo}/>
                         </View>
-                        {/* <View style={{ height: hp("1") }} /> */}
                         <Text style={styles.title}>{translate('e-service')}</Text>
                         <View style={{ height: hp("4") }} />
-                        <TextInput
-                            style={styles.textInput}
+                        <Input
+                            Icon={SvgPhone}
                             placeholder={translate('phone-placeholder')}
                             value={userName}
                             onChangeText={(str) => {
                                 this.setState({ "userName": str })
-                            }} />
+                            }}/>
 
                         <View style={{ height: hp("3") }} />
-                        <TextInput
-                            style={styles.textInput}
+                        <Input
+                            Icon={SvgPwd}
+                            iconStyle={{ paddingRight:wp('2') }}
                             placeholder={translate("password")}
                             value={password}
                             secureTextEntry
@@ -83,7 +87,8 @@ class Login extends React.Component {
                         </TouchableOpacity>
                         <View style={{ height: hp("2") }} />
                         <TouchableOpacity
-                            style={styles.btn}
+                            disabled={disabled_login}
+                            style={{...styles.btn, opacity:disabled_login?0.8:1 }}
                             onPress={async () => {
                                 this.login()
                             }}>
@@ -113,7 +118,7 @@ class Login extends React.Component {
                         onPress={()=>{
                             notify({title:"Sorry!",message:"this feature is under construction"})
                         }}>
-                        <Text style={{ fontSize:16, color:"#21347E" }}>?</Text>
+                        <SvgHelp/>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -147,21 +152,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontFamily: theme.font01
     },
-    textInput: {
-        textAlign: 'right',
-        height: hp('6'),
-        width: wp('90'),
-        alignSelf: 'center',
-        borderBottomWidth: 2,
-        borderColor: "#7A7A7A",
-        backgroundColor: "#E8E8E8",
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingHorizontal: wp('4'),
-        fontSize: 14,
-        fontFamily: theme.font01
-    },
-
     logo: {
         height: wp('35'),
         width: wp('35'),
