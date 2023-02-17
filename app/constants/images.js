@@ -1,9 +1,10 @@
 import React from 'react';
 import { Path, Svg, SvgXml } from 'react-native-svg';
-import { city, female, female_on, help, male, male_on, other, other_on, pwd, pwd_off, pwd_on, user } from './svgs';
+import { back, city, drawer_icon, drawer_profile_icon, female, female_on, help, male, male_on, other, other_on, play, pwd, pwd_off, pwd_on, user } from './svgs';
 
 const Logo = require('./../assets/logo.png');
 const Logo01 = require('./../assets/cle_logo.png');
+const LogoWhite = require('./../assets/logo_white.png');
 const MicIcon = require('./../assets/mic.png');
 
 
@@ -20,10 +21,15 @@ const SvgFemaleOn = () => <SvgXml xml={female_on}/>
 const SvgOtherOff = () => <SvgXml xml={other}/>
 const SvgOtherOn = () => <SvgXml xml={other_on}/>
 const SvgHelp = () => <SvgXml xml={help}/>
+const SvgPlay = () => <SvgXml xml={play}/>
+const SvgDrawerIcon = () => <SvgXml xml={drawer_icon}/>
+const SvgDrawerProfileIcon = () => <SvgXml xml={drawer_profile_icon}/>
+const SvgBackIcon = () => <SvgXml xml={back}/>
 
 export {
     Logo,
     Logo01,
+    LogoWhite,
     MicIcon,
     SvgPhone,
     SvgPwd,
@@ -38,4 +44,8 @@ export {
     SvgOtherOff,
     SvgOtherOn,
     SvgHelp,
+    SvgPlay,
+    SvgDrawerIcon,
+    SvgDrawerProfileIcon,
+    SvgBackIcon,
 }

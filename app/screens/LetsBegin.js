@@ -8,7 +8,8 @@ import {
     ActivityIndicator,
     Image,
     Platform,
-    BackHandler
+    BackHandler,
+    StatusBar
 } from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from './../redux/actions/userActions';
 import { connect } from 'react-redux';
@@ -25,9 +26,10 @@ import {
     on_click_chat_text_panel,
     close_connection
 } from '../api/methods';
-import { Logo, MicIcon } from '../constants/images';
+import { Logo, LogoWhite, MicIcon, SvgBackIcon } from '../constants/images';
 import { call_asr_manager, dialogue_manager, method, run_scripts, tts_manager } from '../api';
 import Loader from '../components/Loader';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 class LetsBegin extends React.Component {
     constructor(props) {
@@ -45,13 +47,16 @@ class LetsBegin extends React.Component {
         this.text_to_speech = text_to_speech.bind(this);
         this.play_message_handler = play_message_handler.bind(this);
         this.state = {
-            "isLoaded":false,
+            "isLoaded": false,
             "loader": false,
             "is_recording": false,
             "socket_status": 3,
             "last_id": false,
             "last_ids_list": {},
-            "chat_list": {},
+            "chat_list": {
+                // "askjdawe": { "is_question": true, "text": "ایک ٹیلے پر واقع مزار خواجہ فریدالدین گنج شکرؒ کے احاطہء صحن میں ذرا سی ژالہ باری چاندی کے ڈھیروں کی مثل بڑے غضب کا نظارا دیتی ہے۔" },
+                // "askjdasa": { "is_question": false, "text": "ایک ٹیلے پر واقع مزار خواجہ فریدالدین گنج شکرؒ کے احاطہء صحن میں ذرا سی ژالہ باری چاندی کے ڈھیروں کی مثل بڑے غضب کا نظارا دیتی ہے۔" },
+            },
             "last_unread_msgs": {},
             "play_text_id": false,
             "temp_text": ""
@@ -59,7 +64,7 @@ class LetsBegin extends React.Component {
     }
 
     async UNSAFE_componentWillMount() {
-        this.setState({ "isLoaded":true })
+        this.setState({ "isLoaded": true })
 
         const options = {
             sampleRate: 16000,  // default 44100
@@ -74,14 +79,14 @@ class LetsBegin extends React.Component {
         AudioRecord.init(options);
         AudioRecord.on('data', this.onAudioStreaming.bind(this));
         this.socketListners()
-        
+
         BackHandler.addEventListener('hardwareBackPress', (async function () {
-            if(this.state.isLoaded){
-                this.setState({ "screen_loader":true, "loader_message":"Closing Connection" })
+            if (this.state.isLoaded) {
+                this.setState({ "screen_loader": true, "loader_message": "Closing Connection" })
                 const res = await this.close_connection()
-                this.setState({ "screen_loader":false, "loader_message":false })
-                notify({"title":res.resultFlag?'Success':'Failed', "message":`${res.message}`})
-                this.props.updateRedux({ resources:{} })
+                this.setState({ "screen_loader": false, "loader_message": false })
+                notify({ "title": res.resultFlag ? 'Success' : 'Failed', "message": `${res.message}` })
+                this.props.updateRedux({ resources: {} })
                 this.props.navigation.goBack(null)
             }
             return true;
@@ -89,23 +94,10 @@ class LetsBegin extends React.Component {
     }
 
     async componentWillUnmount() {
-        this.setState({ "isLoaded":false })
-        // BackHandler.removeEventListener('hardwareBackPress');
+        this.setState({ "isLoaded": false })
         BackHandler.addEventListener('hardwareBackPress', (async function () {
             BackHandler.exitApp()
         }))
-
-        // function addEventListener(eventName, handler) {
-        //     if (_backPressSubscriptions.indexOf(handler) === -1) {
-        //       _backPressSubscriptions.push(handler);
-        //     }
-      
-        //     return {
-        //       remove: function remove() {
-        //         return BackHandler.removeEventListener(eventName, handler);
-        //       }
-        //     };
-        //   }
 
         this.ws = { readyState: 3 };
         this.sound = null;
@@ -206,34 +198,34 @@ class LetsBegin extends React.Component {
     }
 
     render() {
-        const { is_recording, chat_list, screen_loader=false, loader_message=false, loader, socket_status, play_text_id } = this.state;
+        const { is_recording, chat_list, screen_loader = false, loader_message = false, loader, socket_status, play_text_id } = this.state;
         const { resources } = this.props;
 
         return (<>
-            <Loader isShow={screen_loader} mesasge={loader_message}/>
-            <View style={styles.safeArea}>
+            <Loader isShow={screen_loader} mesasge={loader_message} />
+
+            <SafeAreaView style={styles.safeArea} forceInset={{ top: 'always' }}>
+                <StatusBar barStyle="light-content" backgroundColor={theme.designColor} />
+                <View style={styles.headerView}>
+                    <TouchableOpacity
+                        style={styles.helpBtn}
+                        onPress={() => {
+                            notify({ title: "Sorry!", message: "this feature is under construction" })
+                        }}>
+                        <Text style={styles.helpBtnTxt}>HELP</Text>
+                    </TouchableOpacity>
+                    <Image source={LogoWhite} style={{ top: -4, height: wp('14'), width: wp('14') }} />
+                    <TouchableOpacity
+                        style={{ width: wp('18') }}
+                        onPress={() => { this.props.navigation.goBack() }}>
+                        <SvgBackIcon />
+                    </TouchableOpacity>
+                </View>
                 <View style={styles.mainView}>
-                    <View style={styles.v02}>
-                        <View style={{ width: wp('78'), justifyContent: 'center', }}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                {this.getStatusIcon(socket_status)}<Text style={styles.letsBeginText}>{"ای خدمت مرکز"} </Text>
-                            </View>
-                        </View>
-
-                        <TouchableOpacity
-                            onPress={() => {
-                                this.props.navigation.goBack()
-                            }}>
-                            <Image source={Logo} style={{ height: wp('18'), width: wp('18') }} />
-                        </TouchableOpacity>
-                    </View>
-                    <View style={{ height: hp('2', '1') }} />
-
                     <View style={styles.v01}>
                         <ScrollView
                             contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', flexDirection: 'column' }}
-
-                            style={{ width: wp('98') }}
+                            style={{ width: wp('100') }}
                             ref={(ref) => { this.scrollViewRef = ref }}
                             onContentSizeChange={() => {
                                 if (this.scrollViewRef) this.scrollViewRef.scrollToEnd({ animated: false })
@@ -244,11 +236,7 @@ class LetsBegin extends React.Component {
                                     let is = c.is_question;
                                     return (
                                         <View style={styles.chatRow(is)} key={a}>
-                                            {!is ? <>
-                                                <View style={styles.chatViewIcon(is)} />
-                                                <View style={{ width: wp('2') }} />
-                                            </> : <></>
-                                            }
+                                            {!is ? <View style={styles.chatViewIcon(is)} /> : <></>}
                                             <TouchableOpacity
                                                 style={styles.chatTextView(is)}
                                                 onPress={() => {
@@ -256,27 +244,20 @@ class LetsBegin extends React.Component {
                                                     this.on_click_chat_text_panel(c.text)
                                                 }}>
                                                 <Text style={styles.chatTxt(is)}>{c.text}</Text>
-                                                {/* { a == play_text_id && <ActivityIndicator color={"#fff"}/> } */}
                                             </TouchableOpacity>
-                                            {is ? <>
-                                                <View style={{ width: wp('2') }} />
-                                                <View style={styles.chatViewIcon(is)} />
-                                            </> : <></>
-                                            }
+                                            {is ? <View style={styles.chatViewIcon(is)} /> : <></>}
                                         </View>
                                     )
                                 })
                             }
                             {loader && <ActivityIndicator size="large" color={"blue"} />}
-                            {(is_recording && !loader) && <Text style={{ textAlign:'center' }}>Speak Now</Text>}
+                            {(is_recording && !loader) && <Text style={{ textAlign: 'center' }}>Speak Now</Text>}
                         </ScrollView>
                     </View>
 
-                    <View style={{ height: hp('2', '1') }} />
-
-                    <View style={styles.askBtnView}>
+                    <View style={styles.speakBtnView}>
                         <TouchableOpacity
-                            style={styles.autoDetectBtn(is_recording)}
+                            style={styles.speakBtn(is_recording)}
                             onPressIn={async () => {
                                 this.setState({ "loader": true })
                                 let res = await call_asr_manager({ "function": method["openAsrConnection"], "connectionId": this.get_resource("cid") })
@@ -302,13 +283,11 @@ class LetsBegin extends React.Component {
                                 //     this.props.updateRedux({ "resources":resources })
                                 // },300)
                             }}>
-                            <View style={styles.autoDetectBtnInnerRow}>
-                                <Image source={MicIcon} style={styles.autoDetectBtnIcon(is_recording)} />
-                            </View>
+                            <Image source={MicIcon} style={styles.speakBtnTxt(is_recording)} />
                         </TouchableOpacity>
                     </View>
                 </View>
-            </View>
+            </SafeAreaView>
         </>);
     }
 }
@@ -321,54 +300,55 @@ const styles = StyleSheet.create({
         backgroundColor: theme.designColor,
         flex: 1
     },
+    headerView: {
+        height: hp('8'),
+        width: wp('100'),
+        paddingHorizontal: wp('2'),
+        flexDirection: 'row-reverse',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    helpBtn: {
+        height: hp('4.5'),
+        width: wp('18'),
+        borderRadius: 6,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    helpBtnTxt: {
+        fontSize: 16,
+        color: theme.designColor,
+        fontWeight: '700'
+    },
     mainView: {
         backgroundColor: theme.tertiary,
         flex: 1
     },
-    logoRow: {
-        height: hp('20'),
-        justifyContent: 'center',
-        alignItems: 'flex-end',
-        flexDirection: 'row'
+    speakBtnView: {
+        width: '100%',
+        position: 'absolute',
+        bottom: hp('4', '1')
     },
-    v02: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-around',
-    },
-    letsBeginText: {
-        fontSize: 45,
-        textAlign: 'right',
-        color: theme.primary,
-        marginTop: hp('4', '0.5'),
-        fontFamily: theme.font01
-    },
-    notesText: {
-        fontSize: 16,
-        fontWeight: '500',
-        textAlign: 'right',
-        color: theme.quinary,
-    },
-    autoDetectBtn: (is) => ({
+    speakBtn: (is) => ({
         height: hp('10'),
         width: hp('10'),
         alignSelf: 'center',
         borderWidth: 2,
         borderRadius: 100,
-        borderColor: is ? 'red' : theme.designColor,
+        backgroundColor: is ? 'red' : theme.designColor,
         alignItems: 'center',
         justifyContent: 'center',
     }),
-    autoDetectBtnInnerRow: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexDirection: 'row',
-        width: '100%'
-    },
-    autoDetectBtnIcon: is => ({ width: wp('10'), height: wp('10'), resizeMode: 'contain', tintColor: is ? 'red' : theme.designColor }),
+    speakBtnTxt: is => ({
+        width: wp('10'),
+        height: wp('10'),
+        resizeMode: 'contain',
+        tintColor: '#fff'
+    }),
     v01: {
-        height: hp('68'),
-        width: wp('98'),
+        height: hp('80'),
+        width: wp('100'),
         borderWidth: 1,
         borderColor: "#ddd",
         alignSelf: 'center',
@@ -383,27 +363,31 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: is ? 'flex-end' : 'flex-start'
     }),
-    chatViewIcon: (is) => ({
-        height: hp('3.5'),
-        width: hp('3.5'),
-        borderRadius: 100,
-        backgroundColor: is ? 'pink' : 'green'
-    }),
     chatTextView: (is) => ({
         maxWidth: wp('80'),
-        borderRadius: 6,
-        backgroundColor: is ? 'pink' : 'green',
+        borderBottomRightRadius: 10,
+        borderBottomLeftRadius: 10,
+        ...is ? { borderTopLeftRadius: 10 } : { borderTopRightRadius: 10 },
+        backgroundColor: is ? '#DEDEDE' : '#C6DDF8',
         padding: hp('1')
     }),
     chatTxt: (is) => ({
         fontSize: 18,
         textAlign: 'right',
-        color: is ? '#333' : 'white',
+        color: '#333',
         fontFamily: theme.font01
     }),
-    askBtnView: {
-        width: '100%',
-        position: 'absolute',
-        bottom: hp('4', '2')
-    }
+    chatViewIcon: (is) => ({
+        backgroundColor: "transparent",
+        borderStyle: "solid",
+        height: hp('3'),
+
+        borderLeftColor: is ? '#DEDEDE' : 'transparent',
+        borderRightColor: is ? 'transparent' : '#C6DDF8',
+        borderBottomColor: 'transparent',
+
+        borderLeftWidth: is ? hp('2.8') : 0,
+        borderRightWidth: is ? 0 : hp('2.8'),
+        borderBottomWidth: hp('2.8'),
+    }),
 });

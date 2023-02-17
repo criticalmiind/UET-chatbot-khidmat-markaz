@@ -1,4 +1,5 @@
-const main_base_url = "https://bot.cle.org.pk/"
+// const main_base_url = "https://bot.cle.org.pk/"
+const main_base_url = "http://202.142.159.37:7575/"
 
 export const uri = {
     "asr_manager": "asrManager",

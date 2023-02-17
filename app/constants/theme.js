@@ -1,5 +1,5 @@
 export const theme = {
-    designColor: '#005FD2',
+    designColor: '#21347E',
     designColor1: '#FFCD01',
     primary: '#000',
     primary01: '#333',

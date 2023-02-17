@@ -15,10 +15,10 @@ class Login extends React.Component {
         super(props)
         this.state = {
             "loader": false,
-            // 'userName': '',
-            // 'password': ""
-            'userName': 'cleUser',
-            'password': "cle@Password"
+            'userName': '',
+            'password': "",
+            'userName': '03345354727',
+            'password': "12345678"
         }
     }
 
@@ -109,7 +109,7 @@ class Login extends React.Component {
                     <View style={{ height: hp("1") }} />
                     <View style={styles.powered_view}>
                         <Image source={Logo} style={styles.footer_logo} />
-                        <Image source={Logo01} style={styles.footer_logo} />
+                        <Image source={Logo01} style={styles.footer_logo01} />
                     </View>
                 </ScrollView>
                 <View style={styles.helpView}>
@@ -197,6 +197,12 @@ const styles = StyleSheet.create({
         letterSpacing: 6
     },
     footer_logo: { height: wp('13'), width: wp('13'), alignSelf: 'center' },
+    footer_logo01: {
+        height: wp('13'),
+        width: wp('24'),
+        alignSelf: 'center',
+        resizeMode:'contain'
+    },
     helpView:{
         position:'absolute',
         bottom:hp('2'),

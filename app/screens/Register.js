@@ -12,6 +12,12 @@ import { translate } from '../i18n';
 import cities from './../constants/cities.json';
 import Input from '../components/Input';
 
+const GENDER_LIST = [
+    {name:"Male",icon_on:<SvgMaleOn/>,icon_off:<SvgMaleOff/>},
+    {name:"Female",icon_on:<SvgFemaleOn/>,icon_off:<SvgFemaleOff/>},
+    {name:"Other",icon_on:<SvgOtherOn/>,icon_off:<SvgOtherOff/>}
+]
+
 class Register extends React.Component {
     constructor(props) {
         super(props)
@@ -21,9 +27,7 @@ class Register extends React.Component {
             'userName': '',
             'password': '',
             'city': '',
-            'country': '',
-            'secretQuestion': '',
-            'secretAnswer': '',
+            'district':'',
             'gender': 'Male'
         }
     }
@@ -35,9 +39,7 @@ class Register extends React.Component {
             password,
             confirm_password,
             city,
-            country,
-            secretQuestion,
-            secretAnswer,
+            district,
             gender
         } = this.state;
         if (password !== confirm_password) {
@@ -51,9 +53,7 @@ class Register extends React.Component {
             'userName': userName,
             'password': password,
             'city': city,
-            'country': country,
-            'secretQuestion': 'password',
-            'secretAnswer': 'password',
+            'district':district,
             'gender': gender
         }
         let res = await call_application_manager(obj)
@@ -79,7 +79,7 @@ class Register extends React.Component {
             password,
             confirm_password,
             city,
-            secretAnswer,
+            district,
             gender,
         } = this.state;
 
@@ -90,7 +90,7 @@ class Register extends React.Component {
             if(isNullRetNull(confirm_password, 1) == 1) return true
             if(password != confirm_password) return true
             if(isNullRetNull(city, 1) == 1) return true
-            if(isNullRetNull(secretAnswer, 1) == 1) return true
+            if(isNullRetNull(district, 1) == 1) return true
             if(isNullRetNull(gender, 1) == 1) return true
             return false
         }
@@ -110,7 +110,6 @@ class Register extends React.Component {
                         <View style={{ height: hp("2") }} />
                         <Input
                             Icon={SvgUser}
-                            // style={styles.textInput}
                             placeholder={translate('Full Name')}
                             value={name}
                             onChangeText={(str) => {
@@ -130,7 +129,6 @@ class Register extends React.Component {
                         <View style={{ height: hp("2") }} />
                         <Input
                             Icon={SvgPwd}
-                            // style={styles.textInput}
                             placeholder={translate("Confirm Password")}
                             value={password}
                             secureTextEntry
@@ -141,7 +139,6 @@ class Register extends React.Component {
                         <View style={{ height: hp("2") }} />
                         <Input
                             Icon={SvgPwd}
-                            // style={styles.textInput}
                             placeholder={translate("Confirm Password")}
                             value={confirm_password}
                             secureTextEntry
@@ -150,55 +147,56 @@ class Register extends React.Component {
                             }} />
 
                         <View style={{ height: hp("2") }} />
-                        <SelectDropdown
-                            renderSearchInputLeftIcon={()=><SvgCity/>}
-                            renderDropdownIcon={()=><SvgCity/>}
-                            data={cities}
-                            buttonStyle={{ width: wp('90'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
-                            buttonTextStyle={{ fontFamily: theme.font01, textAlign: 'right', color: "#a3a3a3" }}
-                            defaultButtonText={translate('City')}
-                            search={true}
-                            defaultValue={city}
-                            onSelect={(selectedItem) => {
-                                this.setStateObj({ city:selectedItem.name })
-                            }}
-                            buttonTextAfterSelection={(selectedItem) => selectedItem.name }
-                            rowTextForSelection={(item) => item.name }
-                        />
+                        <View style={{ flexDirection:'row-reverse', alignSelf:'center', justifyContent:'space-between', width:wp('90') }}>
+                            <Input
+                                Icon={SvgCity}
+                                viewStyle={{ width: wp('44.5') }}
+                                placeholder={translate("City")}
+                                value={city}
+                                onChangeText={(str) => {
+                                    this.setState({ "city": str })
+                                }} />
+                            <SelectDropdown
+                                renderSearchInputLeftIcon={()=><SvgCity/>}
+                                data={cities}
+                                buttonStyle={{ width: wp('44.5'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
+                                buttonTextStyle={{ fontFamily: theme.font01, textAlign: 'right', color: "#a3a3a3" }}
+                                defaultButtonText={translate('District')}
+                                search={true}
+                                defaultValue={district}
+                                onSelect={(selectedItem) => {
+                                    this.setStateObj({ district:selectedItem.name })
+                                }}
+                                buttonTextAfterSelection={(selectedItem) => selectedItem.name }
+                                rowTextForSelection={(item) => item.name }
+                            />
+                        </View>
 
-                        <View style={{ height: hp("2") }} />
-                        <Input
-                            // Icon={SvgCity}
-                            // style={styles.textInput}
+                        {/* <View style={{ height: hp("2") }} /> */}
+                        
+                        {/* <Input
                             placeholder={translate('Secret String')}
                             value={secretAnswer}
                             onChangeText={(str) => {
                                 this.setState({ "secretAnswer": str })
-                            }} />
+                            }} /> */}
                         <View style={{ height: hp("2") }} />
-                        <View style={styles.v01}>
-                            <Text style={styles.txt01}>{translate('Gender')}</Text>
-                            <View style={styles.v02}>
-                                {
-                                    [
-                                        {name:"Male",icon_on:<SvgMaleOn/>,icon_off:<SvgMaleOff/>},
-                                        {name:"Female",icon_on:<SvgFemaleOn/>,icon_off:<SvgFemaleOff/>},
-                                        {name:"Other",icon_on:<SvgOtherOn/>,icon_off:<SvgOtherOff/>}
-                                    ].map((e) => {
-                                        let is = e.name == gender
-                                        return (
-                                            <TouchableOpacity
-                                                key={e.name}
-                                                style={styles.v03(is)}
-                                                onPress={() => { this.setState({ "gender": e.name }) }}>
-                                                {/* <Text style={{ color: is ? "#fff" : "#21347E" }}>{e}</Text> */}
-                                                {is?e.icon_on:e.icon_off}
-                                            </TouchableOpacity>
-                                        )
-                                    })
-                                }
-                            </View>
-                        </View>
+                        
+                        <SelectDropdown
+                            searchPlaceHolder={translate('Gender')}
+                            searchInputTxtStyle={{ textAlign:"right" }}
+                            data={GENDER_LIST}
+                            buttonStyle={{ width: wp('90'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
+                            buttonTextStyle={{ fontFamily: theme.font01, textAlign: 'right', color: "#a3a3a3" }}
+                            defaultButtonText={translate('Gender')}
+                            search={true}
+                            defaultValue={gender}
+                            onSelect={(i) => {
+                                this.setStateObj({ gender:i.name })
+                            }}
+                            buttonTextAfterSelection={(i) => i.name }
+                            rowTextForSelection={(item) => item.name }
+                            />
                         <View style={{ height: hp("2") }} />
                         <TouchableOpacity
                             disabled={disabled_reg()}
@@ -215,7 +213,7 @@ class Register extends React.Component {
                     <View style={{ height: hp("1") }} />
                     <View style={styles.powered_view}>
                         <Image source={Logo} style={styles.footer_logo} />
-                        <Image source={Logo01} style={styles.footer_logo} />
+                        <Image source={Logo01} style={styles.footer_logo01} />
                     </View>
                     <View style={{ height: hp("6") }} />
                 </ScrollView>
@@ -256,11 +254,6 @@ const styles = StyleSheet.create({
     },
     btnTxt: {
         color: "#fff",
-        fontSize: 16,
-        fontFamily: theme.font01
-    },
-    txt01: {
-        color: "#21347E",
         fontSize: 16,
         fontFamily: theme.font01
     },
@@ -316,6 +309,12 @@ const styles = StyleSheet.create({
         letterSpacing: 6
     },
     footer_logo: { height: wp('13'), width: wp('13'), alignSelf: 'center' },
+    footer_logo01: {
+        height: wp('13'),
+        width: wp('24'),
+        alignSelf: 'center',
+        resizeMode:'contain'
+    },
     helpView: {
         position: 'absolute',
         bottom: hp('2'),
@@ -330,26 +329,4 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center'
     },
-    v01: {
-        width: wp('90'),
-        alignSelf: 'center',
-        flexDirection: 'row-reverse',
-        justifyContent: "space-around"
-    },
-    v02: {
-        alignSelf: 'center',
-        flexDirection: 'row-reverse',
-        justifyContent: 'space-around',
-        width: "86%"
-    },
-    v03: (is) => ({
-        // borderWidth: 3,
-        // borderColor: "#21347E",
-        borderRadius: 100,
-        width: wp('15'),
-        height: wp('15'),
-        alignItems: 'center',
-        justifyContent: 'center',
-        // backgroundColor: is ? "rgba(33, 52, 126, 1)" : "#fff"
-    }),
 });

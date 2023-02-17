@@ -15,14 +15,14 @@ class Input extends React.Component {
     }
 
     render() {
-        const { Icon, iconStyle={}, secureTextEntry } = this.props;
+        const { Icon, iconStyle={}, secureTextEntry, viewStyle={}, textInputStyle={} } = this.props;
         const { showPwd } = this.state;
 
         return (
-            <View style={styles.view}>
+            <View style={{...styles.view, ...viewStyle}}>
                 { Icon && <View style={{...styles.icon, ...iconStyle }}><Icon/></View> }
                 <TextInput 
-                    style={styles.textInput}
+                    style={{...styles.textInput, ...textInputStyle}}
                     {...this.props}
                     {...secureTextEntry ? { "secureTextEntry": !showPwd } : {}}/>
                 { secureTextEntry && 
