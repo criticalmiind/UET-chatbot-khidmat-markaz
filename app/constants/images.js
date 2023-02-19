@@ -1,6 +1,6 @@
 import React from 'react';
 import { Path, Svg, SvgXml } from 'react-native-svg';
-import { back, city, drawer_icon, drawer_profile_icon, female, female_on, help, male, male_on, other, other_on, play, pwd, pwd_off, pwd_on, user } from './svgs';
+import { back, calender, city, drawer_icon, drawer_profile_icon, female, female_on, help, male, male_on, other, other_on, play, player_pause, player_play, popup_help, popup_success, popup_wrong, pwd, pwd_off, pwd_on, user } from './svgs';
 
 const Logo = require('./../assets/logo.png');
 const Logo01 = require('./../assets/cle_logo.png');
@@ -25,6 +25,12 @@ const SvgPlay = () => <SvgXml xml={play}/>
 const SvgDrawerIcon = () => <SvgXml xml={drawer_icon}/>
 const SvgDrawerProfileIcon = () => <SvgXml xml={drawer_profile_icon}/>
 const SvgBackIcon = () => <SvgXml xml={back}/>
+const SvgCalenderIcon = () => <SvgXml xml={calender}/>
+const SvgPlayIcon = () => <SvgXml xml={player_play} fill="#000000"/>
+const SvgPauseIcon = () => <SvgXml xml={player_pause}/>
+const SvgPopupWrongIcon = () => <SvgXml xml={popup_wrong}/>
+const SvgPopupSuccessIcon = () => <SvgXml xml={popup_success}/>
+const SvgPopupHelpIcon = () => <SvgXml xml={popup_help}/>
 
 export {
     Logo,
@@ -48,4 +54,10 @@ export {
     SvgDrawerIcon,
     SvgDrawerProfileIcon,
     SvgBackIcon,
+    SvgCalenderIcon,
+    SvgPlayIcon,
+    SvgPauseIcon,
+    SvgPopupWrongIcon,
+    SvgPopupSuccessIcon,
+    SvgPopupHelpIcon
 }

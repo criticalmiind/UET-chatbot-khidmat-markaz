@@ -1,5 +1,5 @@
 // const main_base_url = "https://bot.cle.org.pk/"
-const main_base_url = "http://202.142.159.37:7575/"
+const main_base_url = "https://202.142.159.37:7575/"
 
 export const uri = {
     "asr_manager": "asrManager",
@@ -39,7 +39,7 @@ export async function call_application_manager(payload) {
         const content = await rawResponse.json();
         return content;
     } catch (error) {
-        return { "resultFlag": false, "message": error }
+        return { "resultFlag": false, "message": error.message }
     }
 }
 
@@ -53,7 +53,7 @@ export async function call_asr_manager(payload) {
         const content = await rawResponse.json();
         return content;
     } catch (error) {
-        return { "resultFlag": false, "message": error }
+        return { "resultFlag": false, "message": error.message }
     }
 }
 
@@ -67,7 +67,7 @@ export async function tts_manager(obj) {
         const content = await rawResponse.json();
         return content;
     } catch (error) {
-        return { "resultFlag": false, "message": error }
+        return { "resultFlag": false, "message": error.message }
     }
 }
 
@@ -81,6 +81,6 @@ export async function dialogue_manager(obj) {
         const content = await rawResponse.json();
         return content;
     } catch (error) {
-        return { "resultFlag": false, "message": error }
+        return { "resultFlag": false, "message": error.message }
     }
 }

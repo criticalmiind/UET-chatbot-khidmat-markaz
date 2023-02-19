@@ -19,27 +19,28 @@ class RadioButton extends React.Component {
             onChange = () => { },
             buttonStyle,
             titleStyle,
-            buttonVerticle=false,
+            buttonVerticle = false,
             buttonTextStyle,
-            selectedKey="title",
+            selectedKey = "title",
             selectedValue
         } = this.props;
 
         return (<>
             <View style={{ ...styles.mainStyle, ...mainStyle ?? {} }}>
                 <Text style={{ ...styles.titleStyle, ...titleStyle ?? {} }}>{title}</Text>
-                <View style={{ "flexDirection":buttonVerticle?"column":"row" }}>
+                <View style={{ "flexDirection": buttonVerticle ? "column" : "row" }}>
                     {buttonsList.map((e) => {
                         let is = e[selectedKey] == selectedValue
-                        return(
-                        <TouchableOpacity
-                            style={{ ...styles.buttonStyle(is), ...buttonStyle ?? {} }}
-                            onPress={() => {
-                                onChange(e)
-                            }}>
-                            <Text style={{...styles.buttonTextStyle(is), ...buttonTextStyle }}>{isNullRetNull(e.title)}</Text>
-                        </TouchableOpacity>
-                    )})}
+                        return (
+                            <TouchableOpacity
+                                style={{ ...styles.buttonStyle(is), ...buttonStyle ?? {} }}
+                                onPress={() => {
+                                    onChange(e)
+                                }}>
+                                <Text style={{ ...styles.buttonTextStyle(is), ...buttonTextStyle }}>{isNullRetNull(e.title)}</Text>
+                            </TouchableOpacity>
+                        )
+                    })}
                 </View>
             </View>
         </>);
@@ -56,19 +57,19 @@ const styles = StyleSheet.create({
     titleStyle: {
         fontSize: 18,
     },
-    buttonStyle:(is)=> ({
+    buttonStyle: (is) => ({
         paddingVertical: wp('1'),
         paddingHorizontal: wp('4'),
-        backgroundColor: is?theme.designColor:theme.tertiary,
+        backgroundColor: is ? theme.designColor : theme.tertiary,
         borderRadius: 2,
         margin: wp('1'),
         alignItems: 'center',
         justifyContent: 'center',
-        "borderWidth":1,
-        "borderColor":theme.designColor
+        "borderWidth": 1,
+        "borderColor": theme.designColor
     }),
-    "buttonTextStyle":(is)=>({
-        "fontSize":14,
-        "color":is?theme.tertiary:theme.primary01
+    "buttonTextStyle": (is) => ({
+        "fontSize": 14,
+        "color": is ? theme.tertiary : theme.primary01
     })
 });

@@ -2,7 +2,7 @@
     "e-service": "ای سروسزسسٹم",
     "phone-placeholder": "03XX-XXXXXXX",
     "password": "پاس ورڈ",
-    "forgot-password": "پاس ورڈ بھول گئے؟",
+    "I forgot my password?": "پاس ورڈ بھول گئے؟",
     "login": "لاگ ان کریں",
     "create_new_account": "نیا اکاؤنٹ بنائیں",
     "powered": "POWERED BY",
@@ -15,6 +15,17 @@
     "start": "شروع کریں",
     "Logout": "لاگ آؤٹ کریں",
     "Delete Account": "اکاؤنٹ ڈیلیٹ کریں",
-    "District":"تحصیل",
-    "dob":"تاریخ پیدائش"
+    "District": "تحصیل",
+    "dob": "تاریخ پیدائش",
+    "Yes": "ہاں",
+    "No": "نہیں",
+    "wrong": "غلطی",
+    "success": "کامیابی",
+    "help": "مدد",
+    "Network request failed": "نیٹ ورک کی درخواست ناکام ہوگئی",
+    "Would You need help?":"کیا آپ کو مدد کی ضرورت ہے؟",
+    "Update Password":"پاسورڈ اب ڈیٹ کریں",
+    "Forgot Password":"پاسورڈ یاد نہیں!",
+    "This Feature is under construction":"یہ فیچر زیر تعمیر ہے۔",
+    "Delete":"ڈیلیٹ کریں"
 }

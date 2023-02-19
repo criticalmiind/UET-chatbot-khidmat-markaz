@@ -8,6 +8,7 @@ import { Logo, Logo01, SvgDrawerIcon, SvgDrawerProfileIcon, SvgPlay } from '../c
 import { call_application_manager, method } from '../api';
 import Loader from '../components/Loader';
 import { translate } from '../i18n';
+import Popup from '../components/Popup';
 
 class Start extends React.Component {
     constructor(props) {
@@ -17,7 +18,7 @@ class Start extends React.Component {
         }
     }
 
-    UNSAFE_componentWillMount() {}
+    UNSAFE_componentWillMount() { }
 
     async get_resources(session) {
         // this.props.navigation.navigate("LetsBegin")
@@ -33,16 +34,17 @@ class Start extends React.Component {
             }, 300)
         } else {
             this.setState({ loader: false })
-            notify({ "title": "Failed!", "message": "Server Not Responding: "+res.message+"", "success": false })
+            notify({ "title": "Failed!", "message": "Server Not Responding: " + res.message + "", "success": false })
         }
     }
 
     render() {
         const { loader, isSlider } = this.state;
         const { sessionId, name } = this.props.userData;
-        
+
         return (<>
             <Loader isShow={loader} />
+            <Popup {...this.state.popup} onClick={() => { this.setState({ popup: {} }) }} />
             {isSlider && <>
                 <TouchableOpacity
                     style={styles.sliderBlurView}
@@ -55,15 +57,16 @@ class Start extends React.Component {
                     <SvgDrawerProfileIcon />
                     <Text style={styles.userNameTxt}>{name}</Text>
 
-                    <View style={{ height:hp('50') }}/>
+                    <View style={{ height: hp('50') }} />
                     <TouchableOpacity
                         style={styles.btn01}
                         onPress={async () => {
-                            notify({title:"Sorry!",message:"this feature is under construction"})
+                            this.setState({ isSlider: false })
+                            this.props.navigation.navigate("DeleteAccount")
                         }}>
                         <Text style={styles.btnTxt}>{translate('Delete Account')}</Text>
                     </TouchableOpacity>
-                    <View style={{ height:hp('1') }}/>
+                    <View style={{ height: hp('1') }} />
                     <TouchableOpacity
                         style={styles.btn01}
                         onPress={async () => {
@@ -74,48 +77,47 @@ class Start extends React.Component {
                 </View>
             </>}
             <View style={styles.safeArea}>
-                <ScrollView>
-                    <View style={styles.mainView}>
-                        <View style={styles.header}>
-                            <TouchableOpacity onPress={() => { this.setState({ isSlider: true }) }}>
-                                <SvgDrawerIcon />
-                            </TouchableOpacity>
+                <View style={styles.header}>
+                    <TouchableOpacity onPress={() => { this.setState({ isSlider: true }) }}>
+                        <SvgDrawerIcon />
+                    </TouchableOpacity>
 
-                            <TouchableOpacity
-                                style={styles.headHelpBtn}
-                                onPress={() => {
-                                    notify({ title: "Sorry!", message: "this feature is under construction" })
-                                }}>
-                                <Text style={styles.headHelpBtnTxt}>HELP</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <View style={{ height: hp("12") }} />
-                        <View style={{ justifyContent: 'center' }}>
-                            <Image source={Logo} style={styles.logo_bg} />
-                            <Image source={Logo} style={styles.logo} />
-                        </View>
-                        <Text style={styles.title}>{translate('e-service')}</Text>
-
-                        <View style={{ height: hp("6") }} />
-                        <TouchableOpacity
-                            style={styles.btn}
-                            onPress={async () => {
-                                this.get_resources(sessionId)
-                            }}>
-                            <SvgPlay />
-                            <View style={{ width: wp('1') }} />
-                            <Text style={styles.btnTxt}>{translate('start')}</Text>
-                        </TouchableOpacity>
-                        {/* <View style={{ height: hp("2") }} />
-                        <TouchableOpacity
-                            style={styles.btn}
-                            onPress={async () => {
-                                this.props.updateRedux({ "userData": {}, "resources": {} })
-                            }}>
-                            <Text style={styles.btnTxt}>{translate('Logout')}</Text>
-                        </TouchableOpacity> */}
+                    <TouchableOpacity
+                        style={styles.headHelpBtn}
+                        onPress={() => {
+                            this.setState({ popup: { "show": true, "type": "help", "message": translate("Would You need help?") } })
+                        }}>
+                        <Text style={styles.headHelpBtnTxt}>HELP</Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.mainView}>
+                    <View style={{ height: hp("8") }} />
+                    <View style={{ justifyContent: 'center' }}>
+                        <Image source={Logo} style={styles.logo_bg} />
+                        <Image source={Logo} style={styles.logo} />
                     </View>
-                    <View style={{ height: hp("24") }} />
+                    <Text style={styles.title}>{translate('e-service')}</Text>
+
+                    <View style={{ height: hp("6") }} />
+                    <TouchableOpacity
+                        style={styles.btn}
+                        onPress={async () => {
+                            this.get_resources(sessionId)
+                        }}>
+                        <SvgPlay />
+                        <View style={{ width: wp('1') }} />
+                        <Text style={styles.btnTxt}>{translate('start')}</Text>
+                    </TouchableOpacity>
+                    <View style={{ height: hp("2") }} />
+                    <TouchableOpacity
+                        style={styles.btn}
+                        onPress={async () => {
+                            this.props.updateRedux({ "userData": {}, "resources": {} })
+                        }}>
+                        <Text style={styles.btnTxt}>{translate('Logout')}</Text>
+                    </TouchableOpacity>
+
+                    <View style={{ height: hp("12") }} />
 
                     <Text style={styles.powered_txt}>{translate('powered')}</Text>
                     <View style={{ height: hp("1") }} />
@@ -123,26 +125,7 @@ class Start extends React.Component {
                         <Image source={Logo} style={styles.footer_logo} />
                         <Image source={Logo01} style={styles.footer_logo01} />
                     </View>
-                </ScrollView>
-                {/* <View style={styles.helpView}>
-                    <TouchableOpacity
-                        style={styles.helpBtn}
-                        onPress={()=>{
-                            notify({title:"Sorry!",message:"this feature is under construction"})
-                        }}>
-                        <Text style={{ fontSize:16, color:"#21347E" }}>?</Text>
-                    </TouchableOpacity>
-                </View> */}
-
-                {/* <View style={styles.v01}>
-                    <TouchableOpacity
-                        style={styles.deleteBtn}
-                        onPress={()=>{
-                            notify({title:"Sorry!",message:"this feature is under construction"})
-                        }}>
-                        <Text style={styles.deleteBtnTxt}>{translate('Delete Account')}</Text>
-                    </TouchableOpacity>
-                </View> */}
+                </View>
             </View>
         </>);
     }
@@ -181,6 +164,7 @@ const styles = StyleSheet.create({
     mainView: {
         backgroundColor: theme.tertiary,
         flex: 1,
+        justifyContent: 'center'
     },
     header: {
         height: hp('10'),

@@ -9,30 +9,35 @@ import { call_application_manager, method } from '../api';
 import Loader from '../components/Loader';
 import { translate } from '../i18n';
 import Input from '../components/Input';
+import Popup from '../components/Popup';
 
 class Login extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
             "loader": false,
-            'userName': '',
+            'userName': "",
             'password': "",
+            // 'userName': "cleUser",
+            // 'password': "cle@Password",
             'userName': '03345354727',
             'password': "12345678"
         }
     }
 
     async login() {
+        // this.props.updateRedux({ "userData": {"id":2} })
+        // return
         const { userName, password } = this.state;
         this.setStateObj({ loader: true })
         let obj = { 'function': method['loginUser'], 'userName': userName, 'password': password }
         let res = await call_application_manager(obj)
         if (res.resultFlag) {
-            notify({ "title": "Success!", "message": "Login Successfully!", "success": true })
+            this.setState({ popup:{ "show":true, "type":"success", "message":"Login Successfully!" } })
             this.props.updateRedux({ "userData": res })
         } else {
             this.setStateObj({ loader: false })
-            notify({ "title": "Failed!", "message": "Login Failed!", "success": false })
+            this.setState({ popup:{ "show":true, "type":"wrong", "message":translate(res.message) } })
         }
     }
 
@@ -44,10 +49,9 @@ class Login extends React.Component {
         const { loader, userName, password } = this.state;
         let disabled_login = (isNullRetNull(userName, 1) == 1 || isNullRetNull(password, 1) == 1)
         
-        // this.props.updateRedux({ "userData": { "a":"test" } })
-
         return (<>
-            <Loader isShow={loader} />
+            <Loader isShow={loader}/>
+            <Popup { ...this.state.popup } onClick={()=>{ this.setState({ popup:{} }) }}/>
             <View style={styles.safeArea}>
                 <ScrollView>
                     <View style={styles.mainView}>
@@ -81,9 +85,9 @@ class Login extends React.Component {
                         <TouchableOpacity
                             style={styles.forgot_pwd_btn}
                             onPress={()=>{
-                                notify({title:"Sorry!",message:"this feature is under construction"})
+                                this.props.navigation.navigate("ForgotPassword")
                             }}>
-                            <Text style={styles.forgot_pwd_txt}>{translate("forgot-password")}</Text>
+                            <Text style={styles.forgot_pwd_txt}>{translate("I forgot my password?")}</Text>
                         </TouchableOpacity>
                         <View style={{ height: hp("2") }} />
                         <TouchableOpacity
@@ -116,7 +120,7 @@ class Login extends React.Component {
                     <TouchableOpacity
                         style={styles.helpBtn}
                         onPress={()=>{
-                            notify({title:"Sorry!",message:"this feature is under construction"})
+                            this.setState({ popup:{ "show":true, "type":"help", "message":translate("Would You need help?") } })
                         }}>
                         <SvgHelp/>
                     </TouchableOpacity>

@@ -14,7 +14,7 @@ import {
 import { mapDispatchToProps, mapStateToProps } from './../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from './../constants/theme';
-import { getAsrLink, get_resource, hp, isNullRetNull, notify, uid, wp } from './../utils';
+import { get_resource, hp, isNullRetNull, notify, uid, wp } from './../utils';
 import AudioRecord from 'react-native-audio-recording-stream';
 import {
     base64_into_blob,
@@ -23,13 +23,14 @@ import {
     play_message_handler,
     on_mic_click,
     text_to_speech,
-    on_click_chat_text_panel,
     close_connection
 } from '../api/methods';
-import { Logo, LogoWhite, MicIcon, SvgBackIcon } from '../constants/images';
-import { call_asr_manager, dialogue_manager, method, run_scripts, tts_manager } from '../api';
+import { LogoWhite, MicIcon, SvgBackIcon } from '../constants/images';
+import { dialogue_manager, run_scripts, tts_manager } from '../api';
 import Loader from '../components/Loader';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import PlayerView from '../components/PlayerView';
+import Popup from '../components/Popup';
 
 class LetsBegin extends React.Component {
     constructor(props) {
@@ -42,7 +43,6 @@ class LetsBegin extends React.Component {
         this.ws = { readyState: 3 };
         // this.ws = new WebSocket(this.get_resource('asr'));
         this.get_query_answers = get_query_answers.bind(this);
-        this.on_click_chat_text_panel = on_click_chat_text_panel.bind(this);
         this.on_mic_click = on_mic_click.bind(this);
         this.text_to_speech = text_to_speech.bind(this);
         this.play_message_handler = play_message_handler.bind(this);
@@ -54,8 +54,8 @@ class LetsBegin extends React.Component {
             "last_id": false,
             "last_ids_list": {},
             "chat_list": {
-                // "askjdawe": { "is_question": true, "text": "ایک ٹیلے پر واقع مزار خواجہ فریدالدین گنج شکرؒ کے احاطہء صحن میں ذرا سی ژالہ باری چاندی کے ڈھیروں کی مثل بڑے غضب کا نظارا دیتی ہے۔" },
-                // "askjdasa": { "is_question": false, "text": "ایک ٹیلے پر واقع مزار خواجہ فریدالدین گنج شکرؒ کے احاطہء صحن میں ذرا سی ژالہ باری چاندی کے ڈھیروں کی مثل بڑے غضب کا نظارا دیتی ہے۔" },
+                "askjdawe": { "is_question": true, "text": "ایک ٹیلے پر واقع مزار خواجہ فریدالدین گنج شکرؒ کے احاطہء صحن میں ذرا سی ژالہ باری چاندی کے ڈھیروں کی مثل بڑے غضب کا نظارا دیتی ہے۔" },
+                "askjdasa": { "is_question": false, "text": "ایک ٹیلے پر واقع مزار خواجہ فریدالدین گنج شکرؒ کے احاطہء صحن میں ذرا سی ژالہ باری چاندی کے ڈھیروں کی مثل بڑے غضب کا نظارا دیتی ہے۔" },
             },
             "last_unread_msgs": {},
             "play_text_id": false,
@@ -65,7 +65,7 @@ class LetsBegin extends React.Component {
 
     async UNSAFE_componentWillMount() {
         this.setState({ "isLoaded": true })
-
+        console.log(this.props)
         const options = {
             sampleRate: 16000,  // default 44100
             channels: 1,        // 1 or 2, default 1
@@ -203,6 +203,7 @@ class LetsBegin extends React.Component {
 
         return (<>
             <Loader isShow={screen_loader} mesasge={loader_message} />
+            <Popup { ...this.state.popup } onClick={()=>{ this.setState({ popup:{} }) }}/>
 
             <SafeAreaView style={styles.safeArea} forceInset={{ top: 'always' }}>
                 <StatusBar barStyle="light-content" backgroundColor={theme.designColor} />
@@ -210,7 +211,7 @@ class LetsBegin extends React.Component {
                     <TouchableOpacity
                         style={styles.helpBtn}
                         onPress={() => {
-                            notify({ title: "Sorry!", message: "this feature is under construction" })
+                            this.setState({ popup:{ "show":true, "type":"help", "message":translate("Would You need help?") } })
                         }}>
                         <Text style={styles.helpBtnTxt}>HELP</Text>
                     </TouchableOpacity>
@@ -237,14 +238,10 @@ class LetsBegin extends React.Component {
                                     return (
                                         <View style={styles.chatRow(is)} key={a}>
                                             {!is ? <View style={styles.chatViewIcon(is)} /> : <></>}
-                                            <TouchableOpacity
-                                                style={styles.chatTextView(is)}
-                                                onPress={() => {
-                                                    // this.setState({ "play_text_id":a });
-                                                    this.on_click_chat_text_panel(c.text)
-                                                }}>
+                                            <View style={styles.chatTextView(is)}>
+                                                <PlayerView text_obj={c}/>
                                                 <Text style={styles.chatTxt(is)}>{c.text}</Text>
-                                            </TouchableOpacity>
+                                            </View>
                                             {is ? <View style={styles.chatViewIcon(is)} /> : <></>}
                                         </View>
                                     )
@@ -259,29 +256,12 @@ class LetsBegin extends React.Component {
                         <TouchableOpacity
                             style={styles.speakBtn(is_recording)}
                             onPressIn={async () => {
-                                this.setState({ "loader": true })
-                                let res = await call_asr_manager({ "function": method["openAsrConnection"], "connectionId": this.get_resource("cid") })
-                                if (res.resultFlag) {
-                                    this.ws = new WebSocket(getAsrLink(res.asrModel), this.get_resource("cid"));
-                                    resources['asrModel'] = res.asrModel
-                                    this.props.updateRedux({ "resources": resources })
-                                    setTimeout(() => {
-                                        // this.setState({ "loader" :false})
-                                        this.on_mic_click()
-                                    }, 500)
-                                } else {
-                                    notify({ "title": "Failed!", "message": res.message, "success": false })
-                                    this.props.navigation.goBack()
-                                }
+                                this.on_mic_click()
                             }}
                             onPressOut={async () => {
                                 setTimeout(async () => {
                                     await this.on_mic_click()
-                                }, 100)
-                                // setTimeout(async () => {
-                                //     resources['asrModel'] = false
-                                //     this.props.updateRedux({ "resources":resources })
-                                // },300)
+                                }, 300)
                             }}>
                             <Image source={MicIcon} style={styles.speakBtnTxt(is_recording)} />
                         </TouchableOpacity>

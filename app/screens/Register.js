@@ -5,12 +5,14 @@ import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userAction
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
 import { hp, isNullRetNull, notify, wp } from '../utils';
-import { Logo, Logo01, SvgCity, SvgFemaleOff, SvgFemaleOn, SvgHelp, SvgMaleOff, SvgMaleOn, SvgOtherOff, SvgOtherOn, SvgPhone, SvgPwd, SvgUser } from '../constants/images';
+import { Logo, Logo01, SvgCalenderIcon, SvgCity, SvgFemaleOff, SvgFemaleOn, SvgHelp, SvgMaleOff, SvgMaleOn, SvgOtherOff, SvgOtherOn, SvgPhone, SvgPwd, SvgUser } from '../constants/images';
 import { call_application_manager, method } from '../api';
 import Loader from '../components/Loader';
 import { translate } from '../i18n';
 import cities from './../constants/cities.json';
 import Input from '../components/Input';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import Popup from '../components/Popup';
 
 const GENDER_LIST = [
     {name:"Male",icon_on:<SvgMaleOn/>,icon_off:<SvgMaleOff/>},
@@ -28,7 +30,8 @@ class Register extends React.Component {
             'password': '',
             'city': '',
             'district':'',
-            'gender': 'Male'
+            'gender': 'Male',
+            'dateOfBirth': false
         }
     }
 
@@ -40,7 +43,8 @@ class Register extends React.Component {
             confirm_password,
             city,
             district,
-            gender
+            gender,
+            dateOfBirth
         } = this.state;
         if (password !== confirm_password) {
             notify({ "title": "Failed!", "message": "Passwords doesn't match!", "success": false })
@@ -54,15 +58,17 @@ class Register extends React.Component {
             'password': password,
             'city': city,
             'district':district,
-            'gender': gender
+            'gender': gender,
+            // 'dateOfBirth':dateOfBirth
         }
         let res = await call_application_manager(obj)
         this.setStateObj({ loader: false })
         if (res.resultFlag) {
-            notify({ "title": "Success!", "message": "Registered Successfully! Now please login!", "success": true })
+            this.setState({ popup:{ "show":true, "type":"success", "message":"Registered Successfully! Now please login!" } })
             this.props.navigation.navigate("Login")
         } else {
-            notify({ "title": "Failed!", "message": res.message, "success": false })
+            this.setState({ popup:{ "show":true, "type":"wrong", "message":translate(res.message) } })
+
         }
     }
 
@@ -73,6 +79,7 @@ class Register extends React.Component {
     render() {
         const {
             loader,
+            showDatePicker,
 
             name,
             userName,
@@ -81,6 +88,7 @@ class Register extends React.Component {
             city,
             district,
             gender,
+            dateOfBirth,
         } = this.state;
 
         let disabled_reg = () => {
@@ -95,9 +103,9 @@ class Register extends React.Component {
             return false
         }
 
-
         return (<>
             <Loader isShow={loader} />
+            <Popup { ...this.state.popup } onClick={()=>{ this.setState({ popup:{} }) }}/>
             <View style={styles.safeArea}>
                 <ScrollView>
                     <View style={styles.mainView}>
@@ -160,7 +168,7 @@ class Register extends React.Component {
                                 renderSearchInputLeftIcon={()=><SvgCity/>}
                                 data={cities}
                                 buttonStyle={{ width: wp('44.5'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
-                                buttonTextStyle={{ fontFamily: theme.font01, textAlign: 'right', color: "#a3a3a3" }}
+                                buttonTextStyle={styles.txt01}
                                 defaultButtonText={translate('District')}
                                 search={true}
                                 defaultValue={district}
@@ -172,14 +180,34 @@ class Register extends React.Component {
                             />
                         </View>
 
-                        {/* <View style={{ height: hp("2") }} /> */}
-                        
-                        {/* <Input
-                            placeholder={translate('Secret String')}
-                            value={secretAnswer}
-                            onChangeText={(str) => {
-                                this.setState({ "secretAnswer": str })
-                            }} /> */}
+                        <View style={{ height: hp("2") }} />
+                        <TouchableOpacity
+                            style={{
+                                width: wp('90'),
+                                alignSelf: 'center',
+                                alignItems:'center',
+                                justifyContent:'space-between',
+                                flexDirection:'row-reverse',
+                                paddingHorizontal:wp('2'),
+                                height: hp('6'),
+                                borderBottomWidth: 2,
+                                borderColor: "#7A7A7A",
+                                backgroundColor:'#E8E8E8'
+                            }}
+                            onPress={()=>{ this.setState({ 'showDatePicker':!showDatePicker }) }}>
+                            { dateOfBirth ? <Text style={styles.txt01}>{dateOfBirth.toLocaleDateString()}</Text> 
+                                : <Text style={styles.txt01}>{translate('dob')}</Text> }
+                            <SvgCalenderIcon/>
+                        </TouchableOpacity>
+                        { showDatePicker && <DateTimePicker
+                            testID="dateTimePicker"
+                            value={dateOfBirth?dateOfBirth:new Date()}
+                            mode={"date"}
+                            is24Hour={true}
+                            onChange={(e)=>{
+                                this.setState({ "dateOfBirth":e.nativeEvent.timestamp, "showDatePicker":false })
+                            }}/>
+                        }
                         <View style={{ height: hp("2") }} />
                         
                         <SelectDropdown
@@ -187,7 +215,7 @@ class Register extends React.Component {
                             searchInputTxtStyle={{ textAlign:"right" }}
                             data={GENDER_LIST}
                             buttonStyle={{ width: wp('90'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
-                            buttonTextStyle={{ fontFamily: theme.font01, textAlign: 'right', color: "#a3a3a3" }}
+                            buttonTextStyle={styles.txt01}
                             defaultButtonText={translate('Gender')}
                             search={true}
                             defaultValue={gender}
@@ -221,7 +249,7 @@ class Register extends React.Component {
                     <TouchableOpacity
                         style={styles.helpBtn}
                         onPress={() => {
-                            notify({ title: "Sorry!", message: "this feature is under construction" })
+                            this.setState({ popup:{ "show":true, "type":"help", "message":translate("Would You need help?") } })
                         }}>
                         <SvgHelp/>
                     </TouchableOpacity>
@@ -329,4 +357,5 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center'
     },
+    txt01:{ fontFamily: theme.font01, textAlign: 'right', color: "#a3a3a3" }
 });

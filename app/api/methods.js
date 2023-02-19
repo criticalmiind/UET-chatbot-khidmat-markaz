@@ -1,6 +1,6 @@
 import { PermissionsAndroid, Alert, Platform } from 'react-native';
 import AudioRecord from "react-native-audio-recording-stream";
-import { isNullRetNull, jsonParse, simplify, uid } from "../utils";
+import { isNullRetNull, jsonParse, notify, simplify, uid } from "../utils";
 import Sound from "react-native-sound";
 import { call_application_manager, method } from '.';
 var RNFS = require('react-native-fs');
@@ -65,8 +65,6 @@ export async function get_query_answers() {
             if (ttsRes.resultFlag) {
                 let audioResponse = jsonParse(ttsRes.audioResponse)
 
-                console.log(audioResponse)
-
                 let encodedFile = audioResponse.response.encodedFile
                 last_unread_msgs[el.id] = { "is_question": false, "encodedFile": encodedFile }
                 setTimeout(() => {
@@ -85,16 +83,21 @@ export async function get_query_answers() {
     });
 }
 
-export async function on_click_chat_text_panel(text) {
-    const ttsRes = await this.tts_manager({ "text": text })
-    if (ttsRes && ttsRes.response && ttsRes.response.status == 'ok') {
+export async function on_click_chat_text_panel(text, callback=(e)=>{}) {
+    const { resultFlag, audioResponse, message } = await this.tts_manager({ "message": text })
+    if(resultFlag){
+        let json = jsonParse(audioResponse)
+        let encodedFile = json.response.encodedFile
         setTimeout(() => {
-            this.play_message_handler(ttsRes.response.encodedFile, false,)
+            this.play_message_handler(encodedFile, false, callback)
         }, 500)
+    }else{
+        // if(message.message && message.stack) notify({ "title":message.message, "message":message.stack })
+        notify({ "title":"Failed!", "message":message+"" })
     }
 }
 
-export async function play_message_handler(url, is_path = false) {
+export async function play_message_handler(url, is_path = false, callback=(e)=>{}) {
     // const { is_recording } = this.state
     // if (!is_recording) return
     if (!is_path) {
@@ -104,6 +107,7 @@ export async function play_message_handler(url, is_path = false) {
                 if (this.sound) this.sound.stop()
                 this.sound = new Sound(path, '', () => {
                     this.sound.play((r) => {
+                        if(callback) callback(r)
                     })
                 })
             })
@@ -111,6 +115,7 @@ export async function play_message_handler(url, is_path = false) {
         if (this.sound) this.sound.stop()
         this.sound = new Sound(url, '', () => {
             this.sound.play((r) => {
+                if(callback) callback(r)
             })
         })
     }
