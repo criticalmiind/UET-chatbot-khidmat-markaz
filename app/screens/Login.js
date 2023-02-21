@@ -1,9 +1,9 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, TextInput, Image, ScrollView } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, View, Image, ScrollView } from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
-import { hp, isNullRetNull, notify, wp } from '../utils';
+import { hp, isNullRetNull, wp } from '../utils';
 import { Logo, Logo01, SvgHelp, SvgPhone, SvgPwd } from '../constants/images';
 import { call_application_manager, method } from '../api';
 import Loader from '../components/Loader';
@@ -26,8 +26,8 @@ class Login extends React.Component {
     }
 
     async login() {
-        // this.props.updateRedux({ "userData": {"id":2} })
-        // return
+        this.props.updateRedux({ "userData": {"id":2} })
+        return
         const { userName, password } = this.state;
         this.setStateObj({ loader: true })
         let obj = { 'function': method['loginUser'], 'userName': userName, 'password': password }

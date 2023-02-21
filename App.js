@@ -5,7 +5,7 @@ import configureStore from "./app/redux/store/index";
 const { persistor, store } = configureStore();
 import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 import EntryPoint from "./app/EntryPoint";
-import { LogBox } from "react-native";
+import { LogBox, Text, View } from "react-native";
 import CodePush from "react-native-code-push";
 
 class App extends Component {
@@ -21,7 +21,7 @@ class App extends Component {
     this._isMounted = true;
     if(this._isMounted){
       LogBox.ignoreAllLogs(true)
-      // await this.checkForUpdate();
+      await this.checkForUpdate();
     }
   }
 
@@ -31,10 +31,10 @@ class App extends Component {
       updateDialog: true,
       installMode: CodePush.InstallMode.IMMEDIATE
     });
-    this.setState({ loader:false })
     if(a === 1){ 
       CodePush.restartApp();
     }
+    this.setState({ loader:false })
   }
 
   setStateObj(obj){
@@ -42,10 +42,18 @@ class App extends Component {
   }
 
   render() {
+    const { loader } = this.state
+    const Update = () => {
+      return(
+        <View style={{ flex:1, alignItems:'center', justifyContent:'center' }}>
+          <Text>Checking For Update!</Text>
+        </View>
+      )
+    }
     return (<>
       <Provider store={store}>
         <PersistGate persistor={persistor}>
-          { <EntryPoint /> }
+          { loader ? <Update/>:<EntryPoint /> }
         </PersistGate>
       </Provider>
     </>);

@@ -1,12 +1,12 @@
 import { createAppContainer } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
-import DeleteAccount from "../screens/DeleteAccount";
-import ForgotPassword from "../screens/ForgotPassword";
 
-import LetsBegin from './../screens/LetsBegin';
 import Login from './../screens/Login';
 import Register from './../screens/Register';
 import Start from './../screens/Start';
+import LetsBegin from './../screens/LetsBegin';
+import DeleteAccount from "../screens/DeleteAccount";
+import ForgotPassword from "../screens/ForgotPassword";
 
 export const MainNav = createStackNavigator({
   Start: { screen:Start, navigationOptions: { headerShown: false } },

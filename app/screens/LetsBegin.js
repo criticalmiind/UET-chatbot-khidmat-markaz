@@ -14,7 +14,7 @@ import {
 import { mapDispatchToProps, mapStateToProps } from './../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from './../constants/theme';
-import { get_resource, hp, isNullRetNull, notify, uid, wp } from './../utils';
+import { get_resource, hp, isNullRetNull, uid, wp } from './../utils';
 import AudioRecord from 'react-native-audio-recording-stream';
 import {
     base64_into_blob,
@@ -65,7 +65,7 @@ class LetsBegin extends React.Component {
 
     async UNSAFE_componentWillMount() {
         this.setState({ "isLoaded": true })
-        console.log(this.props)
+        // console.log(this.props)
         const options = {
             sampleRate: 16000,  // default 44100
             channels: 1,        // 1 or 2, default 1
@@ -85,7 +85,7 @@ class LetsBegin extends React.Component {
                 this.setState({ "screen_loader": true, "loader_message": "Closing Connection" })
                 const res = await this.close_connection()
                 this.setState({ "screen_loader": false, "loader_message": false })
-                notify({ "title": res.resultFlag ? 'Success' : 'Failed', "message": `${res.message}` })
+                this.setState({ popup:{ "show":true, "type":res.resultFlag ? 'success':"wrong", "message":translate(res.message) } })
                 this.props.updateRedux({ resources: {} })
                 this.props.navigation.goBack(null)
             }

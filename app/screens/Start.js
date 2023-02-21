@@ -21,8 +21,8 @@ class Start extends React.Component {
     UNSAFE_componentWillMount() { }
 
     async get_resources(session) {
-        // this.props.navigation.navigate("LetsBegin")
-        // return
+        this.props.navigation.navigate("LetsBegin")
+        return
         this.setState({ loader: true })
         let obj = { 'function': method['startService'], 'sessionId': session }
         let res = await call_application_manager(obj)
@@ -34,7 +34,7 @@ class Start extends React.Component {
             }, 300)
         } else {
             this.setState({ loader: false })
-            notify({ "title": "Failed!", "message": "Server Not Responding: " + res.message + "", "success": false })
+            this.setState({ popup:{ "show":true, "type":"wrong", "message":translate(res.message) } })
         }
     }
 
@@ -54,7 +54,7 @@ class Start extends React.Component {
                 </TouchableOpacity>
                 <View style={styles.sliderView}>
                     <View style={{ height: hp('10') }} />
-                    <SvgDrawerProfileIcon />
+                    <SvgDrawerProfileIcon/>
                     <Text style={styles.userNameTxt}>{name}</Text>
 
                     <View style={{ height: hp('50') }} />

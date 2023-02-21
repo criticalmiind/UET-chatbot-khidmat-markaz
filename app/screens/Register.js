@@ -1,11 +1,11 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, TextInput, Image, ScrollView } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, View, Image, ScrollView } from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown'
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
 import { hp, isNullRetNull, notify, wp } from '../utils';
-import { Logo, Logo01, SvgCalenderIcon, SvgCity, SvgFemaleOff, SvgFemaleOn, SvgHelp, SvgMaleOff, SvgMaleOn, SvgOtherOff, SvgOtherOn, SvgPhone, SvgPwd, SvgUser } from '../constants/images';
+import { Logo, Logo01, SvgCalenderIcon, SvgCity, SvgHelp, SvgPhone, SvgPwd, SvgUser } from '../constants/images';
 import { call_application_manager, method } from '../api';
 import Loader from '../components/Loader';
 import { translate } from '../i18n';
@@ -15,9 +15,9 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Popup from '../components/Popup';
 
 const GENDER_LIST = [
-    {name:"Male",icon_on:<SvgMaleOn/>,icon_off:<SvgMaleOff/>},
-    {name:"Female",icon_on:<SvgFemaleOn/>,icon_off:<SvgFemaleOff/>},
-    {name:"Other",icon_on:<SvgOtherOn/>,icon_off:<SvgOtherOff/>}
+    {name:"Male"},
+    {name:"Female"},
+    {name:"Other"}
 ]
 
 class Register extends React.Component {
