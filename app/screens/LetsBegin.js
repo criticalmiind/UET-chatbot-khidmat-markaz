@@ -23,14 +23,17 @@ import {
     play_message_handler,
     on_mic_click,
     text_to_speech,
-    close_connection
+    close_connection,
+    on_click_chat_text_panel
 } from '../api/methods';
 import { LogoWhite, MicIcon, SvgBackIcon } from '../constants/images';
-import { dialogue_manager, run_scripts, tts_manager } from '../api';
+import { dialogue_manager, run_scripts, SOCKET, SOCKET_CONFIG, tts_manager } from '../api';
 import Loader from '../components/Loader';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PlayerView from '../components/PlayerView';
 import Popup from '../components/Popup';
+import io from 'socket.io-client';
+import { translate } from '../i18n';
 
 class LetsBegin extends React.Component {
     constructor(props) {
@@ -39,8 +42,11 @@ class LetsBegin extends React.Component {
         this.tts_manager = tts_manager.bind(this);
         this.close_connection = close_connection.bind(this);
         this.dialogue_manager = dialogue_manager.bind(this);
+        this.on_click_chat_text_panel = on_click_chat_text_panel.bind(this);
+
         this.sound = null;
         this.ws = { readyState: 3 };
+        this.socket = io(SOCKET, SOCKET_CONFIG);
         // this.ws = new WebSocket(this.get_resource('asr'));
         this.get_query_answers = get_query_answers.bind(this);
         this.on_mic_click = on_mic_click.bind(this);
@@ -65,7 +71,7 @@ class LetsBegin extends React.Component {
 
     async UNSAFE_componentWillMount() {
         this.setState({ "isLoaded": true })
-        // console.log(this.props)
+        
         const options = {
             sampleRate: 16000,  // default 44100
             channels: 1,        // 1 or 2, default 1
@@ -78,19 +84,32 @@ class LetsBegin extends React.Component {
 
         AudioRecord.init(options);
         AudioRecord.on('data', this.onAudioStreaming.bind(this));
-        this.socketListners()
+        // this.socketListners()
 
         BackHandler.addEventListener('hardwareBackPress', (async function () {
             if (this.state.isLoaded) {
                 this.setState({ "screen_loader": true, "loader_message": "Closing Connection" })
                 const res = await this.close_connection()
                 this.setState({ "screen_loader": false, "loader_message": false })
-                this.setState({ popup:{ "show":true, "type":res.resultFlag ? 'success':"wrong", "message":translate(res.message) } })
+                this.setState({ popup: { "show": true, "type": res.resultFlag ? 'success' : "wrong", "message": translate(res.message) } })
                 this.props.updateRedux({ resources: {} })
                 this.props.navigation.goBack(null)
             }
             return true;
         }).bind(this));
+    }
+
+
+    componentDidMount() {
+        this.socket.on('connect', (e) => {
+            console.log('Connected to server', e);
+        });
+
+        this.socket.on('disconnect', (e) => {
+            console.log('Disconnected from server', e);
+        });
+
+        this.socket.on('response', this.onMessage.bind(this));
     }
 
     async componentWillUnmount() {
@@ -99,17 +118,17 @@ class LetsBegin extends React.Component {
             BackHandler.exitApp()
         }))
 
-        this.ws = { readyState: 3 };
+        // this.ws = { readyState: 3 };
+        this.socket.disconnect();
         this.sound = null;
         await AudioRecord.stop()
     }
 
     socketListners() {
         if (this.ws) {
-            this.ws.onopen = this.onOpen.bind(this);
-            this.ws.onmessage = this.onMessage.bind(this)
-            this.ws.onerror = this.onError.bind(this);
-            this.ws.onclose = this.onClose.bind(this);
+            this.socket.on('connect', this.onOpen.bind(this));
+            this.socket.on('disconnect', this.onClose.bind(this));
+            this.socket.on('message', this.onMessage.bind(this));
         }
     }
 
@@ -123,16 +142,19 @@ class LetsBegin extends React.Component {
             }
             // console.log({ "size":chunk.size, "chunk": chunk, "data": data })
             if (chunk) {
-                if (this.ws.readyState == 1) {
-                    this.ws.send(chunk)
-                } else {
-                    if (this.ws.readyState == 3) {
-                        this.ws = { readyState: 3 };
-                        this.ws = new WebSocket(this.get_resource('asr'));
-                        this.socketListners()
-                        this.ws.send(chunk)
-                    }
-                }
+                this.socket.emit('audio_bytes', chunk)
+
+                // if (this.ws.readyState == 1) {
+                //     // this.ws.send(chunk)
+                //     this.socket.emit('audio_bytes', chunk)
+                // } else {
+                //     if (this.ws.readyState == 3) {
+                //         this.ws = { readyState: 3 };
+                //         this.ws = new WebSocket(this.get_resource('asr'));
+                //         this.socketListners()
+                //         this.ws.send(chunk)
+                //     }
+                // }
             }
         } catch (error) {
             console.log("onAudioStreaming", error)
@@ -142,10 +164,9 @@ class LetsBegin extends React.Component {
     onMessage(e) {
         const { chat_list, last_id, last_ids_list, temp_text, is_recording } = this.state;
         if (!is_recording) return;
-        var data = e.data;
-        var json = JSON.parse(data);
+        var json = e.response;
         if (json.result) {
-            // console.log("On Message: ", json)
+            console.log("On Message: ", json)
             const { final, hypotheses = [] } = json.result;
             let res = hypotheses[0]
 
@@ -171,30 +192,9 @@ class LetsBegin extends React.Component {
         this.setState({ "socket_status": 1, "loader": false })
     }
 
-    onError(e) {
-        console.log("On Error:", e)
-        this.setState({ "socket_status": 2 })
-    }
-
     onClose(e) {
         console.log("On Close:", e)
-        this.setState({ "socket_status": 3 })
-    }
-
-    getStatus(id) {
-        let status = 'CONNECTING';
-        if (id == 1) status = 'CONNECTED'
-        if (id == 2) status = 'CLOSING'
-        if (id == 3) status = 'CLOSED'
-        return status
-    }
-
-    getStatusIcon(id) {
-        let color = 'yellow';
-        if (id == 1) color = 'green'
-        if (id == 2) color = 'orange'
-        if (id == 3) color = 'red'
-        return <View style={{ height: hp('3'), width: hp(3), borderRadius: 100, backgroundColor: color }} />
+        // this.setState({ "socket_status": 3 })
     }
 
     render() {
@@ -203,7 +203,7 @@ class LetsBegin extends React.Component {
 
         return (<>
             <Loader isShow={screen_loader} mesasge={loader_message} />
-            <Popup { ...this.state.popup } onClick={()=>{ this.setState({ popup:{} }) }}/>
+            <Popup {...this.state.popup} onClick={() => { this.setState({ popup: {} }) }} />
 
             <SafeAreaView style={styles.safeArea} forceInset={{ top: 'always' }}>
                 <StatusBar barStyle="light-content" backgroundColor={theme.designColor} />
@@ -211,7 +211,7 @@ class LetsBegin extends React.Component {
                     <TouchableOpacity
                         style={styles.helpBtn}
                         onPress={() => {
-                            this.setState({ popup:{ "show":true, "type":"help", "message":translate("Would You need help?") } })
+                            this.setState({ popup: { "show": true, "type": "help", "message": translate("Would You need help?") } })
                         }}>
                         <Text style={styles.helpBtnTxt}>HELP</Text>
                     </TouchableOpacity>
@@ -239,7 +239,7 @@ class LetsBegin extends React.Component {
                                         <View style={styles.chatRow(is)} key={a}>
                                             {!is ? <View style={styles.chatViewIcon(is)} /> : <></>}
                                             <View style={styles.chatTextView(is)}>
-                                                <PlayerView text_obj={c}/>
+                                                <PlayerView text_obj={c} { ...this }/>
                                                 <Text style={styles.chatTxt(is)}>{c.text}</Text>
                                             </View>
                                             {is ? <View style={styles.chatViewIcon(is)} /> : <></>}

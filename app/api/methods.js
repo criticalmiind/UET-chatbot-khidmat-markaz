@@ -3,6 +3,7 @@ import AudioRecord from "react-native-audio-recording-stream";
 import { isNullRetNull, jsonParse, notify, simplify, uid } from "../utils";
 import Sound from "react-native-sound";
 import { call_application_manager, method } from '.';
+import { translate } from '../i18n';
 var RNFS = require('react-native-fs');
 
 export const check_microphone = async () => {
@@ -29,7 +30,7 @@ export async function on_mic_click() {
             if (this.sound) this.sound.stop()
             AudioRecord.start();
         } else {
-            this.ws.send("eos")
+            // this.ws.send("eos")
             this.setState({
                 "is_recording": false,
                 "last_id": false,
@@ -60,7 +61,7 @@ export async function get_query_answers() {
             chat_list[unique_id] = { "is_question": false, "text": cleared_text }
             this.setState({ "chat_list": chat_list })
 
-            const ttsRes = await this.tts_manager({ "message": cleared_text })
+            const ttsRes = await this.tts_manager({ "textMessage": [cleared_text] })
 
             if (ttsRes.resultFlag) {
                 let audioResponse = jsonParse(ttsRes.audioResponse)
@@ -84,16 +85,14 @@ export async function get_query_answers() {
 }
 
 export async function on_click_chat_text_panel(text, callback=(e)=>{}) {
-    const { resultFlag, audioResponse, message } = await this.tts_manager({ "message": text })
+    const { resultFlag, audioResponse, message } = await this.tts_manager({ "textMessage": [text] })
     if(resultFlag){
-        let json = jsonParse(audioResponse)
-        let encodedFile = json.response.encodedFile
+        let encodedFile = audioResponse>0?audioResponse[0].audio:''
         setTimeout(() => {
             this.play_message_handler(encodedFile, false, callback)
         }, 500)
     }else{
-        // if(message.message && message.stack) notify({ "title":message.message, "message":message.stack })
-        notify({ "title":"Failed!", "message":message+"" })
+        this.setState({ popup: { "show": true, "type": "wrong", "message": translate(message+"") } })
     }
 }
 
@@ -123,7 +122,7 @@ export async function play_message_handler(url, is_path = false, callback=(e)=>{
 
 export async function text_to_speech(text) {
     const { chat_list } = this.state;
-    let ttsRes = await this.tts_manager({ "text": text })
+    let ttsRes = await this.tts_manager({ "textMessage": [text] })
     if (simplify(ttsRes.response.status) == 'ok') {
         chat_list.push({ "is_question": false, "text": text })
         this.setState({ chat_list })

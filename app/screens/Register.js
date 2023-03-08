@@ -59,7 +59,7 @@ class Register extends React.Component {
             'city': city,
             'district':district,
             'gender': gender,
-            // 'dateOfBirth':dateOfBirth
+            'dateOfBirth':dateOfBirth
         }
         let res = await call_application_manager(obj)
         this.setStateObj({ loader: false })

@@ -26,8 +26,8 @@ class Login extends React.Component {
     }
 
     async login() {
-        this.props.updateRedux({ "userData": {"id":2} })
-        return
+        // this.props.updateRedux({ "userData": {"id":2} })
+        // return
         const { userName, password } = this.state;
         this.setStateObj({ loader: true })
         let obj = { 'function': method['loginUser'], 'userName': userName, 'password': password }

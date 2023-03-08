@@ -21,20 +21,37 @@ class Start extends React.Component {
     UNSAFE_componentWillMount() { }
 
     async get_resources(session) {
-        this.props.navigation.navigate("LetsBegin")
-        return
+        // this.props.navigation.navigate("LetsBegin")
+        // return
         this.setState({ loader: true })
         let obj = { 'function': method['startService'], 'sessionId': session }
         let res = await call_application_manager(obj)
         if (res.resultFlag) {
-            this.props.updateRedux({ "resources": res })
+            // console.log({
+            //     ...res,
+            //     "asrManager": res.asrManager.replace("http://202.142.159.37:7777", "https://bot.cle.org.pk"),
+            //     "asrModel": "wss://tech.cle.org.pk:9996/client/ws/speech",
+            //     "dialogueManager": res.dialogueManager.replace("http://202.142.159.37:7777", "https://bot.cle.org.pk"),
+            //     "ttsManager": res.dialogueManager.replace("http://202.142.159.37:7777", "https://bot.cle.org.pk"),
+            // })
+            // return
+            this.props.updateRedux({
+                "resources": {
+                    ...res,
+                    "asrManager": res.asrManager.replace("http://202.142.159.37:7777", "https://bot.cle.org.pk"),
+                    "asrModel": "wss://tech.cle.org.pk:9996/client/ws/speech",
+                    "dialogueManager": res.dialogueManager.replace("http://202.142.159.37:7777", "https://bot.cle.org.pk"),
+                    "ttsManager": res.dialogueManager.replace("http://202.142.159.37:7777", "https://bot.cle.org.pk"),
+                }
+            })
+            // this.props.updateRedux({ "resources": res })
             setTimeout(() => {
                 this.setState({ loader: false })
                 this.props.navigation.navigate("LetsBegin")
             }, 300)
         } else {
             this.setState({ loader: false })
-            this.setState({ popup:{ "show":true, "type":"wrong", "message":translate(res.message) } })
+            this.setState({ popup: { "show": true, "type": "wrong", "message": translate(res.message) } })
         }
     }
 
@@ -54,7 +71,7 @@ class Start extends React.Component {
                 </TouchableOpacity>
                 <View style={styles.sliderView}>
                     <View style={{ height: hp('10') }} />
-                    <SvgDrawerProfileIcon/>
+                    <SvgDrawerProfileIcon />
                     <Text style={styles.userNameTxt}>{name}</Text>
 
                     <View style={{ height: hp('50') }} />

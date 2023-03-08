@@ -5,12 +5,10 @@ import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
 import { hp, wp } from '../utils';
 import { SvgPauseIcon, SvgPlayIcon } from '../constants/images';
-import { on_click_chat_text_panel } from '../api/methods';
 
 class PlayerView extends React.Component {
     constructor(props) {
         super(props)
-        this.on_click_chat_text_panel = on_click_chat_text_panel.bind(this);
         this.state = {
             "isPlay":false,
         }
@@ -22,7 +20,7 @@ class PlayerView extends React.Component {
 
     render() {
         const { isPlay } = this.state;
-        const { text_obj={} } = this.props;
+        const { text_obj={}, onPlay } = this.props;
 
         return (
             <View style={styles.v01}>
@@ -30,7 +28,7 @@ class PlayerView extends React.Component {
                     <TouchableOpacity
                         onPress={()=>{
                             this.setState({ "isPlay":!isPlay })
-                            this.on_click_chat_text_panel(text_obj.text, this.sound_callback)
+                            this.props.on_click_chat_text_panel(text_obj.text, this.sound_callback)
                         }}>
                         {isPlay?<SvgPauseIcon />:<SvgPlayIcon />}
                     </TouchableOpacity>
