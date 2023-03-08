@@ -6,15 +6,15 @@ export function getAsrLink(asrModel, connectionId) {
 }
 export function get_resource(key) {
   const { asrModel, connectionId, dialogueManager, ttsManager } = this.props.resources;
-  if(key == 'asr') return asrModel?`${asrModel}?content-type=audio/x-raw,+layout=(string)interleaved,+rate=(int)16000,+format=(string)S16LE,+channels=(int)1,+token=${connectionId}`:''
-  if(key == 'dm') return filter_url(dialogueManager)
-  if(key == 'tts') return filter_url(ttsManager)
-  if(key == 'cid') return connectionId
+  if (key == 'asr') return asrModel ? `${asrModel}?content-type=audio/x-raw,+layout=(string)interleaved,+rate=(int)16000,+format=(string)S16LE,+channels=(int)1,+token=${connectionId}` : ''
+  if (key == 'dm') return filter_url(dialogueManager)
+  if (key == 'tts') return filter_url(ttsManager)
+  if (key == 'cid') return connectionId
 }
 
-export function filter_url(str){
+export function filter_url(str) {
   let arr = str.split("//")
-    return `https://${arr[1]}`
+  return `https://${arr[1]}`
 }
 
 export function jsonParse(str) {
@@ -79,7 +79,7 @@ export function splitArrayIntoChunks(array, lenght) {
   return chunks;
 }
 
-export async function notify({title='', message='', success}) {
+export async function notify({ title = '', message = '', success }) {
   Alert.alert(title, message)
 }
 
@@ -114,3 +114,11 @@ export function search(list, keyword = '', key1 = 'name', key2) {
 export function uid() {
   return Date.now().toString(36) + Math.random().toString(36).substr(2);
 };
+
+export function formatTime(secondsElapsed) {
+  let minutes = Math.floor(secondsElapsed / 60);
+  let seconds = Math.floor(secondsElapsed % 60);
+  minutes = minutes < 10 ? '0' + minutes : minutes;
+  seconds = seconds < 10 ? '0' + seconds : seconds;
+  return `${minutes}:${seconds}`;
+}

@@ -3,34 +3,26 @@ import { Slider, StyleSheet, Text, TouchableOpacity, View, } from 'react-native'
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
-import { hp, wp } from '../utils';
+import { formatTime, hp, wp } from '../utils';
 import { SvgPauseIcon, SvgPlayIcon } from '../constants/images';
 
 class PlayerView extends React.Component {
     constructor(props) {
         super(props)
-        this.state = {
-            "isPlay":false,
-        }
-    }
-
-    sound_callback(e){
-        console.log(e)
+        this.state = {}
     }
 
     render() {
-        const { isPlay } = this.state;
-        const { text_obj={}, onPlay } = this.props;
+        const { text_obj={}, text_id, onPlay, playState=false } = this.props;
 
         return (
             <View style={styles.v01}>
                 <View style={styles.playView}>
                     <TouchableOpacity
                         onPress={()=>{
-                            this.setState({ "isPlay":!isPlay })
-                            this.props.on_click_chat_text_panel(text_obj.text, this.sound_callback)
+                            if(onPlay) onPlay(playState)
                         }}>
-                        {isPlay?<SvgPauseIcon />:<SvgPlayIcon />}
+                        {playState?<SvgPauseIcon />:<SvgPlayIcon />}
                     </TouchableOpacity>
                 </View>
                 <Slider
@@ -42,7 +34,7 @@ class PlayerView extends React.Component {
                     maximumValue={1}
                     minimumTrackTintColor="#333333"
                     maximumTrackTintColor="#000000" />
-                <Text style={styles.counterTxt}>00:10</Text>
+                <Text style={styles.counterTxt}>{formatTime(text_obj.duration?text_obj.duration:0)}</Text>
             </View>
         );
     }

@@ -84,10 +84,15 @@ export async function get_query_answers() {
     });
 }
 
-export async function on_click_chat_text_panel(text, callback=(e)=>{}) {
+export async function onPlayBack(text_id, text, callback=(e)=>{}) {
+    const { palyState, chat_list } = this.state
     const { resultFlag, audioResponse, message } = await this.tts_manager({ "textMessage": [text] })
     if(resultFlag){
-        let encodedFile = audioResponse>0?audioResponse[0].audio:''
+        let encodedFile = audioResponse.length>0?audioResponse[0].audio:''
+        let duration = parseFloat(audioResponse.length>0?audioResponse[0].duration:0)
+        chat_list[text_id] = { ...chat_list[text_id], "duration":duration }
+        this.setState({ "playState":'paly', "chat_list":chat_list  })
+
         setTimeout(() => {
             this.play_message_handler(encodedFile, false, callback)
         }, 500)
@@ -103,6 +108,7 @@ export async function play_message_handler(url, is_path = false, callback=(e)=>{
         const path = `${RNFS.DocumentDirectoryPath}/test_audio_file.wav`;
         await RNFS.writeFile(path, url.replace("data:audio/wav;base64,", ""), 'base64')
             .then(() => {
+                console.log(path)
                 if (this.sound) this.sound.stop()
                 this.sound = new Sound(path, '', () => {
                     this.sound.play((r) => {

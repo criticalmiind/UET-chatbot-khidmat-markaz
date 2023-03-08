@@ -24,7 +24,7 @@ import {
     on_mic_click,
     text_to_speech,
     close_connection,
-    on_click_chat_text_panel
+    onPlayBack
 } from '../api/methods';
 import { LogoWhite, MicIcon, SvgBackIcon } from '../constants/images';
 import { dialogue_manager, run_scripts, SOCKET, SOCKET_CONFIG, tts_manager } from '../api';
@@ -42,7 +42,7 @@ class LetsBegin extends React.Component {
         this.tts_manager = tts_manager.bind(this);
         this.close_connection = close_connection.bind(this);
         this.dialogue_manager = dialogue_manager.bind(this);
-        this.on_click_chat_text_panel = on_click_chat_text_panel.bind(this);
+        this.onPlayBack = onPlayBack.bind(this);
 
         this.sound = null;
         this.ws = { readyState: 3 };
@@ -102,7 +102,7 @@ class LetsBegin extends React.Component {
 
     componentDidMount() {
         this.socket.on('connect', (e) => {
-            console.log('Connected to server', e);
+            console.log('Connected to server');
         });
 
         this.socket.on('disconnect', (e) => {
@@ -117,18 +117,16 @@ class LetsBegin extends React.Component {
         BackHandler.addEventListener('hardwareBackPress', (async function () {
             BackHandler.exitApp()
         }))
-
-        // this.ws = { readyState: 3 };
         this.socket.disconnect();
         this.sound = null;
         await AudioRecord.stop()
     }
 
     socketListners() {
-        if (this.ws) {
+        if (this.socket) {
             this.socket.on('connect', this.onOpen.bind(this));
             this.socket.on('disconnect', this.onClose.bind(this));
-            this.socket.on('message', this.onMessage.bind(this));
+            this.socket.on('response', this.onMessage.bind(this));
         }
     }
 
@@ -239,7 +237,15 @@ class LetsBegin extends React.Component {
                                         <View style={styles.chatRow(is)} key={a}>
                                             {!is ? <View style={styles.chatViewIcon(is)} /> : <></>}
                                             <View style={styles.chatTextView(is)}>
-                                                <PlayerView text_obj={c} { ...this }/>
+                                                <PlayerView
+                                                    text_obj={c}
+                                                    text_id={a}
+                                                    { ...this }
+                                                    onPlay={()=>{
+                                                        // if(isPlay && this.props.sound) this.props.sound.pause()
+                                                        // console.log(text_id)
+                                                        this.onPlayBack(a, c.text, ()=>{})
+                                                    }}/>
                                                 <Text style={styles.chatTxt(is)}>{c.text}</Text>
                                             </View>
                                             {is ? <View style={styles.chatViewIcon(is)} /> : <></>}
