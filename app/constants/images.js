@@ -36,8 +36,8 @@ const SvgDrawerIcon = () => <Image source={menu} style={{ width:24, height:24, r
 const SvgDrawerProfileIcon = () => <Image source={name} style={{ width:wp('20'), height:wp('20'), resizeMode:'contain' }}/> //<SvgXml xml={drawer_profile_icon}/>
 const SvgBackIcon = () => <Image source={back} style={{ width:20, height:20, resizeMode:'contain' }}/> //<SvgXml xml={back}/>
 const SvgCalenderIcon = () => <Image source={calender} style={{ width:18, height:18, resizeMode:'contain' }}/> //<SvgXml xml={calender}/>
-const SvgPlayIcon = () => <Image source={play} style={{ width:18, height:18, resizeMode:'contain' }}/> //<SvgXml xml={player_play} fill="#000000"/>
-const SvgPauseIcon = () => <Image source={play} style={{ width:18, height:18, resizeMode:'contain' }}/> //<SvgXml xml={player_pause}/>
+const SvgPlayIcon = () => <Image source={play} style={{ width:18, height:18, resizeMode:'contain', tintColor:'#333' }}/> //<SvgXml xml={player_play} fill="#000000"/>
+const SvgPauseIcon = () => <Image source={play} style={{ width:18, height:18, resizeMode:'contain', tintColor:'#333' }}/> //<SvgXml xml={player_pause}/>
 const SvgPopupWrongIcon = () => <Image source={error_popup} style={{ width:18, height:18, resizeMode:'contain' }}/> //<SvgXml xml={popup_wrong}/>
 const SvgPopupSuccessIcon = () => <Image source={success_popup} style={{ width:18, height:18, resizeMode:'contain' }}/> //<SvgXml xml={popup_success}/>
 const SvgPopupHelpIcon = () => <Image source={help_popup} style={{ width:18, height:18, resizeMode:'contain' }}/> //<SvgXml xml={popup_help}/>

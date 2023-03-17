@@ -104,5 +104,5 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center'
     },
-    txt: { fontFamily: theme.font01, fontSize: 20 },
+    txt: { fontFamily: theme.font01, fontSize: 20, color:'#333' },
 });

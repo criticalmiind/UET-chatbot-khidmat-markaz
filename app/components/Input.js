@@ -57,7 +57,8 @@ const styles = StyleSheet.create({
         paddingLeft: wp('1'),
         flex: 1,
         fontSize: 14,
-        fontFamily: theme.font01
+        fontFamily: theme.font01,
+        color:"#333"
     },
     icon: {
         paddingLeft: wp('1'),

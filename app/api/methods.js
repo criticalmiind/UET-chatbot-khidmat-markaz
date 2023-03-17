@@ -21,12 +21,12 @@ export const check_microphone = async () => {
 
 export const base64_into_blob = (base64, type = 'audio/x-raw') => fetch(`data:${type};base64,${base64}`).then(res => res.blob())
 
-export async function on_mic_click() {
+export async function on_mic_click(recording) {
     const { is_recording } = this.state;
     let audioPermission = await check_microphone();
     if (audioPermission) {
         if (!is_recording) {
-            this.setState({ "is_recording": !is_recording, "last_id": uid() })
+            this.setState({ "is_recording": recording, "last_id": uid() })
             if (this.sound) this.sound.stop()
             AudioRecord.start();
         } else {
@@ -52,27 +52,38 @@ export async function get_query_answers() {
 
     let ids_list = Object.entries(last_ids_list).map(e => ({ "id": e[0], ...e[1] }))
     ids_list.forEach(async (el) => {
-        const qs = await this.dialogue_manager({ "message": el.text })
+        const qs = await this.dialogue_manager({ "textMessage": el.text })
         if (qs.resultFlag) {
             // let cleared_text = isNullRetNull(qs.textResponse,"").split("!")[0]
             let cleared_text = isNullRetNull(qs.textResponse, "")
 
             const unique_id = uid();
-            chat_list[unique_id] = { "is_question": false, "text": cleared_text }
+            chat_list[unique_id] = { "is_question": false, "text": cleared_text.toString() }
             this.setState({ "chat_list": chat_list })
-
-            const ttsRes = await this.tts_manager({ "textMessage": [cleared_text] })
-
-            if (ttsRes.resultFlag) {
-                let audioResponse = jsonParse(ttsRes.audioResponse)
-
-                let encodedFile = audioResponse.response.encodedFile
-                last_unread_msgs[el.id] = { "is_question": false, "encodedFile": encodedFile }
+            
+            const { resultFlag, audioResponse, message } = await this.tts_manager({ "textMessage": [cleared_text.toString()] })
+            if (resultFlag) {
+                let encodedFile = audioResponse.length>0?audioResponse[0].audio:''
+                let duration = parseFloat(audioResponse.length>0?audioResponse[0].duration:0)
+                last_unread_msgs[el.id] = { "is_question": false, "encodedFile": encodedFile, "duration":duration }
                 setTimeout(() => {
                     this.setState({ "last_unread_msgs": last_unread_msgs })
                     this.play_message_handler(encodedFile, false)
                 }, 500)
+            }else{
+                this.setState({ popup: { "show": true, "type":'success', "message": translate(message) } })
             }
+            // const ttsRes = await this.tts_manager({ "textMessage": [cleared_text] })
+            // if (ttsRes.resultFlag) {
+            //     let audioResponse = jsonParse(ttsRes.audioResponse)
+
+            //     let encodedFile = audioResponse.response.encodedFile
+            //     last_unread_msgs[el.id] = { "is_question": false, "encodedFile": encodedFile }
+            //     setTimeout(() => {
+            //         this.setState({ "last_unread_msgs": last_unread_msgs })
+            //         this.play_message_handler(encodedFile, false)
+            //     }, 500)
+            // }
         }
         setTimeout(() => {
             this.setState({
@@ -108,7 +119,6 @@ export async function play_message_handler(url, is_path = false, callback=(e)=>{
         const path = `${RNFS.DocumentDirectoryPath}/test_audio_file.wav`;
         await RNFS.writeFile(path, url.replace("data:audio/wav;base64,", ""), 'base64')
             .then(() => {
-                console.log(path)
                 if (this.sound) this.sound.stop()
                 this.sound = new Sound(path, '', () => {
                     this.sound.play((r) => {
@@ -136,10 +146,10 @@ export async function text_to_speech(text) {
 }
 
 export async function close_connection() {
-    const { session } = this.props.userData;
-    let obj = { "function": method["closeConnection"], "sessionId":session, "connectionId":this.get_resource('cid') }
+    const { sessionId } = this.props.userData;
+    let obj = { "function": method["connectionClose"], "sessionId":sessionId, "connectionId":this.get_resource('cid') }
     try {
-        let res = await call_application_manager(obj)
+        let res = await call_application_manager(obj)        
         return res
     } catch (error) {
         return { "resultFlag":false, "message":`${error}` }

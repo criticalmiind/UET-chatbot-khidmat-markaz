@@ -32,12 +32,13 @@ class Login extends React.Component {
         this.setStateObj({ loader: true })
         let obj = { 'function': method['loginUser'], 'userName': userName, 'password': password }
         let res = await call_application_manager(obj)
+        // console.log(res);
         if (res.resultFlag) {
             this.setState({ popup:{ "show":true, "type":"success", "message":"Login Successfully!" } })
             this.props.updateRedux({ "userData": res })
         } else {
             this.setStateObj({ loader: false })
-            this.setState({ popup:{ "show":true, "type":"wrong", "message":translate(res.message) } })
+            this.setState({ popup:{ "show":true, "type":"wrong", "message":translate(res.message?res.message:res.error) } })
         }
     }
 

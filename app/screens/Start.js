@@ -27,24 +27,8 @@ class Start extends React.Component {
         let obj = { 'function': method['startService'], 'sessionId': session }
         let res = await call_application_manager(obj)
         if (res.resultFlag) {
-            // console.log({
-            //     ...res,
-            //     "asrManager": res.asrManager.replace("http://202.142.159.37:7777", "https://bot.cle.org.pk"),
-            //     "asrModel": "wss://tech.cle.org.pk:9996/client/ws/speech",
-            //     "dialogueManager": res.dialogueManager.replace("http://202.142.159.37:7777", "https://bot.cle.org.pk"),
-            //     "ttsManager": res.dialogueManager.replace("http://202.142.159.37:7777", "https://bot.cle.org.pk"),
-            // })
-            // return
-            this.props.updateRedux({
-                "resources": {
-                    ...res,
-                    "asrManager": res.asrManager.replace("http://202.142.159.37:7777", "https://bot.cle.org.pk"),
-                    "asrModel": "wss://tech.cle.org.pk:9996/client/ws/speech",
-                    "dialogueManager": res.dialogueManager.replace("http://202.142.159.37:7777", "https://bot.cle.org.pk"),
-                    "ttsManager": res.dialogueManager.replace("http://202.142.159.37:7777", "https://bot.cle.org.pk"),
-                }
-            })
-            // this.props.updateRedux({ "resources": res })
+            console.log(res);
+            this.props.updateRedux({ "resources": res })
             setTimeout(() => {
                 this.setState({ loader: false })
                 this.props.navigation.navigate("LetsBegin")
@@ -59,6 +43,7 @@ class Start extends React.Component {
         const { loader, isSlider } = this.state;
         const { sessionId, name } = this.props.userData;
 
+        console.log(this.props.userData);
         return (<>
             <Loader isShow={loader} />
             <Popup {...this.state.popup} onClick={() => { this.setState({ popup: {} }) }} />

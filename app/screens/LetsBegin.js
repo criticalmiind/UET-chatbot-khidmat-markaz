@@ -45,9 +45,7 @@ class LetsBegin extends React.Component {
         this.onPlayBack = onPlayBack.bind(this);
 
         this.sound = null;
-        this.ws = { readyState: 3 };
-        this.socket = io(SOCKET, SOCKET_CONFIG);
-        // this.ws = new WebSocket(this.get_resource('asr'));
+        this.socket = io(this.get_resource('asr'), SOCKET_CONFIG(this.get_resource('cid')));
         this.get_query_answers = get_query_answers.bind(this);
         this.on_mic_click = on_mic_click.bind(this);
         this.text_to_speech = text_to_speech.bind(this);
@@ -56,12 +54,12 @@ class LetsBegin extends React.Component {
             "isLoaded": false,
             "loader": false,
             "is_recording": false,
-            "socket_status": 3,
+            "socket_status": false,
             "last_id": false,
             "last_ids_list": {},
             "chat_list": {
-                "askjdawe": { "is_question": true, "text": "ایک ٹیلے پر واقع مزار خواجہ فریدالدین گنج شکرؒ کے احاطہء صحن میں ذرا سی ژالہ باری چاندی کے ڈھیروں کی مثل بڑے غضب کا نظارا دیتی ہے۔" },
-                "askjdasa": { "is_question": false, "text": "ایک ٹیلے پر واقع مزار خواجہ فریدالدین گنج شکرؒ کے احاطہء صحن میں ذرا سی ژالہ باری چاندی کے ڈھیروں کی مثل بڑے غضب کا نظارا دیتی ہے۔" },
+                // "askjdawe": { "is_question": true, "text": "ایک ٹیلے پر واقع مزار خواجہ فریدالدین گنج شکرؒ کے احاطہء صحن میں ذرا سی ژالہ باری چاندی کے ڈھیروں کی مثل بڑے غضب کا نظارا دیتی ہے۔" },
+                // "askjdasa": { "is_question": false, "text": "ایک ٹیلے پر واقع مزار خواجہ فریدالدین گنج شکرؒ کے احاطہء صحن میں ذرا سی ژالہ باری چاندی کے ڈھیروں کی مثل بڑے غضب کا نظارا دیتی ہے۔" },
             },
             "last_unread_msgs": {},
             "play_text_id": false,
@@ -71,7 +69,7 @@ class LetsBegin extends React.Component {
 
     async UNSAFE_componentWillMount() {
         this.setState({ "isLoaded": true })
-        
+
         const options = {
             sampleRate: 16000,  // default 44100
             channels: 1,        // 1 or 2, default 1
@@ -88,28 +86,25 @@ class LetsBegin extends React.Component {
 
         BackHandler.addEventListener('hardwareBackPress', (async function () {
             if (this.state.isLoaded) {
-                this.setState({ "screen_loader": true, "loader_message": "Closing Connection" })
-                const res = await this.close_connection()
-                this.setState({ "screen_loader": false, "loader_message": false })
-                this.setState({ popup: { "show": true, "type": res.resultFlag ? 'success' : "wrong", "message": translate(res.message) } })
-                this.props.updateRedux({ resources: {} })
-                this.props.navigation.goBack(null)
+                await this.closeSession()
+                // this.props.navigation.goBack(null)
             }
             return true;
         }).bind(this));
     }
 
-
     componentDidMount() {
-        this.socket.on('connect', (e) => {
+        this.socket?.on('connect', (e) => {
             console.log('Connected to server');
+            this.setState({ "socket_status": true })
         });
 
-        this.socket.on('disconnect', (e) => {
+        this.socket?.on('disconnect', (e) => {
             console.log('Disconnected from server', e);
+            this.setState({ "socket_status": false })
         });
 
-        this.socket.on('response', this.onMessage.bind(this));
+        this.socket?.on('response', this.onMessage.bind(this));
     }
 
     async componentWillUnmount() {
@@ -117,9 +112,25 @@ class LetsBegin extends React.Component {
         BackHandler.addEventListener('hardwareBackPress', (async function () {
             BackHandler.exitApp()
         }))
-        this.socket.disconnect();
+        this.socket?.disconnect();
         this.sound = null;
         await AudioRecord.stop()
+    }
+
+    async closeSession() {
+        this.setState({ "screen_loader": true, "loader_message": "Closing Connection" })
+        const res = await this.close_connection()
+        this.setState({ "screen_loader": false, "loader_message": false })
+        this.setState({ popup: { "show": true, "type": res.resultFlag ? 'success' : "wrong", "message": translate(res.message) } })
+        if (res.resultFlag) {
+            this.props.updateRedux({ resources: {} })
+            this.props.navigation.goBack(null)
+        } else {
+            setTimeout(() => {
+                this.props.updateRedux({ resources: {} })
+                this.props.navigation.goBack(null)
+            }, 2000)
+        }
     }
 
     socketListners() {
@@ -140,19 +151,12 @@ class LetsBegin extends React.Component {
             }
             // console.log({ "size":chunk.size, "chunk": chunk, "data": data })
             if (chunk) {
-                this.socket.emit('audio_bytes', chunk)
-
-                // if (this.ws.readyState == 1) {
-                //     // this.ws.send(chunk)
-                //     this.socket.emit('audio_bytes', chunk)
-                // } else {
-                //     if (this.ws.readyState == 3) {
-                //         this.ws = { readyState: 3 };
-                //         this.ws = new WebSocket(this.get_resource('asr'));
-                //         this.socketListners()
-                //         this.ws.send(chunk)
-                //     }
-                // }
+                if (this.state.socket_status) {
+                    // this.ws.send(chunk)
+                    this.socket?.emit('audio_bytes', chunk)
+                } else {
+                    this.socket = io(this.get_resource('asr'), SOCKET_CONFIG(this.get_resource('cid')));
+                }
             }
         } catch (error) {
             console.log("onAudioStreaming", error)
@@ -164,7 +168,7 @@ class LetsBegin extends React.Component {
         if (!is_recording) return;
         var json = e.response;
         if (json.result) {
-            console.log("On Message: ", json)
+            // console.log("On Message: ", json)
             const { final, hypotheses = [] } = json.result;
             let res = hypotheses[0]
 
@@ -216,7 +220,10 @@ class LetsBegin extends React.Component {
                     <Image source={LogoWhite} style={{ top: -4, height: wp('14'), width: wp('14') }} />
                     <TouchableOpacity
                         style={{ width: wp('18') }}
-                        onPress={() => { this.props.navigation.goBack() }}>
+                        onPress={() => {
+                            this.closeSession()
+                            // this.props.navigation.goBack()
+                        }}>
                         <SvgBackIcon />
                     </TouchableOpacity>
                 </View>
@@ -240,12 +247,12 @@ class LetsBegin extends React.Component {
                                                 <PlayerView
                                                     text_obj={c}
                                                     text_id={a}
-                                                    { ...this }
-                                                    onPlay={()=>{
+                                                    {...this}
+                                                    onPlay={() => {
                                                         // if(isPlay && this.props.sound) this.props.sound.pause()
                                                         // console.log(text_id)
-                                                        this.onPlayBack(a, c.text, ()=>{})
-                                                    }}/>
+                                                        this.onPlayBack(a, c.text, () => { })
+                                                    }} />
                                                 <Text style={styles.chatTxt(is)}>{c.text}</Text>
                                             </View>
                                             {is ? <View style={styles.chatViewIcon(is)} /> : <></>}
@@ -262,12 +269,12 @@ class LetsBegin extends React.Component {
                         <TouchableOpacity
                             style={styles.speakBtn(is_recording)}
                             onPressIn={async () => {
-                                this.on_mic_click()
+                                this.on_mic_click(true)
                             }}
                             onPressOut={async () => {
                                 setTimeout(async () => {
-                                    await this.on_mic_click()
-                                }, 300)
+                                    await this.on_mic_click(false)
+                                }, 500)
                             }}>
                             <Image source={MicIcon} style={styles.speakBtnTxt(is_recording)} />
                         </TouchableOpacity>
