@@ -123,13 +123,15 @@ class LetsBegin extends React.Component {
         this.setState({ "screen_loader": false, "loader_message": false })
         this.setState({ popup: { "show": true, "type": res.resultFlag ? 'success' : "wrong", "message": translate(res.message) } })
         if (res.resultFlag) {
-            this.props.updateRedux({ resources: {} })
-            this.props.navigation.goBack(null)
+            setTimeout(() => {
+                this.props.updateRedux({ resources: {} })
+                this.props.navigation.goBack(null)
+            }, 1500)
         } else {
             setTimeout(() => {
                 this.props.updateRedux({ resources: {} })
                 this.props.navigation.goBack(null)
-            }, 2000)
+            }, 1500)
         }
     }
 
@@ -152,7 +154,6 @@ class LetsBegin extends React.Component {
             // console.log({ "size":chunk.size, "chunk": chunk, "data": data })
             if (chunk) {
                 if (this.state.socket_status) {
-                    // this.ws.send(chunk)
                     this.socket?.emit('audio_bytes', chunk)
                 } else {
                     this.socket = io(this.get_resource('asr'), SOCKET_CONFIG(this.get_resource('cid')));
@@ -196,7 +197,7 @@ class LetsBegin extends React.Component {
 
     onClose(e) {
         console.log("On Close:", e)
-        // this.setState({ "socket_status": 3 })
+        this.setState({ "socket_status": 3 })
     }
 
     render() {

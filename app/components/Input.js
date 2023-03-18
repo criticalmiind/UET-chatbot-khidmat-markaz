@@ -23,6 +23,7 @@ class Input extends React.Component {
                 {Icon && <View style={{ ...styles.icon, ...iconStyle }}><Icon /></View>}
                 <TextInput
                     style={{ ...styles.textInput, ...textInputStyle }}
+                    placeholderTextColor={"#939393"}
                     {...this.props}
                     {...secureTextEntry ? { "secureTextEntry": !showPwd } : {}} />
                 {secureTextEntry &&

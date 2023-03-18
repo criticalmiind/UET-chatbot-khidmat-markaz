@@ -24,19 +24,6 @@ class DeleteAccount extends React.Component {
 
     async delete_account() {
         this.setState({ popup: { "show": true, "type": "wrong", "message": translate("This Feature is under construction") } })
-
-        // const { userName, password } = this.state;
-        // this.setStateObj({ loader: true })
-        // let obj = { 'function': method['loginUser'], 'userName': userName, 'password': password }
-        // let res = await call_application_manager(obj)
-        // console.log(res)
-        // if (res.resultFlag) {
-        //     this.setState({ popup: { "show": true, "type": "success", "message": "Login Successfully!" } })
-        //     this.props.updateRedux({ "userData": res })
-        // } else {
-        //     this.setStateObj({ loader: false })
-        //     this.setState({ popup: { "show": true, "type": "wrong", "message": translate(res.message) } })
-        // }
     }
 
     setStateObj(data) {

@@ -15,9 +15,9 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Popup from '../components/Popup';
 
 const GENDER_LIST = [
-    {name:"Male"},
-    {name:"Female"},
-    {name:"Other"}
+    { name: "Male" },
+    { name: "Female" },
+    { name: "Other" }
 ]
 
 class Register extends React.Component {
@@ -29,9 +29,18 @@ class Register extends React.Component {
             'userName': '',
             'password': '',
             'city': '',
-            'district':'',
+            'district': '',
             'gender': 'Male',
+            'dateOfBirth': false,
+            
+            'name': 'Khan',
+            'userName': 'khan123',
+            'password': '123456',
+            'confirm_password': '123456',
+            'city': 'lahore',
+            'district': 'Lahore',
             'dateOfBirth': false
+
         }
     }
 
@@ -53,21 +62,22 @@ class Register extends React.Component {
         this.setStateObj({ loader: true })
         let obj = {
             'function': method['signUpUser'],
-            'name': name,
+            // 'name': name,
             'userName': userName,
             'password': password,
             'city': city,
-            'district':district,
+            // 'district':district,
+            'tehsil': district,
             'gender': gender,
-            'dateOfBirth':dateOfBirth
+            'dataOfBirth': dateOfBirth
         }
         let res = await call_application_manager(obj)
         this.setStateObj({ loader: false })
         if (res.resultFlag) {
-            this.setState({ popup:{ "show":true, "type":"success", "message":"Registered Successfully! Now please login!" } })
+            this.setState({ popup: { "show": true, "type": "success", "message": "Registered Successfully! Now please login!" } })
             this.props.navigation.navigate("Login")
         } else {
-            this.setState({ popup:{ "show":true, "type":"wrong", "message":translate(res.message) } })
+            this.setState({ popup: { "show": true, "type": "wrong", "message": translate(res.message) } })
 
         }
     }
@@ -92,20 +102,20 @@ class Register extends React.Component {
         } = this.state;
 
         let disabled_reg = () => {
-            if(isNullRetNull(name, 1) == 1) return true
-            if(isNullRetNull(userName, 1) == 1) return true
-            if(isNullRetNull(password, 1) == 1) return true
-            if(isNullRetNull(confirm_password, 1) == 1) return true
-            if(password != confirm_password) return true
-            if(isNullRetNull(city, 1) == 1) return true
-            if(isNullRetNull(district, 1) == 1) return true
-            if(isNullRetNull(gender, 1) == 1) return true
+            if (isNullRetNull(name, 1) == 1) return true
+            if (isNullRetNull(userName, 1) == 1) return true
+            if (isNullRetNull(password, 1) == 1) return true
+            if (isNullRetNull(confirm_password, 1) == 1) return true
+            if (password != confirm_password) return true
+            if (isNullRetNull(city, 1) == 1) return true
+            if (isNullRetNull(district, 1) == 1) return true
+            if (isNullRetNull(gender, 1) == 1) return true
             return false
         }
 
         return (<>
             <Loader isShow={loader} />
-            <Popup { ...this.state.popup } onClick={()=>{ this.setState({ popup:{} }) }}/>
+            <Popup {...this.state.popup} onClick={() => { this.setState({ popup: {} }) }} />
             <View style={styles.safeArea}>
                 <ScrollView>
                     <View style={styles.mainView}>
@@ -155,7 +165,7 @@ class Register extends React.Component {
                             }} />
 
                         <View style={{ height: hp("2") }} />
-                        <View style={{ flexDirection:'row-reverse', alignSelf:'center', justifyContent:'space-between', width:wp('90') }}>
+                        <View style={{ flexDirection: 'row-reverse', alignSelf: 'center', justifyContent: 'space-between', width: wp('90') }}>
                             <Input
                                 Icon={SvgCity}
                                 viewStyle={{ width: wp('44.5') }}
@@ -165,7 +175,7 @@ class Register extends React.Component {
                                     this.setState({ "city": str })
                                 }} />
                             <SelectDropdown
-                                renderSearchInputLeftIcon={()=><SvgCity/>}
+                                renderSearchInputLeftIcon={() => <SvgCity />}
                                 data={cities}
                                 buttonStyle={{ width: wp('44.5'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
                                 buttonTextStyle={styles.txt01}
@@ -173,10 +183,10 @@ class Register extends React.Component {
                                 search={true}
                                 defaultValue={district}
                                 onSelect={(selectedItem) => {
-                                    this.setStateObj({ district:selectedItem.name })
+                                    this.setStateObj({ district: selectedItem.name })
                                 }}
-                                buttonTextAfterSelection={(selectedItem) => selectedItem.name }
-                                rowTextForSelection={(item) => item.name }
+                                buttonTextAfterSelection={(selectedItem) => selectedItem.name}
+                                rowTextForSelection={(item) => item.name}
                             />
                         </View>
 
@@ -185,34 +195,34 @@ class Register extends React.Component {
                             style={{
                                 width: wp('90'),
                                 alignSelf: 'center',
-                                alignItems:'center',
-                                justifyContent:'space-between',
-                                flexDirection:'row-reverse',
-                                paddingHorizontal:wp('2'),
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                flexDirection: 'row-reverse',
+                                paddingHorizontal: wp('2'),
                                 height: hp('6'),
                                 borderBottomWidth: 2,
                                 borderColor: "#7A7A7A",
-                                backgroundColor:'#E8E8E8'
+                                backgroundColor: '#E8E8E8'
                             }}
-                            onPress={()=>{ this.setState({ 'showDatePicker':!showDatePicker }) }}>
-                            { dateOfBirth ? <Text style={styles.txt01}>{dateOfBirth.toLocaleDateString()}</Text> 
-                                : <Text style={styles.txt01}>{translate('dob')}</Text> }
-                            <SvgCalenderIcon/>
+                            onPress={() => { this.setState({ 'showDatePicker': !showDatePicker }) }}>
+                            {dateOfBirth ? <Text style={styles.txt01}>{dateOfBirth.toLocaleDateString()}</Text>
+                                : <Text style={styles.txt01}>{translate('dob')}</Text>}
+                            <SvgCalenderIcon />
                         </TouchableOpacity>
-                        { showDatePicker && <DateTimePicker
+                        {showDatePicker && <DateTimePicker
                             testID="dateTimePicker"
-                            value={dateOfBirth?dateOfBirth:new Date()}
+                            value={dateOfBirth ? dateOfBirth : new Date()}
                             mode={"date"}
                             is24Hour={true}
-                            onChange={(e)=>{
-                                this.setState({ "dateOfBirth":e.nativeEvent.timestamp, "showDatePicker":false })
-                            }}/>
+                            onChange={(e) => {
+                                this.setState({ "dateOfBirth": e.nativeEvent.timestamp, "showDatePicker": false })
+                            }} />
                         }
                         <View style={{ height: hp("2") }} />
-                        
+
                         <SelectDropdown
                             searchPlaceHolder={translate('Gender')}
-                            searchInputTxtStyle={{ textAlign:"right" }}
+                            searchInputTxtStyle={{ textAlign: "right" }}
                             data={GENDER_LIST}
                             buttonStyle={{ width: wp('90'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
                             buttonTextStyle={styles.txt01}
@@ -220,15 +230,15 @@ class Register extends React.Component {
                             search={true}
                             defaultValue={gender}
                             onSelect={(i) => {
-                                this.setStateObj({ gender:i.name })
+                                this.setStateObj({ gender: i.name })
                             }}
-                            buttonTextAfterSelection={(i) => i.name }
-                            rowTextForSelection={(item) => item.name }
-                            />
+                            buttonTextAfterSelection={(i) => i.name}
+                            rowTextForSelection={(item) => item.name}
+                        />
                         <View style={{ height: hp("2") }} />
                         <TouchableOpacity
                             disabled={disabled_reg()}
-                            style={{...styles.btn, opacity:disabled_reg()?0.8:1}}
+                            style={{ ...styles.btn, opacity: disabled_reg() ? 0.8 : 1 }}
                             onPress={async () => {
                                 this.register()
                             }}>
@@ -249,9 +259,9 @@ class Register extends React.Component {
                     <TouchableOpacity
                         style={styles.helpBtn}
                         onPress={() => {
-                            this.setState({ popup:{ "show":true, "type":"help", "message":translate("Would You need help?") } })
+                            this.setState({ popup: { "show": true, "type": "help", "message": translate("Would You need help?") } })
                         }}>
-                        <SvgHelp/>
+                        <SvgHelp />
                     </TouchableOpacity>
                 </View>
             </View>
@@ -341,7 +351,7 @@ const styles = StyleSheet.create({
         height: wp('13'),
         width: wp('24'),
         alignSelf: 'center',
-        resizeMode:'contain'
+        resizeMode: 'contain'
     },
     helpView: {
         position: 'absolute',
@@ -357,5 +367,5 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center'
     },
-    txt01:{ fontFamily: theme.font01, textAlign: 'right', color: "#a3a3a3" }
+    txt01: { fontFamily: theme.font01, textAlign: 'right', color: "#a3a3a3" }
 });

@@ -26,14 +26,14 @@ class App extends Component {
   }
 
   async checkForUpdate() {
-    // this.setState({ loader:true })
-    // const a = await CodePush.sync({
-    //   updateDialog: true,
-    //   installMode: CodePush.InstallMode.IMMEDIATE
-    // });
-    // if(a === 1){ 
-    //   CodePush.restartApp();
-    // }
+    this.setState({ loader:true })
+    const a = await CodePush.sync({
+      updateDialog: true,
+      installMode: CodePush.InstallMode.IMMEDIATE
+    });
+    if(a === 1){ 
+      CodePush.restartApp();
+    }
     this.setState({ loader:false })
   }
 
