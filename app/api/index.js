@@ -38,11 +38,9 @@ export async function call_application_manager(payload) {
             headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        console.log(payload, rawResponse);
         const content = await rawResponse.json();
         return content;
     } catch (error) {
-        console.log(error);
         return { "resultFlag": false, "message": error.message }
     }
 }

@@ -22,7 +22,6 @@ import {
     get_query_answers,
     play_message_handler,
     on_mic_click,
-    text_to_speech,
     close_connection,
     onPlayBack
 } from '../api/methods';
@@ -48,7 +47,6 @@ class LetsBegin extends React.Component {
         this.socket = io(this.get_resource('asr'), SOCKET_CONFIG(this.get_resource('cid')));
         this.get_query_answers = get_query_answers.bind(this);
         this.on_mic_click = on_mic_click.bind(this);
-        this.text_to_speech = text_to_speech.bind(this);
         this.play_message_handler = play_message_handler.bind(this);
         this.state = {
             "isLoaded": false,
@@ -58,6 +56,7 @@ class LetsBegin extends React.Component {
             "last_id": false,
             "last_ids_list": {},
             "chat_list": {
+                "asfdasfa": { "is_question": true, "text": "آپ حبیب بینک میں فیس جمع کروانے کے بعد درکار دستاویزات لے کر# ای خدمت مرکز تشریف لے جائیں۔ آپ کا لائسنس 15 دن میں رینیو ہو جائے گا۔ کیا آپ کو مزید کچھ معلوم کرنا ہے؟" },
                 // "askjdawe": { "is_question": true, "text": "ایک ٹیلے پر واقع مزار خواجہ فریدالدین گنج شکرؒ کے احاطہء صحن میں ذرا سی ژالہ باری چاندی کے ڈھیروں کی مثل بڑے غضب کا نظارا دیتی ہے۔" },
                 // "askjdasa": { "is_question": false, "text": "ایک ٹیلے پر واقع مزار خواجہ فریدالدین گنج شکرؒ کے احاطہء صحن میں ذرا سی ژالہ باری چاندی کے ڈھیروں کی مثل بڑے غضب کا نظارا دیتی ہے۔" },
             },
@@ -82,7 +81,6 @@ class LetsBegin extends React.Component {
 
         AudioRecord.init(options);
         AudioRecord.on('data', this.onAudioStreaming.bind(this));
-        // this.socketListners()
 
         BackHandler.addEventListener('hardwareBackPress', (async function () {
             if (this.state.isLoaded) {
@@ -101,7 +99,18 @@ class LetsBegin extends React.Component {
 
         this.socket?.on('disconnect', (e) => {
             console.log('Disconnected from server', e);
-            this.setState({ "socket_status": false })
+            this.setState({
+                "socket_status": false,
+                "popup": {
+                    "show": true,
+                    "type": 'success',
+                    "message": translate("Session Expired!")
+                }
+            })
+            setTimeout(() => {
+                this.props.updateRedux({ resources: {} })
+                this.props.navigation.goBack(null)
+            }, 1000)
         });
 
         this.socket?.on('response', this.onMessage.bind(this));
@@ -126,20 +135,12 @@ class LetsBegin extends React.Component {
             setTimeout(() => {
                 this.props.updateRedux({ resources: {} })
                 this.props.navigation.goBack(null)
-            }, 1500)
+            }, 1000)
         } else {
             setTimeout(() => {
                 this.props.updateRedux({ resources: {} })
                 this.props.navigation.goBack(null)
-            }, 1500)
-        }
-    }
-
-    socketListners() {
-        if (this.socket) {
-            this.socket.on('connect', this.onOpen.bind(this));
-            this.socket.on('disconnect', this.onClose.bind(this));
-            this.socket.on('response', this.onMessage.bind(this));
+            }, 1000)
         }
     }
 
@@ -190,16 +191,6 @@ class LetsBegin extends React.Component {
         }
     }
 
-    onOpen(e) {
-        console.log("On Open:", e)
-        this.setState({ "socket_status": 1, "loader": false })
-    }
-
-    onClose(e) {
-        console.log("On Close:", e)
-        this.setState({ "socket_status": 3 })
-    }
-
     render() {
         const { is_recording, chat_list, screen_loader = false, loader_message = false, loader, socket_status, play_text_id } = this.state;
         const { resources } = this.props;
@@ -239,20 +230,20 @@ class LetsBegin extends React.Component {
                             }}>
                             {
                                 Object.entries(chat_list).map((arr, i) => {
-                                    let a = arr[0], c = arr[1];
+                                    let unique_id = arr[0], c = arr[1];
                                     let is = c.is_question;
                                     return (
-                                        <View style={styles.chatRow(is)} key={a}>
+                                        <View style={styles.chatRow(is)} key={unique_id}>
                                             {!is ? <View style={styles.chatViewIcon(is)} /> : <></>}
                                             <View style={styles.chatTextView(is)}>
                                                 <PlayerView
                                                     text_obj={c}
-                                                    text_id={a}
+                                                    text_id={unique_id}
                                                     {...this}
                                                     onPlay={() => {
                                                         // if(isPlay && this.props.sound) this.props.sound.pause()
                                                         // console.log(text_id)
-                                                        this.onPlayBack(a, c.text, () => { })
+                                                        this.onPlayBack(unique_id, c, () => { })
                                                     }} />
                                                 <Text style={styles.chatTxt(is)}>{c.text}</Text>
                                             </View>

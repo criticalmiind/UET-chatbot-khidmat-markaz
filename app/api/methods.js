@@ -54,8 +54,10 @@ export async function get_query_answers() {
     ids_list.forEach(async (el) => {
         const qs = await this.dialogue_manager({ "textMessage": el.text })
         if (qs.resultFlag) {
+            console.log(qs);
             // let cleared_text = isNullRetNull(qs.textResponse,"").split("!")[0]
-            let cleared_text = isNullRetNull(qs.textResponse, "")
+            let cleared_text = qs.textResponse
+            // isNullRetNull(qs.textResponse, "")
 
             const unique_id = uid();
             chat_list[unique_id] = { "is_question": false, "text": cleared_text.toString() }
@@ -73,17 +75,6 @@ export async function get_query_answers() {
             }else{
                 this.setState({ popup: { "show": true, "type":'success', "message": translate(message) } })
             }
-            // const ttsRes = await this.tts_manager({ "textMessage": [cleared_text] })
-            // if (ttsRes.resultFlag) {
-            //     let audioResponse = jsonParse(ttsRes.audioResponse)
-
-            //     let encodedFile = audioResponse.response.encodedFile
-            //     last_unread_msgs[el.id] = { "is_question": false, "encodedFile": encodedFile }
-            //     setTimeout(() => {
-            //         this.setState({ "last_unread_msgs": last_unread_msgs })
-            //         this.play_message_handler(encodedFile, false)
-            //     }, 500)
-            // }
         }
         setTimeout(() => {
             this.setState({
@@ -95,14 +86,18 @@ export async function get_query_answers() {
     });
 }
 
-export async function onPlayBack(text_id, text, callback=(e)=>{}) {
+export async function onPlayBack(text_id, obj, callback=(e)=>{}) {
     const { palyState, chat_list } = this.state
-    const { resultFlag, audioResponse, message } = await this.tts_manager({ "textMessage": [text] })
+    if(obj.encodedFile){
+        this.play_message_handler(obj.encodedFile, false, callback)
+        return
+    }
+    const { resultFlag, audioResponse, message } = await this.tts_manager({ "textMessage": [obj.text] })
     if(resultFlag){
         let encodedFile = audioResponse.length>0?audioResponse[0].audio:''
         let duration = parseFloat(audioResponse.length>0?audioResponse[0].duration:0)
-        chat_list[text_id] = { ...chat_list[text_id], "duration":duration }
-        this.setState({ "playState":'paly', "chat_list":chat_list  })
+        chat_list[text_id] = { ...obj, "duration":duration, "encodedFile":encodedFile  }
+        this.setState({ "playState":'paly', "chat_list":chat_list })
 
         setTimeout(() => {
             this.play_message_handler(encodedFile, false, callback)
@@ -133,15 +128,6 @@ export async function play_message_handler(url, is_path = false, callback=(e)=>{
                 if(callback) callback(r)
             })
         })
-    }
-}
-
-export async function text_to_speech(text) {
-    const { chat_list } = this.state;
-    let ttsRes = await this.tts_manager({ "textMessage": [text] })
-    if (simplify(ttsRes.response.status) == 'ok') {
-        chat_list.push({ "is_question": false, "text": text })
-        this.setState({ chat_list })
     }
 }
 

@@ -33,13 +33,13 @@ class Register extends React.Component {
             'gender': 'Male',
             'dateOfBirth': false,
             
-            'name': 'Khan',
-            'userName': 'khan123',
-            'password': '123456',
-            'confirm_password': '123456',
-            'city': 'lahore',
-            'district': 'Lahore',
-            'dateOfBirth': false
+            // 'name': 'Khan',
+            // 'userName': 'khan123',
+            // 'password': '123456',
+            // 'confirm_password': '123456',
+            // 'city': 'lahore',
+            // 'district': 'Lahore',
+            // 'dateOfBirth': false
 
         }
     }
@@ -75,7 +75,9 @@ class Register extends React.Component {
         this.setStateObj({ loader: false })
         if (res.resultFlag) {
             this.setState({ popup: { "show": true, "type": "success", "message": "Registered Successfully! Now please login!" } })
-            this.props.navigation.navigate("Login")
+            setTimeout(() => {
+                this.props.navigation.navigate("Login")
+            }, 1500);
         } else {
             this.setState({ popup: { "show": true, "type": "wrong", "message": translate(res.message) } })
 

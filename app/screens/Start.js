@@ -28,13 +28,12 @@ class Start extends React.Component {
         let res = await call_application_manager(obj)
         if (res.resultFlag) {
             this.props.updateRedux({ "resources": res })
-            setTimeout(() => {
+            // setTimeout(() => {
                 this.setState({ loader: false })
                 this.props.navigation.navigate("LetsBegin")
-            }, 300)
+            // }, 300)
         } else {
-            this.setState({ loader: false })
-            this.setState({ popup: { "show": true, "type": "wrong", "message": translate(res.message) } })
+            this.setState({ loader: false, popup: { "show": true, "type": "wrong", "message": translate(res.message) } })
         }
     }
 
