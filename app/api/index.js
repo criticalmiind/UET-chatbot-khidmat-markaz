@@ -1,6 +1,6 @@
 const main_base_url = "https://bot.cle.org.pk/"
 // const main_base_url = "https://202.142.159.37:7575/"
-export const SOCKET = "http://202.142.147.2:5002"
+// export const SOCKET = "http://202.142.147.2:5002"
 export const SOCKET_CONFIG = (connection1) => ({ "transportOptions": { "polling": { "extraHeaders": { 'connectionid': connection1 } } } })
 
 export const uri = {

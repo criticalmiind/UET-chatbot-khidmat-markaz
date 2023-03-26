@@ -27,23 +27,19 @@ class Start extends React.Component {
         let obj = { 'function': method['startService'], 'sessionId': session }
         let res = await call_application_manager(obj)
         if (res.resultFlag) {
-            console.log(res);
             this.props.updateRedux({ "resources": res })
-            setTimeout(() => {
+            // setTimeout(() => {
                 this.setState({ loader: false })
                 this.props.navigation.navigate("LetsBegin")
-            }, 300)
+            // }, 300)
         } else {
-            this.setState({ loader: false })
-            this.setState({ popup: { "show": true, "type": "wrong", "message": translate(res.message) } })
+            this.setState({ loader: false, popup: { "show": true, "type": "wrong", "message": translate(res.message) } })
         }
     }
 
     render() {
         const { loader, isSlider } = this.state;
         const { sessionId, name } = this.props.userData;
-
-        console.log(this.props.userData);
         return (<>
             <Loader isShow={loader} />
             <Popup {...this.state.popup} onClick={() => { this.setState({ popup: {} }) }} />
