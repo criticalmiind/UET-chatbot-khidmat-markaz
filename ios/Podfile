@@ -23,7 +23,7 @@ target 'EKhidmatMarkaz' do
   pod 'RNSound', :path => '../node_modules/react-native-sound'
 
 
-  pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-community/async-storage'
+  # pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-community/async-storage'
 
   pod 'CodePush', :path => '../node_modules/react-native-code-push'
 

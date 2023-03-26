@@ -44,8 +44,8 @@ class LetsBegin extends React.Component {
         this.dialogue_manager = dialogue_manager.bind(this);
         this.onPlayBack = onPlayBack.bind(this);
 
-        this.sound = null;
-        this.socket = io(this.get_resource('asr'), SOCKET_CONFIG(this.get_resource('cid')));
+        // this.Sound = null;
+        // this.socket = io(this.get_resource('asr'), SOCKET_CONFIG(this.get_resource('cid')));
         this.get_query_answers = get_query_answers.bind(this);
         this.on_mic_click = on_mic_click.bind(this);
         this.text_to_speech = text_to_speech.bind(this);
@@ -58,7 +58,7 @@ class LetsBegin extends React.Component {
             "last_id": false,
             "last_ids_list": {},
             "chat_list": {
-                // "askjdawe": { "is_question": true, "text": "ایک ٹیلے پر واقع مزار خواجہ فریدالدین گنج شکرؒ کے احاطہء صحن میں ذرا سی ژالہ باری چاندی کے ڈھیروں کی مثل بڑے غضب کا نظارا دیتی ہے۔" },
+                "askjdawe": { "is_question": true, "text": "ایک ٹیلے پر واقع مزار خواجہ فریدالدین گنج شکرؒ کے احاطہء صحن میں ذرا سی ژالہ باری چاندی کے ڈھیروں کی مثل بڑے غضب کا نظارا دیتی ہے۔" },
                 // "askjdasa": { "is_question": false, "text": "ایک ٹیلے پر واقع مزار خواجہ فریدالدین گنج شکرؒ کے احاطہء صحن میں ذرا سی ژالہ باری چاندی کے ڈھیروں کی مثل بڑے غضب کا نظارا دیتی ہے۔" },
             },
             "last_unread_msgs": {},
@@ -113,7 +113,7 @@ class LetsBegin extends React.Component {
             BackHandler.exitApp()
         }))
         this.socket?.disconnect();
-        this.sound = null;
+        this.Sound = null;
         await AudioRecord.stop()
     }
 
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
     speakBtnView: {
         width: '100%',
         position: 'absolute',
-        bottom: hp('4', '1')
+        bottom: hp('1', '1')
     },
     speakBtn: (is) => ({
         height: hp('10'),
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
         tintColor: '#fff'
     }),
     v01: {
-        height: hp('80'),
+        height: hp('69','80'),
         width: wp('100'),
         borderWidth: 1,
         borderColor: "#ddd",

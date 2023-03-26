@@ -1,3 +1,5 @@
+import { Platform } from "react-native";
+
 export const theme = {
     designColor: '#21347E',
     designColor1: '#FFCD01',
@@ -14,5 +16,5 @@ export const theme = {
     octonary01: "#535353",
     success: "#4CD963",
 
-    font01: 'Alvi-Nastaleeq-Regular',
+    font01: Platform.OS == 'ios'?undefined:'Alvi-Nastaleeq-Regular',
 }

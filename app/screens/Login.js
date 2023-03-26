@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center'
     },
     forgot_pwd_txt: {
-        fontFamily: "#21347E"
+        // fontFamily: "#21347E"
     },
     powered_view: {
         width: wp('40'),

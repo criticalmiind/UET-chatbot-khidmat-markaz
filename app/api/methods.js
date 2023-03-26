@@ -27,7 +27,7 @@ export async function on_mic_click(recording) {
     if (audioPermission) {
         if (!is_recording) {
             this.setState({ "is_recording": recording, "last_id": uid() })
-            if (this.sound) this.sound.stop()
+            if (this.Sound) this.Sound.stop()
             AudioRecord.start();
         } else {
             // this.ws.send("eos")
@@ -119,17 +119,17 @@ export async function play_message_handler(url, is_path = false, callback=(e)=>{
         const path = `${RNFS.DocumentDirectoryPath}/test_audio_file.wav`;
         await RNFS.writeFile(path, url.replace("data:audio/wav;base64,", ""), 'base64')
             .then(() => {
-                if (this.sound) this.sound.stop()
-                this.sound = new Sound(path, '', () => {
-                    this.sound.play((r) => {
+                if (this.Sound) this.Sound.stop()
+                this.Sound = new Sound(path, '', () => {
+                    this.Sound.play((r) => {
                         if(callback) callback(r)
                     })
                 })
             })
     } else {
-        if (this.sound) this.sound.stop()
-        this.sound = new Sound(url, '', () => {
-            this.sound.play((r) => {
+        if (this.Sound) this.Sound.stop()
+        this.Sound = new Sound(url, '', () => {
+            this.Sound.play((r) => {
                 if(callback) callback(r)
             })
         })

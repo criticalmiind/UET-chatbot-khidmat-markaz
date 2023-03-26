@@ -59,8 +59,8 @@ const styles = StyleSheet.create({
         left:wp('2')
     },
     sliderStyle:{
-        left:wp('1%'),
-        width: '91%',
+        left:wp('6','1'),
+        width: wp('55','55'),
         borderRadius: 100,
         padding: 0
     },
