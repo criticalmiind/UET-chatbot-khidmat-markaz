@@ -9,12 +9,13 @@ import {
     Image,
     Platform,
     BackHandler,
-    StatusBar
+    StatusBar,
+    Alert
 } from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from './../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from './../constants/theme';
-import { get_resource, hp, isNullRetNull, uid, wp } from './../utils';
+import { formatTime, get_resource, hp, isNullRetNull, uid, wp } from './../utils';
 import AudioRecord from 'react-native-audio-recording-stream';
 import {
     base64_into_blob,
@@ -43,8 +44,8 @@ class LetsBegin extends React.Component {
         this.dialogue_manager = dialogue_manager.bind(this);
         this.onPlayBack = onPlayBack.bind(this);
 
-        // this.Sound = null;
-        // this.socket = io(this.get_resource('asr'), SOCKET_CONFIG(this.get_resource('cid')));
+        this.Sound = null;
+        this.socket = io(this.get_resource('asr'), SOCKET_CONFIG(this.get_resource('cid')));
         this.get_query_answers = get_query_answers.bind(this);
         this.on_mic_click = on_mic_click.bind(this);
         this.play_message_handler = play_message_handler.bind(this);
@@ -56,9 +57,8 @@ class LetsBegin extends React.Component {
             "last_id": false,
             "last_ids_list": {},
             "chat_list": {
-                "asfdasfa": { "is_question": true, "text": "آپ حبیب بینک میں فیس جمع کروانے کے بعد درکار دستاویزات لے کر# ای خدمت مرکز تشریف لے جائیں۔ آپ کا لائسنس 15 دن میں رینیو ہو جائے گا۔ کیا آپ کو مزید کچھ معلوم کرنا ہے؟" },
-                // "askjdawe": { "is_question": true, "text": "ایک ٹیلے پر واقع مزار خواجہ فریدالدین گنج شکرؒ کے احاطہء صحن میں ذرا سی ژالہ باری چاندی کے ڈھیروں کی مثل بڑے غضب کا نظارا دیتی ہے۔" },
-                // "askjdasa": { "is_question": false, "text": "ایک ٹیلے پر واقع مزار خواجہ فریدالدین گنج شکرؒ کے احاطہء صحن میں ذرا سی ژالہ باری چاندی کے ڈھیروں کی مثل بڑے غضب کا نظارا دیتی ہے۔" },
+                // "asfdasfa": { "is_question": true, "text": ["آپ حبیب بینک میں فیس جمع کروانے کے بعد درکار دستاویزات لے کر# ای خدمت مرکز تشریف لے جائیں۔","آپ کا لائسنس 15 دن میں رینیو ہو جائے گا۔ کیا آپ کو مزید کچھ معلوم کرنا ہے؟"] },
+                // "asfdasfa": { "is_question": false, "text": ["ای خدمت مرکز","آپ حبیب بینک میں فیس جمع کروانے کے بعد درکار دستاویزات لے کر# ای خدمت مرکز تشریف لے جائیں۔","آپ کا لائسنس 15 دن میں رینیو ہو جائے گا۔ کیا آپ کو مزید کچھ معلوم کرنا ہے؟"] },
             },
             "last_unread_msgs": {},
             "play_text_id": false,
@@ -85,7 +85,6 @@ class LetsBegin extends React.Component {
         BackHandler.addEventListener('hardwareBackPress', (async function () {
             if (this.state.isLoaded) {
                 await this.closeSession()
-                // this.props.navigation.goBack(null)
             }
             return true;
         }).bind(this));
@@ -97,51 +96,50 @@ class LetsBegin extends React.Component {
             this.setState({ "socket_status": true })
         });
 
-        this.socket?.on('disconnect', (e) => {
+        this.socket?.on('disconnect', (async (e) => {
             console.log('Disconnected from server', e);
-            this.setState({
-                "socket_status": false,
-                "popup": {
-                    "show": true,
-                    "type": 'success',
-                    "message": translate("Session Expired!")
-                }
-            })
-            setTimeout(() => {
-                this.props.updateRedux({ resources: {} })
-                this.props.navigation.goBack(null)
-            }, 1000)
-        });
+            await this.closeSession()
+        }).bind(this));
 
         this.socket?.on('response', this.onMessage.bind(this));
+
+        this.timeout = setInterval(() => {
+            const { playState } = this.state;
+            if (this.Sound && playState == 'play') {
+                this.Sound.getCurrentTime(async (seconds, isPlaying) => {
+                    // console.log(seconds, isPlaying);
+                    this.setState({ "duration": seconds })
+                })
+            }
+        },100)
     }
 
     async componentWillUnmount() {
         this.setState({ "isLoaded": false })
+        if (this.timeout) clearInterval(this.timeout);
         BackHandler.addEventListener('hardwareBackPress', (async function () {
             BackHandler.exitApp()
         }))
         this.socket?.disconnect();
+        if(this.Sound) this.Sound.stop()
         this.Sound = null;
         await AudioRecord.stop()
+    }
+
+    wait = (time = 100) => {
+        return new Promise((resolve) => {
+            setTimeout(() => { resolve() }, time)
+        });
     }
 
     async closeSession() {
         this.setState({ "screen_loader": true, "loader_message": "Closing Connection" })
         const res = await this.close_connection()
-        this.setState({ "screen_loader": false, "loader_message": false })
-        this.setState({ popup: { "show": true, "type": res.resultFlag ? 'success' : "wrong", "message": translate(res.message) } })
-        if (res.resultFlag) {
-            setTimeout(() => {
-                this.props.updateRedux({ resources: {} })
-                this.props.navigation.goBack(null)
-            }, 1000)
-        } else {
-            setTimeout(() => {
-                this.props.updateRedux({ resources: {} })
-                this.props.navigation.goBack(null)
-            }, 1000)
-        }
+        this.setState({ "popup": { "show": true, "type": res.resultFlag ? 'success' : "wrong", "message": translate(res.message) } })
+        setTimeout(() => {
+            this.props.updateRedux({ resources: {} })
+            this.props.navigation.goBack(null)
+        }, 2000)
     }
 
     async onAudioStreaming(data) {
@@ -187,14 +185,44 @@ class LetsBegin extends React.Component {
                 "last_id": unique_id,
                 "last_ids_list": last_ids_list
             })
-            // if (final) this.ws.close();
+        }
+    }
+
+    playComplete = (success) => {
+        if (this.Sound) {
+            if (!success) {
+                Alert.alert('Notice', '(Error code : 2) audio file error.\naudio file not reachable!');
+            }
+            this.setState({ "playState": false });
         }
     }
 
     render() {
-        const { is_recording, chat_list, screen_loader = false, loader_message = false, loader, socket_status, play_text_id } = this.state;
+        const { is_recording, chat_list, screen_loader = false, loader_message = false, loader, playState } = this.state;
         const { resources } = this.props;
 
+        const _renderMessagePanel = (unique_id, obj, text, index1, index2) => {
+            return (
+                <View style={styles.chatRow(obj.is_question)} key={unique_id + index1 + (index2 || 'test')}>
+                    {!obj.is_question ? <View style={styles.chatViewIcon(obj.is_question)} /> : <></>}
+                    <View style={styles.chatTextView(obj.is_question)}>
+                        {!obj.is_question && <PlayerView
+                            duration={this.state.duration || 0}
+                            text_obj={obj}
+                            text_id={unique_id}
+                            playState={playState}
+                            {...this}
+                            onPlay={() => {
+                                if (this.Sound) this.Sound.stop()
+                                this.onPlayBack(unique_id, obj, () => { })
+                            }}>
+                        </PlayerView>}
+                        <Text style={styles.chatTxt(obj.is_question)}>{text}</Text>
+                    </View>
+                    {obj.is_question ? <View style={styles.chatViewIcon(obj.is_question)} /> : <></>}
+                </View>
+            )
+        }
         return (<>
             <Loader isShow={screen_loader} mesasge={loader_message} />
             <Popup {...this.state.popup} onClick={() => { this.setState({ popup: {} }) }} />
@@ -214,7 +242,6 @@ class LetsBegin extends React.Component {
                         style={{ width: wp('18') }}
                         onPress={() => {
                             this.closeSession()
-                            // this.props.navigation.goBack()
                         }}>
                         <SvgBackIcon />
                     </TouchableOpacity>
@@ -229,27 +256,15 @@ class LetsBegin extends React.Component {
                                 if (this.scrollViewRef) this.scrollViewRef.scrollToEnd({ animated: false })
                             }}>
                             {
-                                Object.entries(chat_list).map((arr, i) => {
-                                    let unique_id = arr[0], c = arr[1];
-                                    let is = c.is_question;
-                                    return (
-                                        <View style={styles.chatRow(is)} key={unique_id}>
-                                            {!is ? <View style={styles.chatViewIcon(is)} /> : <></>}
-                                            <View style={styles.chatTextView(is)}>
-                                                <PlayerView
-                                                    text_obj={c}
-                                                    text_id={unique_id}
-                                                    {...this}
-                                                    onPlay={() => {
-                                                        // if(isPlay && this.props.sound) this.props.sound.pause()
-                                                        // console.log(text_id)
-                                                        this.onPlayBack(unique_id, c, () => { })
-                                                    }} />
-                                                <Text style={styles.chatTxt(is)}>{c.text}</Text>
-                                            </View>
-                                            {is ? <View style={styles.chatViewIcon(is)} /> : <></>}
-                                        </View>
-                                    )
+                                Object.entries(chat_list).map((arr, index1) => {
+                                    const unique_id = arr[0], obj = arr[1];
+                                    // const is_question = c.is_question;
+                                    if (typeof (obj.text) == 'string') {
+                                        return _renderMessagePanel(unique_id, obj, obj.text, index1)
+                                    }
+                                    return <>{obj.text.map((text, index2) => {
+                                        return _renderMessagePanel(unique_id, obj, text, index1, index2)
+                                    })}</>
                                 })
                             }
                             {loader && <ActivityIndicator size="large" color={"blue"} />}
@@ -332,7 +347,7 @@ const styles = StyleSheet.create({
         tintColor: '#fff'
     }),
     v01: {
-        height: hp('69','80'),
+        height: hp('69', '80'),
         width: wp('100'),
         borderWidth: 1,
         borderColor: "#ddd",

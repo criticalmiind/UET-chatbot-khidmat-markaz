@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, TextInput, Image, ScrollView } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, View, TextInput, Image, ScrollView, Platform } from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
@@ -9,6 +9,7 @@ import { call_application_manager, method } from '../api';
 import Loader from '../components/Loader';
 import { translate } from '../i18n';
 import Popup from '../components/Popup';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 class Start extends React.Component {
     constructor(props) {
@@ -28,10 +29,10 @@ class Start extends React.Component {
         let res = await call_application_manager(obj)
         if (res.resultFlag) {
             this.props.updateRedux({ "resources": res })
-            // setTimeout(() => {
+            setTimeout(() => {
                 this.setState({ loader: false })
                 this.props.navigation.navigate("LetsBegin")
-            // }, 300)
+            }, 300)
         } else {
             this.setState({ loader: false, popup: { "show": true, "type": "wrong", "message": translate(res.message) } })
         }
@@ -43,88 +44,90 @@ class Start extends React.Component {
         return (<>
             <Loader isShow={loader} />
             <Popup {...this.state.popup} onClick={() => { this.setState({ popup: {} }) }} />
-            {isSlider && <>
-                <TouchableOpacity
-                    style={styles.sliderBlurView}
-                    onPress={() => {
-                        this.setState({ isSlider: false })
-                    }}>
-                </TouchableOpacity>
-                <View style={styles.sliderView}>
-                    <View style={{ height: hp('10') }} />
-                    <SvgDrawerProfileIcon />
-                    <Text style={styles.userNameTxt}>{name}</Text>
-
-                    <View style={{ height: hp('50') }} />
+            <SafeAreaView style={styles.safeArea} forceInset={{ top: 'always' }}>
+                {isSlider && <>
                     <TouchableOpacity
-                        style={styles.btn01}
-                        onPress={async () => {
-                            this.setState({ isSlider: false })
-                            this.props.navigation.navigate("DeleteAccount")
-                        }}>
-                        <Text style={styles.btnTxt}>{translate('Delete Account')}</Text>
-                    </TouchableOpacity>
-                    <View style={{ height: hp('1') }} />
-                    <TouchableOpacity
-                        style={styles.btn01}
-                        onPress={async () => {
-                            this.props.updateRedux({ "userData": {}, "resources": {} })
-                        }}>
-                        <Text style={styles.btnTxt}>{translate('Logout')}</Text>
-                    </TouchableOpacity>
-                </View>
-            </>}
-            <View style={styles.safeArea}>
-                <View style={styles.header}>
-                    <TouchableOpacity onPress={() => { this.setState({ isSlider: true }) }}>
-                        <SvgDrawerIcon />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={styles.headHelpBtn}
+                        style={styles.sliderBlurView}
                         onPress={() => {
-                            this.setState({ popup: { "show": true, "type": "help", "message": translate("Would You need help?") } })
+                            this.setState({ isSlider: false })
                         }}>
-                        <Text style={styles.headHelpBtnTxt}>HELP</Text>
                     </TouchableOpacity>
-                </View>
-                <View style={styles.mainView}>
-                    <View style={{ height: hp("8") }} />
-                    <View style={{ justifyContent: 'center' }}>
-                        <Image source={Logo} style={styles.logo_bg} />
-                        <Image source={Logo} style={styles.logo} />
+                    <View style={styles.sliderView}>
+                        <View style={{ height: hp('10') }} />
+                        <SvgDrawerProfileIcon />
+                        <Text style={styles.userNameTxt}>{name}</Text>
+
+                        <View style={{ height: hp('50') }} />
+                        <TouchableOpacity
+                            style={styles.btn01}
+                            onPress={async () => {
+                                this.setState({ isSlider: false })
+                                this.props.navigation.navigate("DeleteAccount")
+                            }}>
+                            <Text style={styles.btnTxt}>{translate('Delete Account')}</Text>
+                        </TouchableOpacity>
+                        <View style={{ height: hp('1') }} />
+                        <TouchableOpacity
+                            style={styles.btn01}
+                            onPress={async () => {
+                                this.props.updateRedux({ "userData": {}, "resources": {} })
+                            }}>
+                            <Text style={styles.btnTxt}>{translate('Logout')}</Text>
+                        </TouchableOpacity>
                     </View>
-                    <Text style={styles.title}>{translate('e-service')}</Text>
+                </>}
+                <View style={styles.safeArea}>
+                    <View style={styles.header}>
+                        <TouchableOpacity onPress={() => { this.setState({ isSlider: true }) }}>
+                            <SvgDrawerIcon />
+                        </TouchableOpacity>
 
-                    <View style={{ height: hp("6") }} />
-                    <TouchableOpacity
-                        style={styles.btn}
-                        onPress={async () => {
-                            this.get_resources(sessionId)
-                        }}>
-                        <SvgPlay />
-                        <View style={{ width: wp('1') }} />
-                        <Text style={styles.btnTxt}>{translate('start')}</Text>
-                    </TouchableOpacity>
-                    <View style={{ height: hp("2") }} />
-                    <TouchableOpacity
-                        style={styles.btn}
-                        onPress={async () => {
-                            this.props.updateRedux({ "userData": {}, "resources": {} })
-                        }}>
-                        <Text style={styles.btnTxt}>{translate('Logout')}</Text>
-                    </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.headHelpBtn}
+                            onPress={() => {
+                                this.setState({ popup: { "show": true, "type": "help", "message": translate("Would You need help?") } })
+                            }}>
+                            <Text style={styles.headHelpBtnTxt}>HELP</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.mainView}>
+                        <View style={{ height: hp("8") }} />
+                        <View style={{ justifyContent: 'center' }}>
+                            <Image source={Logo} style={styles.logo_bg} />
+                            <Image source={Logo} style={styles.logo} />
+                        </View>
+                        <Text style={styles.title}>{translate('e-service')}</Text>
 
-                    <View style={{ height: hp("12") }} />
+                        <View style={{ height: hp("6") }} />
+                        <TouchableOpacity
+                            style={styles.btn}
+                            onPress={async () => {
+                                this.get_resources(sessionId)
+                            }}>
+                            <SvgPlay />
+                            <View style={{ width: wp('1') }} />
+                            <Text style={styles.btnTxt}>{translate('start')}</Text>
+                        </TouchableOpacity>
+                        <View style={{ height: hp("2") }} />
+                        <TouchableOpacity
+                            style={styles.btn}
+                            onPress={async () => {
+                                this.props.updateRedux({ "userData": {}, "resources": {} })
+                            }}>
+                            <Text style={styles.btnTxt}>{translate('Logout')}</Text>
+                        </TouchableOpacity>
 
-                    <Text style={styles.powered_txt}>{translate('powered')}</Text>
-                    <View style={{ height: hp("1") }} />
-                    <View style={styles.powered_view}>
-                        <Image source={Logo} style={styles.footer_logo} />
-                        <Image source={Logo01} style={styles.footer_logo01} />
+                        <View style={{ height: hp("12") }} />
+
+                        <Text style={styles.powered_txt}>{translate('powered')}</Text>
+                        <View style={{ height: hp("1") }} />
+                        <View style={styles.powered_view}>
+                            <Image source={Logo} style={styles.footer_logo} />
+                            <Image source={Logo01} style={styles.footer_logo01} />
+                        </View>
                     </View>
                 </View>
-            </View>
+            </SafeAreaView>
         </>);
     }
 }
@@ -132,6 +135,11 @@ class Start extends React.Component {
 export default connect(mapStateToProps, mapDispatchToProps)(Start);
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flexDirection: 'column',
+        backgroundColor: theme.designColor,
+        flex: 1
+    },
     sliderBlurView: {
         height: hp('100'),
         width: wp('100'),
@@ -165,7 +173,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     header: {
-        height: hp('10'),
+        // height: hp('10'),
+        ...Platform.select({ "ios": {}, "android": { "height": hp('10') } }),
         width: wp('100%'),
         flexDirection: 'row',
         alignItems: 'center',

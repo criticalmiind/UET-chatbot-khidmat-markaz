@@ -1,6 +1,6 @@
 import { PermissionsAndroid, Alert, Platform } from 'react-native';
 import AudioRecord from "react-native-audio-recording-stream";
-import { isNullRetNull, jsonParse, notify, simplify, uid } from "../utils";
+import { uid } from "../utils";
 import Sound from "react-native-sound";
 import { call_application_manager, method } from '.';
 import { translate } from '../i18n';
@@ -54,16 +54,13 @@ export async function get_query_answers() {
     ids_list.forEach(async (el) => {
         const qs = await this.dialogue_manager({ "textMessage": el.text })
         if (qs.resultFlag) {
-            console.log(qs);
-            // let cleared_text = isNullRetNull(qs.textResponse,"").split("!")[0]
             let cleared_text = qs.textResponse
-            // isNullRetNull(qs.textResponse, "")
 
             const unique_id = uid();
-            chat_list[unique_id] = { "is_question": false, "text": cleared_text.toString() }
+            chat_list[unique_id] = { "is_question": false, "text": cleared_text }
             this.setState({ "chat_list": chat_list })
             
-            const { resultFlag, audioResponse, message } = await this.tts_manager({ "textMessage": [cleared_text.toString()] })
+            const { resultFlag, audioResponse, message } = await this.tts_manager({ "textMessage": cleared_text })
             if (resultFlag) {
                 let encodedFile = audioResponse.length>0?audioResponse[0].audio:''
                 let duration = parseFloat(audioResponse.length>0?audioResponse[0].duration:0)
@@ -92,7 +89,7 @@ export async function onPlayBack(text_id, obj, callback=(e)=>{}) {
         this.play_message_handler(obj.encodedFile, false, callback)
         return
     }
-    const { resultFlag, audioResponse, message } = await this.tts_manager({ "textMessage": [obj.text] })
+    const { resultFlag, audioResponse, message } = await this.tts_manager({ "textMessage": obj.text })
     if(resultFlag){
         let encodedFile = audioResponse.length>0?audioResponse[0].audio:''
         let duration = parseFloat(audioResponse.length>0?audioResponse[0].duration:0)
@@ -115,10 +112,17 @@ export async function play_message_handler(url, is_path = false, callback=(e)=>{
         await RNFS.writeFile(path, url.replace("data:audio/wav;base64,", ""), 'base64')
             .then(() => {
                 if (this.Sound) this.Sound.stop()
-                this.Sound = new Sound(path, '', () => {
-                    this.Sound.play((r) => {
-                        if(callback) callback(r)
-                    })
+                this.Sound = new Sound(path, '', (error) => {
+                    if (error) {
+                        Alert.alert('Notice', '(Error code : 1) audio file error.\naudio file not reachable!');
+                    }else{
+                        try {
+                            this.setState({ "playState":'play' })
+                            this.Sound.play(this.playComplete)
+                        } catch (e) {
+                            Alert.alert('Notice', '(Error code : 2) '+e);
+                        }
+                    }
                 })
             })
     } else {

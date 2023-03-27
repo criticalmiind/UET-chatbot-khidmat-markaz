@@ -6,44 +6,37 @@ import { theme } from '../constants/theme';
 import { formatTime, hp, wp } from '../utils';
 import { SvgPauseIcon, SvgPlayIcon } from '../constants/images';
 
-class PlayerView extends React.Component {
-    constructor(props) {
-        super(props)
-        this.state = {}
-    }
+const PlayerView = ({ text_obj = {}, text_id, onPlay, playState = false, duration=0 }) => {
 
-    render() {
-        const { text_obj={}, text_id, onPlay, playState=false } = this.props;
-
-        return (
-            <View style={styles.v01}>
-                <View style={styles.playView}>
-                    <TouchableOpacity
-                        onPress={()=>{
-                            if(onPlay) onPlay(playState)
-                        }}>
-                        {playState?<SvgPauseIcon />:<SvgPlayIcon />}
-                    </TouchableOpacity>
-                </View>
-                <Slider
-                    style={styles.sliderStyle}
-                    thumbTintColor="transparent"
-                    disabled={0}
-                    value={0}
-                    minimumValue={0}
-                    maximumValue={1}
-                    minimumTrackTintColor="#333333"
-                    maximumTrackTintColor="#000000" />
-                <Text style={styles.counterTxt}>{formatTime(text_obj.duration?text_obj.duration:0)}</Text>
+    return (
+        <View style={styles.v01}>
+            <View style={styles.playView}>
+                <TouchableOpacity
+                    onPress={() => {
+                        if (onPlay) onPlay(playState)
+                    }}>
+                    {playState == 'play' && <SvgPauseIcon /> || <SvgPlayIcon />}
+                </TouchableOpacity>
             </View>
-        );
-    }
+            <Slider
+                style={styles.sliderStyle}
+                thumbTintColor="transparent"
+                // thumbImage={}
+                disabled
+                value={duration||0}
+                minimumValue={0}
+                maximumValue={(text_obj.duration||0)}
+                minimumTrackTintColor="#333333"
+                maximumTrackTintColor="#000000" />
+            <Text style={styles.counterTxt}>{formatTime(duration)}</Text>
+        </View>
+    );
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(PlayerView);
 
 const styles = StyleSheet.create({
-    v01:{
+    v01: {
         height: hp('3'),
         width: '100%',
         backgroundColor: '#F0F7FF',
@@ -51,25 +44,26 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         flexDirection: 'row',
         alignItems: 'center',
-        paddingLeft: wp('1')
+        paddingLeft: wp('1'),
+        width:wp('76')
     },
-    playView:{
-        position:'absolute',
-        zIndex:10,
-        left:wp('2')
+    playView: {
+        position: 'absolute',
+        zIndex: 10,
+        left: wp('2'),
     },
-    sliderStyle:{
-        left:wp('6','1'),
-        width: wp('55','55'),
+    sliderStyle: {
+        left: wp('6', '1'),
+        width: '78%',
         borderRadius: 100,
         padding: 0
     },
-    counterTxt:{
-        position:'absolute',
-        zIndex:10,
-        right:wp('2'),
-        fontFamily:theme.font01,
-        color:"#333",
-        fontSize:10
+    counterTxt: {
+        position: 'absolute',
+        zIndex: 10,
+        right: wp('2'),
+        fontFamily: theme.font01,
+        color: "#333",
+        fontSize: 10
     },
 });

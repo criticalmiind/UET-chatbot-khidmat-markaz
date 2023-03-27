@@ -423,11 +423,11 @@ PODS:
   - RNScreens (3.20.0):
     - React-Core
     - React-RCTImage
-  - RNSound (0.11.2):
-    - React-Core
-    - RNSound/Core (= 0.11.2)
-  - RNSound/Core (0.11.2):
-    - React-Core
+  - RNSound (0.11.0):
+    - React
+    - RNSound/Core (= 0.11.0)
+  - RNSound/Core (0.11.0):
+    - React
   - RNSVG (12.4.3):
     - React-Core
   - RNVectorIcons (7.1.0):
@@ -695,7 +695,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: a479ebd5ed4221a810967000735517df0d2db211
   RNReanimated: 59e4c5e8defd5f8215df1048dcddade33715e353
   RNScreens: 218801c16a2782546d30bd2026bb625c0302d70f
-  RNSound: 6c156f925295bdc83e8e422e7d8b38d33bc71852
+  RNSound: da030221e6ac7e8290c6b43f2b5f2133a8e225b0
   RNSVG: f3b60aeeaa81960e2e0536c3a9eef50b667ef3a9
   RNVectorIcons: bc69e6a278b14842063605de32bec61f0b251a59
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
