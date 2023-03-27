@@ -15,7 +15,7 @@ import {
 import { mapDispatchToProps, mapStateToProps } from './../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from './../constants/theme';
-import { formatTime, get_resource, hp, isNullRetNull, uid, wp } from './../utils';
+import { get_resource, hp, isNullRetNull, uid, wp } from './../utils';
 import AudioRecord from 'react-native-audio-recording-stream';
 import {
     base64_into_blob,
@@ -27,7 +27,7 @@ import {
     onPlayBack
 } from '../api/methods';
 import { LogoWhite, MicIcon, SvgBackIcon } from '../constants/images';
-import { dialogue_manager, run_scripts, SOCKET, SOCKET_CONFIG, tts_manager } from '../api';
+import { dialogue_manager, run_scripts, SOCKET_CONFIG, tts_manager } from '../api';
 import Loader from '../components/Loader';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PlayerView from '../components/PlayerView';
@@ -60,7 +60,7 @@ class LetsBegin extends React.Component {
                 // "asfdasfa": { "is_question": true, "text": ["آپ حبیب بینک میں فیس جمع کروانے کے بعد درکار دستاویزات لے کر# ای خدمت مرکز تشریف لے جائیں۔","آپ کا لائسنس 15 دن میں رینیو ہو جائے گا۔ کیا آپ کو مزید کچھ معلوم کرنا ہے؟"] },
                 // "asfdasfa": { "is_question": false, "text": ["ای خدمت مرکز","آپ حبیب بینک میں فیس جمع کروانے کے بعد درکار دستاویزات لے کر# ای خدمت مرکز تشریف لے جائیں۔","آپ کا لائسنس 15 دن میں رینیو ہو جائے گا۔ کیا آپ کو مزید کچھ معلوم کرنا ہے؟"] },
             },
-            "last_unread_msgs": {},
+            "last_played_voice": {},
             "play_text_id": false,
             "temp_text": ""
         }
@@ -92,7 +92,6 @@ class LetsBegin extends React.Component {
 
     componentDidMount() {
         this.socket?.on('connect', (e) => {
-            console.log('Connected to server');
             this.setState({ "socket_status": true })
         });
 
@@ -107,11 +106,10 @@ class LetsBegin extends React.Component {
             const { playState } = this.state;
             if (this.Sound && playState == 'play') {
                 this.Sound.getCurrentTime(async (seconds, isPlaying) => {
-                    // console.log(seconds, isPlaying);
                     this.setState({ "duration": seconds })
                 })
             }
-        },100)
+        }, 100)
     }
 
     async componentWillUnmount() {
@@ -121,7 +119,7 @@ class LetsBegin extends React.Component {
             BackHandler.exitApp()
         }))
         this.socket?.disconnect();
-        if(this.Sound) this.Sound.stop()
+        if (this.Sound) this.Sound.stop()
         this.Sound = null;
         await AudioRecord.stop()
     }
@@ -190,31 +188,32 @@ class LetsBegin extends React.Component {
 
     playComplete = (success) => {
         if (this.Sound) {
-            if (!success) {
-                Alert.alert('Notice', '(Error code : 2) audio file error.\naudio file not reachable!');
-            }
+            if (!success) Alert.alert('Notice', '(Error code : 3) audio file error.\naudio file not stopped!');
             this.setState({ "playState": false });
         }
     }
 
     render() {
-        const { is_recording, chat_list, screen_loader = false, loader_message = false, loader, playState } = this.state;
-        const { resources } = this.props;
+        const { is_recording, chat_list, screen_loader = false, loader_message = false, loader } = this.state;
 
-        const _renderMessagePanel = (unique_id, obj, text, index1, index2) => {
+        const _renderMessagePanel = (unique_id, obj, text, index) => {
+            const { last_played_voice, duration, playState } = this.state;
+
+            
             return (
-                <View style={styles.chatRow(obj.is_question)} key={unique_id + index1 + (index2 || 'test')}>
+                <View style={styles.chatRow(obj.is_question)} key={unique_id + index}>
                     {!obj.is_question ? <View style={styles.chatViewIcon(obj.is_question)} /> : <></>}
                     <View style={styles.chatTextView(obj.is_question)}>
                         {!obj.is_question && <PlayerView
-                            duration={this.state.duration || 0}
-                            text_obj={obj}
-                            text_id={unique_id}
+                            voice_timer={duration}
+                            lastPlayVoice={last_played_voice}
+                            index={index}
+                            unique_id={unique_id}
                             playState={playState}
                             {...this}
                             onPlay={() => {
                                 if (this.Sound) this.Sound.stop()
-                                this.onPlayBack(unique_id, obj, () => { })
+                                this.onPlayBack(unique_id, obj, index)
                             }}>
                         </PlayerView>}
                         <Text style={styles.chatTxt(obj.is_question)}>{text}</Text>
@@ -260,10 +259,10 @@ class LetsBegin extends React.Component {
                                     const unique_id = arr[0], obj = arr[1];
                                     // const is_question = c.is_question;
                                     if (typeof (obj.text) == 'string') {
-                                        return _renderMessagePanel(unique_id, obj, obj.text, index1)
+                                        return _renderMessagePanel(unique_id, obj, obj['text'], index1)
                                     }
                                     return <>{obj.text.map((text, index2) => {
-                                        return _renderMessagePanel(unique_id, obj, text, index1, index2)
+                                        return _renderMessagePanel(unique_id, obj, obj['text'][index2], index2)
                                     })}</>
                                 })
                             }

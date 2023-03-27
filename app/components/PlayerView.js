@@ -4,9 +4,21 @@ import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userAction
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
 import { formatTime, hp, wp } from '../utils';
-import { SvgPauseIcon, SvgPlayIcon } from '../constants/images';
+import { SvgPauseIcon, SvgPlayIcon, thumb, ThumbImg } from '../constants/images';
 
-const PlayerView = ({ text_obj = {}, text_id, onPlay, playState = false, duration=0 }) => {
+const PlayerView = ({
+    onPlay,
+    lastPlayVoice = { "duration":0, "index":0, "text_id":false },
+    playState = false,
+    voice_timer = 0,
+    unique_id,
+    index
+}) => {
+
+    const timer = lastPlayVoice["index"] == index && lastPlayVoice["text_id"] == unique_id ? (voice_timer || 0) : 0
+    
+    const isPlay = playState == 'play' && lastPlayVoice["index"] == index && lastPlayVoice["text_id"] == unique_id
+
 
     return (
         <View style={styles.v01}>
@@ -15,20 +27,24 @@ const PlayerView = ({ text_obj = {}, text_id, onPlay, playState = false, duratio
                     onPress={() => {
                         if (onPlay) onPlay(playState)
                     }}>
-                    {playState == 'play' && <SvgPauseIcon /> || <SvgPlayIcon />}
+                    {isPlay && <SvgPauseIcon /> || <SvgPlayIcon />}
                 </TouchableOpacity>
             </View>
             <Slider
                 style={styles.sliderStyle}
                 thumbTintColor="transparent"
-                // thumbImage={}
-                disabled
-                value={duration||0}
+                // thumbImage
+                // onSlidingComplete={(e)=>{
+                //     console.log('test',e)
+                // }}
+                disabled={false}
                 minimumValue={0}
-                maximumValue={(text_obj.duration||0)}
-                minimumTrackTintColor="#333333"
+                // maximumValue={1}
+                maximumValue={parseFloat(lastPlayVoice['duration'])||0}
+                value={timer}
+                minimumTrackTintColor="#A3A3A3"
                 maximumTrackTintColor="#000000" />
-            <Text style={styles.counterTxt}>{formatTime(duration)}</Text>
+            <Text style={styles.counterTxt}>{formatTime(timer)}</Text>
         </View>
     );
 }
@@ -45,7 +61,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingLeft: wp('1'),
-        width:wp('76')
+        width: wp('76')
     },
     playView: {
         position: 'absolute',

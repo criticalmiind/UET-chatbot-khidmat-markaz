@@ -84,6 +84,10 @@ export async function notify({ title = '', message = '', success }) {
   Alert.alert(title, message)
 }
 
+export function makeAudioFileObj(text, audio = false, files = {}) {
+  return { ...audio ? { [`${text}`]: audio } : {}, ...files }
+}
+
 // export async function askUser(is, callback) {
 //   if (is) return callback(is)
 //   Alert.alert(
