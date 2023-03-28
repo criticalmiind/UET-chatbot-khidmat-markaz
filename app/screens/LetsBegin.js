@@ -45,7 +45,7 @@ class LetsBegin extends React.Component {
         this.onPlayBack = onPlayBack.bind(this);
 
         this.Sound = null;
-        // this.socket = io(this.get_resource('asr'), SOCKET_CONFIG(this.get_resource('cid')));
+        this.socket = io(this.get_resource('asr'), SOCKET_CONFIG(this.get_resource('cid')));
         this.get_query_answers = get_query_answers.bind(this);
         this.on_mic_click = on_mic_click.bind(this);
         this.play_message_handler = play_message_handler.bind(this);
@@ -56,11 +56,11 @@ class LetsBegin extends React.Component {
             "socket_status": false,
             "last_id": false,
             "last_ids_list": {
-                // "asalamoalaikom": { "is_question": true, "text": "السلام علیکم" },
+                "asalamoalaikom": { "is_question": true, "text": "السلام علیکم" },
             },
             "chat_list": {
                 // "asfdasfa": { "is_question": true, "text": ["آپ حبیب بینک میں فیس جمع کروانے کے بعد درکار دستاویزات لے کر# ای خدمت مرکز تشریف لے جائیں۔","آپ کا لائسنس 15 دن میں رینیو ہو جائے گا۔ کیا آپ کو مزید کچھ معلوم کرنا ہے؟"] },
-                "asfdasfa": { "is_question": false, "text": ["ای خدمت مرکز","آپ حبیب بینک میں فیس جمع کروانے کے بعد درکار دستاویزات لے کر# ای خدمت مرکز تشریف لے جائیں۔","آپ کا لائسنس 15 دن میں رینیو ہو جائے گا۔ کیا آپ کو مزید کچھ معلوم کرنا ہے؟"] },
+                // "asfdasfa": { "is_question": false, "text": ["ای خدمت مرکز","آپ حبیب بینک میں فیس جمع کروانے کے بعد درکار دستاویزات لے کر# ای خدمت مرکز تشریف لے جائیں۔","آپ کا لائسنس 15 دن میں رینیو ہو جائے گا۔ کیا آپ کو مزید کچھ معلوم کرنا ہے؟"] },
             },
             "last_played_voice": {},
             "play_text_id": false,
@@ -217,7 +217,7 @@ class LetsBegin extends React.Component {
 
 
             return (
-                <View style={styles.chatRow(obj.is_question)} key={unique_id + index}>
+                <View style={styles.chatRow(obj.is_question)} key={uid()}>
                     {!obj.is_question ? <View style={styles.chatViewIcon(obj.is_question)} /> : <></>}
                     <View style={styles.chatTextView(obj.is_question)}>
                         {!obj.is_question && <PlayerView
@@ -274,7 +274,6 @@ class LetsBegin extends React.Component {
                             {
                                 Object.entries(chat_list).map((arr, index1) => {
                                     const unique_id = arr[0], obj = arr[1];
-                                    // const is_question = c.is_question;
                                     if (typeof (obj.text) == 'string') {
                                         return _renderMessagePanel(unique_id, obj, obj['text'], index1)
                                     }
