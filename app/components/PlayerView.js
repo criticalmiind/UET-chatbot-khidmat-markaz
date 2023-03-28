@@ -1,24 +1,23 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Slider, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
 import { formatTime, hp, wp } from '../utils';
-import { SvgPauseIcon, SvgPlayIcon, thumb, ThumbImg } from '../constants/images';
+import { SvgPauseIcon, SvgPlayIcon } from '../constants/images';
 
 const PlayerView = ({
     onPlay,
-    lastPlayVoice = { "duration":0, "index":0, "text_id":false },
+    lastPlayVoice = { "duration": 0, "index": 0, "text_id": false },
     playState = false,
     voice_timer = 0,
     unique_id,
-    index
+    index,
 }) => {
 
     const timer = lastPlayVoice["index"] == index && lastPlayVoice["text_id"] == unique_id ? (voice_timer || 0) : 0
-    
-    const isPlay = playState == 'play' && lastPlayVoice["index"] == index && lastPlayVoice["text_id"] == unique_id
 
+    const isPlay = playState == 'play' && lastPlayVoice["index"] == index && lastPlayVoice["text_id"] == unique_id
 
     return (
         <View style={styles.v01}>
@@ -39,8 +38,7 @@ const PlayerView = ({
                 // }}
                 disabled={false}
                 minimumValue={0}
-                // maximumValue={1}
-                maximumValue={parseFloat(lastPlayVoice['duration'])||0}
+                maximumValue={parseFloat(lastPlayVoice['duration']) || 0}
                 value={timer}
                 minimumTrackTintColor="#A3A3A3"
                 maximumTrackTintColor="#000000" />

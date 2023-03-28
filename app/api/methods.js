@@ -25,21 +25,16 @@ export async function on_mic_click(recording) {
     const { is_recording } = this.state;
     let audioPermission = await check_microphone();
     if (audioPermission) {
-        if (!is_recording) {
+        // if (!is_recording) {
+        if (recording) {
             this.setState({ "is_recording": recording, "last_id": uid() })
             if (this.Sound) this.Sound.stop()
             AudioRecord.start();
         } else {
-            // this.ws.send("eos")
-            this.setState({
-                "is_recording": false,
-                "last_id": false,
-                "temp_text": ""
-            })
+            this.setState({ "is_recording": false, "last_id": false, "temp_text": "" })
             let audioFile = await AudioRecord.stop();
-            setTimeout(() => {
-                this.get_query_answers()
-            }, 200);
+            await this.wait(200)
+            this.get_query_answers()
         }
     } else {
         Alert.alert("Please Allow audio permission and try again!")
@@ -50,6 +45,7 @@ export async function on_mic_click(recording) {
 export async function get_query_answers() {
     const { chat_list, last_ids_list } = this.state;
     const ids_list = Object.entries(last_ids_list).map(e => ({ "id": e[0], ...e[1] }))
+    
     ids_list.forEach(async (el) => {
         const qs = await this.dialogue_manager({ "textMessage": el.text })
         if (qs.resultFlag) {
@@ -72,30 +68,30 @@ export async function get_query_answers() {
                 Alert.alert("Error", message)
             }
         }
-        setTimeout(() => {
-            this.setState({
-                "last_ids_list": {},
-                "last_id": false,
-                "temp_text": ""
-            })
-        }, 500);
+        await this.wait(500)
+        this.setState({
+            "last_ids_list": {},
+            "last_id": false,
+            "temp_text": ""
+        })
     });
 }
 
 export async function onPlayBack(text_id, obj, index) {
     const { chat_list } = this.state
     const text = obj.text[index]
-    if(obj['voiceFiles'] && obj['voiceFiles'][text]){
+    if (obj['voiceFiles'] && obj['voiceFiles'][text]) {
         this.setState({
             "playState": 'paly',
             "last_played_voice": {
                 "duration": obj['voiceFiles'][text]['duration'],
                 "index": index,
-                "text_id":text_id
+                "text_id": text_id
             },
             "chat_list": chat_list
         })
-        setTimeout(() => { this.play_message_handler(obj['voiceFiles'][text]['audio'], false) }, 500)
+        await this.wait(600)
+        this.play_message_handler(obj['voiceFiles'][text]['audio'], false)
         return
     }
     const { resultFlag, audioResponse, message } = await this.tts_manager({ "textMessage": [obj.text[text]] })
@@ -108,11 +104,12 @@ export async function onPlayBack(text_id, obj, index) {
             "last_played_voice": {
                 "duration": voiceBase64['duration'],
                 "index": index,
-                "text_id":text_id
+                "text_id": text_id
             },
             "chat_list": chat_list
         })
-        setTimeout(() => { this.play_message_handler(voiceBase64['audio'], false) }, 500)
+        await this.wait(600)
+        this.play_message_handler(voiceBase64['audio'], false)
     } else {
         this.setState({ popup: { "show": true, "type": "wrong", "message": translate(message + "") } })
     }
@@ -124,24 +121,11 @@ export async function play_message_handler(url, is_path = false) {
         await RNFS.writeFile(path, url.replace("data:audio/wav;base64,", ""), 'base64')
             .then(() => {
                 if (this.Sound) this.Sound.stop()
-                this.Sound = new Sound(path, '', (error) => {
-                    if (error) {
-                        Alert.alert('Notice', '(Error code : 1) audio file error.\naudio file not reachable!');
-                    } else {
-                        try {
-                            this.setState({ "playState": 'play' })
-                            this.Sound.play(this.playComplete)
-                        } catch (e) {
-                            Alert.alert('Notice', '(Error code : 2) ' + e);
-                        }
-                    }
-                })
+                this.Sound = new Sound(path, '', this.onSoundPlay.bind(this))
             })
     } else {
         if (this.Sound) this.Sound.stop()
-        this.Sound = new Sound(url, '', () => {
-            this.Sound.play(this.playComplete)
-        })
+        this.Sound = new Sound(url, '', this.onSoundPlay.bind(this))
     }
 }
 

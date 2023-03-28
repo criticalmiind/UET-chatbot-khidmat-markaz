@@ -55,7 +55,9 @@ class LetsBegin extends React.Component {
             "is_recording": false,
             "socket_status": false,
             "last_id": false,
-            "last_ids_list": {},
+            "last_ids_list": {
+                "asalamoalaikom": { "is_question": true, "text": "السلام علیکم" },
+            },
             "chat_list": {
                 // "asfdasfa": { "is_question": true, "text": ["آپ حبیب بینک میں فیس جمع کروانے کے بعد درکار دستاویزات لے کر# ای خدمت مرکز تشریف لے جائیں۔","آپ کا لائسنس 15 دن میں رینیو ہو جائے گا۔ کیا آپ کو مزید کچھ معلوم کرنا ہے؟"] },
                 // "asfdasfa": { "is_question": false, "text": ["ای خدمت مرکز","آپ حبیب بینک میں فیس جمع کروانے کے بعد درکار دستاویزات لے کر# ای خدمت مرکز تشریف لے جائیں۔","آپ کا لائسنس 15 دن میں رینیو ہو جائے گا۔ کیا آپ کو مزید کچھ معلوم کرنا ہے؟"] },
@@ -88,11 +90,22 @@ class LetsBegin extends React.Component {
             }
             return true;
         }).bind(this));
+
+        // this.timeout = setInterval(() => {
+        //     const { playState } = this.state;
+        //     if (this.Sound && playState == 'play') {
+        //         this.Sound.getCurrentTime(async (seconds, isPlaying) => {
+        //             this.setState({ "duration": seconds })
+        //         })
+        //     }
+        // }, 100)
     }
 
     componentDidMount() {
         this.socket?.on('connect', (e) => {
             this.setState({ "socket_status": true })
+            console.log("socket connected")
+            this.get_query_answers()
         });
 
         this.socket?.on('disconnect', (async (e) => {
@@ -101,15 +114,6 @@ class LetsBegin extends React.Component {
         }).bind(this));
 
         this.socket?.on('response', this.onMessage.bind(this));
-
-        this.timeout = setInterval(() => {
-            const { playState } = this.state;
-            if (this.Sound && playState == 'play') {
-                this.Sound.getCurrentTime(async (seconds, isPlaying) => {
-                    this.setState({ "duration": seconds })
-                })
-            }
-        }, 100)
     }
 
     async componentWillUnmount() {
@@ -118,8 +122,8 @@ class LetsBegin extends React.Component {
         BackHandler.addEventListener('hardwareBackPress', (async function () {
             BackHandler.exitApp()
         }))
-        this.socket?.disconnect();
-        if (this.Sound) this.Sound.stop()
+        if (this.socket && this.state.socket_status) this.socket?.disconnect();
+        if (this.Sound && this.state.playState == 'play') this.Sound.stop()
         this.Sound = null;
         await AudioRecord.stop()
     }
@@ -134,10 +138,9 @@ class LetsBegin extends React.Component {
         this.setState({ "screen_loader": true, "loader_message": "Closing Connection" })
         const res = await this.close_connection()
         this.setState({ "popup": { "show": true, "type": res.resultFlag ? 'success' : "wrong", "message": translate(res.message) } })
-        setTimeout(() => {
-            this.props.updateRedux({ resources: {} })
-            this.props.navigation.goBack(null)
-        }, 2000)
+        await this.wait(1000)
+        this.props.updateRedux({ resources: {} })
+        this.props.navigation.goBack(null)
     }
 
     async onAudioStreaming(data) {
@@ -149,13 +152,7 @@ class LetsBegin extends React.Component {
                 chunk = await base64_into_blob(data);
             }
             // console.log({ "size":chunk.size, "chunk": chunk, "data": data })
-            if (chunk) {
-                if (this.state.socket_status) {
-                    this.socket?.emit('audio_bytes', chunk)
-                } else {
-                    this.socket = io(this.get_resource('asr'), SOCKET_CONFIG(this.get_resource('cid')));
-                }
-            }
+            if (chunk) this.socket?.emit('audio_bytes', chunk)
         } catch (error) {
             console.log("onAudioStreaming", error)
         }
@@ -166,7 +163,6 @@ class LetsBegin extends React.Component {
         if (!is_recording) return;
         var json = e.response;
         if (json.result) {
-            // console.log("On Message: ", json)
             const { final, hypotheses = [] } = json.result;
             let res = hypotheses[0]
 
@@ -189,7 +185,27 @@ class LetsBegin extends React.Component {
     playComplete = (success) => {
         if (this.Sound) {
             if (!success) Alert.alert('Notice', '(Error code : 3) audio file error.\naudio file not stopped!');
-            this.setState({ "playState": false });
+            this.setState({ "playState": false, "duration":0 });
+        }
+        if (this.timeout) clearInterval(this.timeout);
+    }
+
+    onSoundPlay(error) {
+        // console.log("SoundPlay")
+        if (error) {
+            Alert.alert('Notice', '(Error code : 1) audio file error.\naudio file not reachable!');
+        } else {
+            try {
+                this.timeout = setInterval((e) => {
+                    this.Sound.getCurrentTime(async (seconds, isPlaying) => {
+                        this.setState({ "playState": "play", "duration": seconds })
+                    })
+                }, 100)
+
+                this.Sound.play(this.playComplete.bind(this))
+            } catch (e) {
+                Alert.alert('Notice', '(Error code : 2) ' + e);
+            }
         }
     }
 
@@ -199,7 +215,7 @@ class LetsBegin extends React.Component {
         const _renderMessagePanel = (unique_id, obj, text, index) => {
             const { last_played_voice, duration, playState } = this.state;
 
-            
+
             return (
                 <View style={styles.chatRow(obj.is_question)} key={unique_id + index}>
                     {!obj.is_question ? <View style={styles.chatViewIcon(obj.is_question)} /> : <></>}
@@ -210,6 +226,7 @@ class LetsBegin extends React.Component {
                             index={index}
                             unique_id={unique_id}
                             playState={playState}
+                            sound={this.Sound}
                             {...this}
                             onPlay={() => {
                                 if (this.Sound) this.Sound.stop()
@@ -278,9 +295,8 @@ class LetsBegin extends React.Component {
                                 this.on_mic_click(true)
                             }}
                             onPressOut={async () => {
-                                setTimeout(async () => {
-                                    await this.on_mic_click(false)
-                                }, 500)
+                                await this.wait(500)
+                                await this.on_mic_click(false)
                             }}>
                             <Image source={MicIcon} style={styles.speakBtnTxt(is_recording)} />
                         </TouchableOpacity>
