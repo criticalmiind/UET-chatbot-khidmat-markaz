@@ -3,7 +3,7 @@ import { Slider, StyleSheet, Text, TouchableOpacity, View, } from 'react-native'
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
-import { formatTime, hp, wp } from '../utils';
+import { formatTime, hp, platform, wp } from '../utils';
 import { SvgPauseIcon, SvgPlayIcon } from '../constants/images';
 
 const PlayerView = ({
@@ -38,10 +38,11 @@ const PlayerView = ({
                 // }}
                 disabled={false}
                 minimumValue={0}
-                maximumValue={parseFloat(lastPlayVoice['duration']) || 0}
+                maximumValue={1}
+                // maximumValue={parseFloat(lastPlayVoice['duration']) || 0}
                 value={timer}
                 minimumTrackTintColor="#A3A3A3"
-                maximumTrackTintColor="#000000" />
+                maximumTrackTintColor="#000000"/>
             <Text style={styles.counterTxt}>{formatTime(timer)}</Text>
         </View>
     );
@@ -67,8 +68,8 @@ const styles = StyleSheet.create({
         left: wp('2'),
     },
     sliderStyle: {
-        left: wp('6', '1'),
-        width: '78%',
+        left: wp('6', '2'),
+        width: platform('78%','90%'),
         borderRadius: 100,
         padding: 0
     },
