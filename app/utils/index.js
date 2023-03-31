@@ -26,6 +26,17 @@ export function jsonParse(str) {
   }
 }
 
+export function platform(ios, android, ipad) {
+  if (Platform.isPad && ipad) {
+    return ipad ? ipad : ios;
+  }
+  if (ios && android) {
+    return Platform.OS === 'ios' ? ios : android;
+  } else {
+    return ios
+  }
+}
+
 export function wp(ios, android, ipad) {
   if (Platform.isPad && ipad) {
     return ipad ? widthPercentageToDP(isNullRetNull(ipad, 0)) : widthPercentageToDP(isNullRetNull(ios, 0));

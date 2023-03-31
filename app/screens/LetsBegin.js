@@ -217,7 +217,7 @@ class LetsBegin extends React.Component {
 
 
             return (
-                <View style={styles.chatRow(obj.is_question)} key={unique_id + index}>
+                <View style={styles.chatRow(obj.is_question)} key={uid()}>
                     {!obj.is_question ? <View style={styles.chatViewIcon(obj.is_question)} /> : <></>}
                     <View style={styles.chatTextView(obj.is_question)}>
                         {!obj.is_question && <PlayerView
@@ -274,7 +274,6 @@ class LetsBegin extends React.Component {
                             {
                                 Object.entries(chat_list).map((arr, index1) => {
                                     const unique_id = arr[0], obj = arr[1];
-                                    // const is_question = c.is_question;
                                     if (typeof (obj.text) == 'string') {
                                         return _renderMessagePanel(unique_id, obj, obj['text'], index1)
                                     }
