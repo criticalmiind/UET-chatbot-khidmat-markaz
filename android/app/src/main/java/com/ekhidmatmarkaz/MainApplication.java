@@ -5,7 +5,7 @@ import android.content.Context;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
 import com.criticalmiind.audiorecord.RNAudioRecordPackage;
-import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
+// import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.zmxv.RNSound.RNSoundPackage;
 import com.rnfs.RNFSPackage;
 import com.facebook.react.ReactInstanceManager;

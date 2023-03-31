@@ -75,9 +75,8 @@ class LetsBegin extends React.Component {
             sampleRate: 16000,  // default 44100
             channels: 1,        // 1 or 2, default 1
             bitsPerSample: 16,  // 8 or 16, default 16
-            // audioSource: 6,     // android only (see below)
+            chunkSize: 1024, //2048, //4096, //8192
             wavFile: 'onMessage.wav', // default 'audio.wav'
-            chunkSize: 4096, //8192
         };
         let audioPermission = await check_microphone();
 
@@ -197,6 +196,7 @@ class LetsBegin extends React.Component {
         } else {
             try {
                 this.timeout = setInterval((e) => {
+                    if(this.Sound)
                     this.Sound.getCurrentTime(async (seconds, isPlaying) => {
                         this.setState({ "playState": "play", "duration": seconds })
                     })
