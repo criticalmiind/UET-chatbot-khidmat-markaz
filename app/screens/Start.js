@@ -10,6 +10,7 @@ import Loader from '../components/Loader';
 import { translate } from '../i18n';
 import Popup from '../components/Popup';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AudioSetting from '../components/AudioSetting';
 
 class Start extends React.Component {
     constructor(props) {
@@ -39,11 +40,12 @@ class Start extends React.Component {
     }
 
     render() {
-        const { loader, isSlider } = this.state;
+        const { loader, isSlider, audioSettingPopup } = this.state;
         const { sessionId, name } = this.props.userData;
         return (<>
             <Loader isShow={loader} />
             <Popup {...this.state.popup} onClick={() => { this.setState({ popup: {} }) }} />
+            {audioSettingPopup && <AudioSetting onClick={(is) => { this.setState({ "audioSettingPopup": is }) }} />}
             <SafeAreaView style={styles.safeArea} forceInset={{ top: 'always' }}>
                 {isSlider && <>
                     <TouchableOpacity
@@ -117,7 +119,17 @@ class Start extends React.Component {
                             <Text style={styles.btnTxt}>{translate('Logout')}</Text>
                         </TouchableOpacity>
 
-                        <View style={{ height: hp("12") }} />
+                        <View style={{ height: hp("2") }} />
+                        <TouchableOpacity
+                            style={styles.btn}
+                            onPress={async () => {
+                                this.setState({ "audioSettingPopup":true })
+                            }}>
+                            <Text style={styles.btnTxt}>{translate('Speak Settings')}</Text>
+                        </TouchableOpacity>
+
+                        {/* <View style={{ height: hp("12") }} /> */}
+                        <View style={{ height: hp("8") }} />
 
                         <Text style={styles.powered_txt}>{translate('powered')}</Text>
                         <View style={{ height: hp("1") }} />
