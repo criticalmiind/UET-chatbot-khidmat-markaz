@@ -71,16 +71,18 @@ class LetsBegin extends React.Component {
     async UNSAFE_componentWillMount() {
         this.setState({ "isLoaded": true })
 
-        const options = {
-            sampleRate: 16000,  // default 44100
-            channels: 1,        // 1 or 2, default 1
-            bitsPerSample: 16,  // 8 or 16, default 16
-            chunkSize: 1024, //2048, //4096, //8192
-            wavFile: 'onMessage.wav', // default 'audio.wav'
-        };
+        // const options = {
+        //     sampleRate: 16000,  // default 44100
+        //     channels: 1,        // 1 or 2, default 1
+        //     bitsPerSample: 16,  // 8 or 16, default 16
+        //     chunkSize: 1024, //2048, //4096, //8192
+        //     wavFile: `audio-${uid()}.wav`, // default 'audio.wav'
+        // };
+        // AudioRecord.init(options);
+
         let audioPermission = await check_microphone();
 
-        AudioRecord.init(options);
+        AudioRecord.init(this.props.audioRecordingOptions);
         AudioRecord.on('data', this.onAudioStreaming.bind(this));
 
         BackHandler.addEventListener('hardwareBackPress', (async function () {
