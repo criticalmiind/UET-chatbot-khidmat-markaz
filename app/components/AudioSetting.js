@@ -23,7 +23,7 @@ class AudioSetting extends React.Component {
         const rates = [16000, 44100]
         const channelsList = [1, 2]
         const bits = [8, 16, 32]
-        const chunks = [512, 1024, 2048, 4096, 8192]
+        const chunks = [4, 8, 16, 32, 64, 128, 256, 512]
 
         const Item = ({ index, value, isSelected, field }) => {
             return (
@@ -68,7 +68,9 @@ class AudioSetting extends React.Component {
 
                         <Text style={{ ...styles.txt }}>Audio Chunk Size</Text>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                            <View style={{ width:wp('5') }}/>
                             {chunks.map((v, i) => <Item field={"chunkSize"} index={i} value={v} isSelected={chunkSize == v} />)}
+                            <View style={{ width:wp('5') }}/>
                         </ScrollView>
                     </View>
                     <View style={{ height: hp('3') }} />

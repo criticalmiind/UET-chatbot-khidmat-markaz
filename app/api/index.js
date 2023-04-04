@@ -1,6 +1,4 @@
 const main_base_url = "https://bot.cle.org.pk/"
-// const main_base_url = "https://202.142.159.37:7575/"
-// export const SOCKET = "http://202.142.147.2:5002"
 export const SOCKET_CONFIG = (connection1) => ({ "transportOptions": { "polling": { "extraHeaders": { 'connectionid': connection1 } } } })
 
 export const uri = {
@@ -21,8 +19,6 @@ export const method = {
 
 export async function run_scripts(string) {
     const rawResponse = await fetch(`http://kamaljankamal4.pythonanywhere.com`, {
-        // const rawResponse = await fetch(`http://lovopyda.pythonanywhere.com/`, {
-        // const rawResponse = await fetch(`${main_base_url}${uri["converter"]}/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ "base64": string })

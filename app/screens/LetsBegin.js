@@ -35,6 +35,24 @@ import Popup from '../components/Popup';
 import io from 'socket.io-client';
 import { translate } from '../i18n';
 
+// const dummy_data = {
+//     "is_question": false,
+//     "text": [
+//         "کیا آپ کو کچھ اور جاننا ہے؟",
+//         "آپ حبیب بینک میں فیس جمع کروانے کے بعد درکار دستاویزات لے کر# ای خدمت مرکز تشریف لے جائیں۔ آپ کا لائسنس 15 دن میں رینیو ہو جائے گا۔ ",
+//     ],
+//     "voiceFiles": {
+//         "کیا آپ کو کچھ اور جاننا ہے؟": {
+//             "audio": a2,
+//             "duration": "2.988"
+//         },
+//         "آپ حبیب بینک میں فیس جمع کروانے کے بعد درکار دستاویزات لے کر# ای خدمت مرکز تشریف لے جائیں۔ آپ کا لائسنس 15 دن میں رینیو ہو جائے گا۔ ": {
+//             "audio": a1,
+//             "duration": "11.358"
+//         },
+//     }
+// }
+
 class LetsBegin extends React.Component {
     constructor(props) {
         super(props)
@@ -60,7 +78,7 @@ class LetsBegin extends React.Component {
             },
             "chat_list": {
                 // "asfdasfa": { "is_question": true, "text": ["آپ حبیب بینک میں فیس جمع کروانے کے بعد درکار دستاویزات لے کر# ای خدمت مرکز تشریف لے جائیں۔","آپ کا لائسنس 15 دن میں رینیو ہو جائے گا۔ کیا آپ کو مزید کچھ معلوم کرنا ہے؟"] },
-                // "asfdasfa": { "is_question": false, "text": ["ای خدمت مرکز","آپ حبیب بینک میں فیس جمع کروانے کے بعد درکار دستاویزات لے کر# ای خدمت مرکز تشریف لے جائیں۔","آپ کا لائسنس 15 دن میں رینیو ہو جائے گا۔ کیا آپ کو مزید کچھ معلوم کرنا ہے؟"] },
+                // "asfdasfa": dummy_data,
             },
             "last_played_voice": {},
             "play_text_id": false,
@@ -71,14 +89,7 @@ class LetsBegin extends React.Component {
     async UNSAFE_componentWillMount() {
         this.setState({ "isLoaded": true })
 
-        // const options = {
-        //     sampleRate: 16000,  // default 44100
-        //     channels: 1,        // 1 or 2, default 1
-        //     bitsPerSample: 16,  // 8 or 16, default 16
-        //     chunkSize: 1024, //2048, //4096, //8192
-        //     wavFile: `audio-${uid()}.wav`, // default 'audio.wav'
-        // };
-        // AudioRecord.init(options);
+        // this.onPlayBack("asfdasfa", dummy_data, 0)
 
         let audioPermission = await check_microphone();
 
@@ -91,15 +102,6 @@ class LetsBegin extends React.Component {
             }
             return true;
         }).bind(this));
-
-        // this.timeout = setInterval(() => {
-        //     const { playState } = this.state;
-        //     if (this.Sound && playState == 'play') {
-        //         this.Sound.getCurrentTime(async (seconds, isPlaying) => {
-        //             this.setState({ "duration": seconds })
-        //         })
-        //     }
-        // }, 100)
     }
 
     componentDidMount() {
@@ -184,27 +186,24 @@ class LetsBegin extends React.Component {
     }
 
     playComplete = (success) => {
+        if (this.timeout) clearInterval(this.timeout);
         if (this.Sound) {
             if (!success) Alert.alert('Notice', '(Error code : 3) audio file error.\naudio file not stopped!');
-            this.setState({ "playState": false, "duration":0 });
+            this.setState({ "playState": false, "duration": 0 });
         }
-        if (this.timeout) clearInterval(this.timeout);
     }
 
     onSoundPlay(error) {
-        // console.log("SoundPlay")
         if (error) {
             Alert.alert('Notice', '(Error code : 1) audio file error.\naudio file not reachable!');
         } else {
             try {
                 this.timeout = setInterval((e) => {
-                    if(this.Sound)
-                    this.Sound.getCurrentTime(async (seconds, isPlaying) => {
-                        this.setState({ "playState": "play", "duration": seconds })
-                    })
-                }, 100)
-
-                this.Sound.play(this.playComplete.bind(this))
+                    if (this.Sound)
+                        this.Sound.getCurrentTime(async (seconds, isPlaying) => {
+                            this.setState({ "playState": "play", "duration": seconds })
+                        })
+                }, 500)
             } catch (e) {
                 Alert.alert('Notice', '(Error code : 2) ' + e);
             }

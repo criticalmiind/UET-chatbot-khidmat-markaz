@@ -19,6 +19,8 @@ const PlayerView = ({
 
     const isPlay = playState == 'play' && lastPlayVoice["index"] == index && lastPlayVoice["text_id"] == unique_id
 
+    const PlayIcon = () => isPlay?<SvgPauseIcon />:<SvgPlayIcon />
+
     return (
         <View style={styles.v01}>
             <View style={styles.playView}>
@@ -26,7 +28,8 @@ const PlayerView = ({
                     onPress={() => {
                         if (onPlay) onPlay(playState)
                     }}>
-                    {isPlay && <SvgPauseIcon /> || <SvgPlayIcon />}
+                    {/* {isPlay && <SvgPauseIcon /> || <SvgPlayIcon />} */}
+                    <PlayIcon/>
                 </TouchableOpacity>
             </View>
             <Slider
@@ -36,10 +39,9 @@ const PlayerView = ({
                 // onSlidingComplete={(e)=>{
                 //     console.log('test',e)
                 // }}
-                disabled={false}
+                disabled={true}
                 minimumValue={0}
-                maximumValue={1}
-                // maximumValue={parseFloat(lastPlayVoice['duration']) || 0}
+                maximumValue={parseFloat(lastPlayVoice['duration']) || 0}
                 value={timer}
                 minimumTrackTintColor="#A3A3A3"
                 maximumTrackTintColor="#000000"/>
