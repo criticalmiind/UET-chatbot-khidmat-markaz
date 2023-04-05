@@ -30,6 +30,8 @@ class Start extends React.Component {
         let res = await call_application_manager(obj)
         if (res.resultFlag) {
             this.props.updateRedux({ "resources": res })
+            console.log("Session Id: ",session)
+            console.log("Connection ID", res)
             setTimeout(() => {
                 this.setState({ loader: false })
                 this.props.navigation.navigate("LetsBegin")

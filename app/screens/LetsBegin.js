@@ -74,7 +74,7 @@ class LetsBegin extends React.Component {
             "socket_status": false,
             "last_id": false,
             "last_ids_list": {
-                "asalamoalaikom": { "is_question": true, "text": "السلام علیکم" },
+                // "asalamoalaikom": { "is_question": true, "text": "السلام علیکم" },
             },
             "chat_list": {
                 // "asfdasfa": { "is_question": true, "text": ["آپ حبیب بینک میں فیس جمع کروانے کے بعد درکار دستاویزات لے کر# ای خدمت مرکز تشریف لے جائیں۔","آپ کا لائسنس 15 دن میں رینیو ہو جائے گا۔ کیا آپ کو مزید کچھ معلوم کرنا ہے؟"] },
