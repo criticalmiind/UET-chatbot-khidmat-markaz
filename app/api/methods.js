@@ -22,7 +22,7 @@ export const check_microphone = async () => {
 export const base64_into_blob = (base64, type = 'audio/x-raw') => fetch(`data:${type};base64,${base64}`).then(res => res.blob())
 
 export async function on_mic_click(recording) {
-    const { is_recording } = this.state;
+    const { is_recording, socketio } = this.state;
     if (this.timeout) clearInterval(this.timeout);
     let audioPermission = await check_microphone();
     if (audioPermission) {
@@ -32,9 +32,9 @@ export async function on_mic_click(recording) {
             await this.wait(200)
             AudioRecord.start();
         } else {
-            // if (this.socket) {
-            //     this.socket?.emit('audio_end')
-            // }
+            if (socketio) {
+                socketio?.emit('audio_end')
+            }
             this.setState({ "is_recording": false, "last_id": false, "temp_text": "" })
             let audioFile = await AudioRecord.stop();
             await this.wait(200)

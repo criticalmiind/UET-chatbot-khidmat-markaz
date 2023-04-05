@@ -72,6 +72,7 @@ class LetsBegin extends React.Component {
             "loader": false,
             "is_recording": false,
             "socket_status": false,
+            "socketio": null,
             "last_id": false,
             "last_ids_list": {
                 "asalamoalaikom": { "is_question": true, "text": "السلام علیکم" },
@@ -105,25 +106,41 @@ class LetsBegin extends React.Component {
     }
 
     componentDidMount() {
-        this.socket?.on('connect', (e) => {
+        // this.socket?.on('connect', (e) => {
+        //     this.setState({ "socket_status": true })
+        //     console.log("socket connected")
+        //     this.get_query_answers()
+        // });
+
+        // this.socket?.on('disconnect', (async (e) => {
+        //     console.log('Disconnected from server', e);
+        //     await this.closeSession()
+        // }).bind(this));
+
+        // this.socket?.on('response', this.onMessage.bind(this));
+    }
+
+    connectSocket = () => {
+        const socket = io(this.get_resource('asr'), SOCKET_CONFIG(this.get_resource('cid')));
+        socket.on('connect', (e) => {
             this.setState({ "socket_status": true })
             console.log("socket connected")
-            this.get_query_answers()
+            this.on_mic_click(true)
         });
-
-        this.socket?.on('disconnect', (async (e) => {
+        socket.on('disconnect', (async (e) => {
             console.log('Disconnected from server', e);
-            await this.closeSession()
+            // await this.closeSession()
         }).bind(this));
-
-        this.socket?.on('response', this.onMessage.bind(this));
+        socket.on('response', this.onMessage.bind(this));
+        this.setState({ "socketio":socket });
     }
 
     async componentWillUnmount() {
+        const { socketio, socket_status, playState } = this.state
         this.setState({ "isLoaded": false })
         if (this.timeout) clearInterval(this.timeout);
-        if (this.socket && this.state.socket_status) this.socket?.disconnect();
-        if (this.Sound && this.state.playState == 'play') this.Sound.stop()
+        if (socketio && socket_status) socketio?.disconnect();
+        if (this.Sound && playState == 'play') this.Sound.stop()
         this.Sound = null;
         await AudioRecord.stop()
         BackHandler.addEventListener('hardwareBackPress', (async function () {
@@ -138,9 +155,11 @@ class LetsBegin extends React.Component {
     }
 
     async closeSession() {
-        if(this.socket){
-            this.socket?.emit('audio_bytes', 'EOS')
-            this.socket?.emit('audio_end')
+        const { socketio, socket_status, playState } = this.state
+
+        if (socketio) {
+            socketio?.emit('audio_bytes', 'EOS')
+            socketio?.emit('audio_end')
         }
         this.setState({ "screen_loader": true, "loader_message": "Closing Connection" })
         const res = await this.close_connection()
@@ -151,17 +170,9 @@ class LetsBegin extends React.Component {
     }
 
     async onAudioStreaming(data) {
+        const { socketio } = this.state
         try {
-            this.socket?.emit('audio_bytes', data.replace("data:audio/wav;base64,", ""))
-            // var chunk = null
-            // if (Platform.OS == 'android') {
-            //     chunk = await run_scripts(data, abortController.signal);
-            //     if (!this.state.is_recording) return
-            // } else {
-            //     chunk = await base64_into_blob(data);
-            // }
-            // // console.log({ "size": chunk.size, "chunk": chunk, "data": data })
-            // if (chunk) this.socket?.emit('audio_bytes', chunk)
+            socketio?.emit('audio_bytes', data.replace("data:audio/wav;base64,", ""))
         } catch (error) {
             console.log("onAudioStreaming", error)
         }
@@ -298,7 +309,8 @@ class LetsBegin extends React.Component {
                         <TouchableOpacity
                             style={styles.speakBtn(is_recording)}
                             onPressIn={async () => {
-                                this.on_mic_click(true)
+                                // this.on_mic_click(true)
+                                this.connectSocket()
                             }}
                             onPressOut={async () => {
                                 await this.wait(500)
