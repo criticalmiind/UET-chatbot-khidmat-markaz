@@ -32,6 +32,9 @@ export async function on_mic_click(recording) {
             await this.wait(200)
             AudioRecord.start();
         } else {
+            // if (this.socket) {
+            //     this.socket?.emit('audio_end')
+            // }
             this.setState({ "is_recording": false, "last_id": false, "temp_text": "" })
             let audioFile = await AudioRecord.stop();
             await this.wait(200)
@@ -116,7 +119,7 @@ export async function play_message_handler(url, is_path = false) {
             if (err) {
                 resolve()
             } else {
-                this.Sound.play(async(s) => {
+                this.Sound.play(async (s) => {
                     this.playComplete(s)
                     await this.wait(600)
                     resolve()

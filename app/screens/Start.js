@@ -31,7 +31,7 @@ class Start extends React.Component {
         if (res.resultFlag) {
             this.props.updateRedux({ "resources": res })
             console.log("Session Id: ",session)
-            console.log("Connection ID", res)
+            console.log("Connection ID", res.connectionId)
             setTimeout(() => {
                 this.setState({ loader: false })
                 this.props.navigation.navigate("LetsBegin")

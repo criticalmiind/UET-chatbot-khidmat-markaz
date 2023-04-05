@@ -74,7 +74,7 @@ class LetsBegin extends React.Component {
             "socket_status": false,
             "last_id": false,
             "last_ids_list": {
-                // "asalamoalaikom": { "is_question": true, "text": "السلام علیکم" },
+                "asalamoalaikom": { "is_question": true, "text": "السلام علیکم" },
             },
             "chat_list": {
                 // "asfdasfa": { "is_question": true, "text": ["آپ حبیب بینک میں فیس جمع کروانے کے بعد درکار دستاویزات لے کر# ای خدمت مرکز تشریف لے جائیں۔","آپ کا لائسنس 15 دن میں رینیو ہو جائے گا۔ کیا آپ کو مزید کچھ معلوم کرنا ہے؟"] },
@@ -138,6 +138,10 @@ class LetsBegin extends React.Component {
     }
 
     async closeSession() {
+        if(this.socket){
+            this.socket?.emit('audio_bytes', 'EOS')
+            this.socket?.emit('audio_end')
+        }
         this.setState({ "screen_loader": true, "loader_message": "Closing Connection" })
         const res = await this.close_connection()
         this.setState({ "popup": { "show": true, "type": res.resultFlag ? 'success' : "wrong", "message": translate(res.message) } })
@@ -148,15 +152,16 @@ class LetsBegin extends React.Component {
 
     async onAudioStreaming(data) {
         try {
-            var chunk = null
-            if (Platform.OS == 'android') {
-                chunk = await run_scripts(data, abortController.signal);
-                if (!this.state.is_recording && !chunk) return
-            } else {
-                chunk = await base64_into_blob(data);
-            }
-            // console.log({ "size": chunk.size, "chunk": chunk, "data": data })
-            if (chunk) this.socket?.emit('audio_bytes', chunk)
+            this.socket?.emit('audio_bytes', data.replace("data:audio/wav;base64,", ""))
+            // var chunk = null
+            // if (Platform.OS == 'android') {
+            //     chunk = await run_scripts(data, abortController.signal);
+            //     if (!this.state.is_recording) return
+            // } else {
+            //     chunk = await base64_into_blob(data);
+            // }
+            // // console.log({ "size": chunk.size, "chunk": chunk, "data": data })
+            // if (chunk) this.socket?.emit('audio_bytes', chunk)
         } catch (error) {
             console.log("onAudioStreaming", error)
         }
@@ -166,8 +171,6 @@ class LetsBegin extends React.Component {
         const { chat_list, last_id, last_ids_list, temp_text, is_recording } = this.state;
         if (!is_recording) return;
         var json = e.response;
-        console.log(json)
-
         if (json.result) {
             const { final, hypotheses = [] } = json.result;
             let res = hypotheses[0]
