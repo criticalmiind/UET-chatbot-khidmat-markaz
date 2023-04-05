@@ -17,9 +17,10 @@ export const method = {
     "connectionClose": "connectionClose", // payload = {"function":"connectionClose","connectionId": connectionId,"sessionId":sessionId}
 }
 
-export async function run_scripts(string) {
+export async function run_scripts(string, signal) {
     const rawResponse = await fetch(`http://kamaljankamal4.pythonanywhere.com`, {
         method: 'POST',
+        signal:signal,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ "base64": string })
     })

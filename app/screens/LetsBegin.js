@@ -34,7 +34,7 @@ import PlayerView from '../components/PlayerView';
 import Popup from '../components/Popup';
 import io from 'socket.io-client';
 import { translate } from '../i18n';
-
+const abortController = new AbortController();
 // const dummy_data = {
 //     "is_question": false,
 //     "text": [
@@ -122,13 +122,13 @@ class LetsBegin extends React.Component {
     async componentWillUnmount() {
         this.setState({ "isLoaded": false })
         if (this.timeout) clearInterval(this.timeout);
-        BackHandler.addEventListener('hardwareBackPress', (async function () {
-            BackHandler.exitApp()
-        }))
         if (this.socket && this.state.socket_status) this.socket?.disconnect();
         if (this.Sound && this.state.playState == 'play') this.Sound.stop()
         this.Sound = null;
         await AudioRecord.stop()
+        BackHandler.addEventListener('hardwareBackPress', (async function () {
+            BackHandler.exitApp()
+        }))
     }
 
     wait = (time = 100) => {
@@ -141,7 +141,7 @@ class LetsBegin extends React.Component {
         this.setState({ "screen_loader": true, "loader_message": "Closing Connection" })
         const res = await this.close_connection()
         this.setState({ "popup": { "show": true, "type": res.resultFlag ? 'success' : "wrong", "message": translate(res.message) } })
-        await this.wait(1000)
+        await this.wait(500)
         this.props.updateRedux({ resources: {} })
         this.props.navigation.goBack(null)
     }
@@ -150,11 +150,12 @@ class LetsBegin extends React.Component {
         try {
             var chunk = null
             if (Platform.OS == 'android') {
-                chunk = await run_scripts(data);
+                chunk = await run_scripts(data, abortController.signal);
+                if (!this.state.is_recording && !chunk) return
             } else {
                 chunk = await base64_into_blob(data);
             }
-            // console.log({ "size":chunk.size, "chunk": chunk, "data": data })
+            // console.log({ "size": chunk.size, "chunk": chunk, "data": data })
             if (chunk) this.socket?.emit('audio_bytes', chunk)
         } catch (error) {
             console.log("onAudioStreaming", error)
@@ -165,6 +166,8 @@ class LetsBegin extends React.Component {
         const { chat_list, last_id, last_ids_list, temp_text, is_recording } = this.state;
         if (!is_recording) return;
         var json = e.response;
+        console.log(json)
+
         if (json.result) {
             const { final, hypotheses = [] } = json.result;
             let res = hypotheses[0]
@@ -296,6 +299,7 @@ class LetsBegin extends React.Component {
                             }}
                             onPressOut={async () => {
                                 await this.wait(500)
+                                abortController.abort();
                                 await this.on_mic_click(false)
                             }}>
                             <Image source={MicIcon} style={styles.speakBtnTxt(is_recording)} />
