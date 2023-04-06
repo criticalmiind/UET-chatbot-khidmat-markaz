@@ -18,11 +18,11 @@ import { theme } from './../constants/theme';
 import { get_resource, hp, isNullRetNull, uid, wp } from './../utils';
 import AudioRecord from 'react-native-audio-recording-stream';
 import {
-    base64_into_blob,
     check_microphone,
     get_query_answers,
     play_message_handler,
-    on_mic_click,
+    onSpeakPress,
+    onSpeakRelease,
     close_connection,
     onPlayBack
 } from '../api/methods';
@@ -65,12 +65,14 @@ class LetsBegin extends React.Component {
         this.Sound = null;
         this.socket = io(this.get_resource('asr'), SOCKET_CONFIG(this.get_resource('cid')));
         this.get_query_answers = get_query_answers.bind(this);
-        this.on_mic_click = on_mic_click.bind(this);
+        this.onSpeakPress = onSpeakPress.bind(this);
+        this.onSpeakRelease = onSpeakRelease.bind(this);
         this.play_message_handler = play_message_handler.bind(this);
         this.state = {
             "isLoaded": false,
             "loader": false,
             "is_recording": false,
+            "speakPressed": false,
             "socket_status": false,
             "socketio": null,
             "last_id": false,
@@ -90,8 +92,6 @@ class LetsBegin extends React.Component {
     async UNSAFE_componentWillMount() {
         this.setState({ "isLoaded": true })
 
-        // this.onPlayBack("asfdasfa", dummy_data, 0)
-
         let audioPermission = await check_microphone();
 
         AudioRecord.init(this.props.audioRecordingOptions);
@@ -106,6 +106,7 @@ class LetsBegin extends React.Component {
     }
 
     componentDidMount() {
+        this.get_query_answers()
         // this.socket?.on('connect', (e) => {
         //     this.setState({ "socket_status": true })
         //     console.log("socket connected")
@@ -121,25 +122,31 @@ class LetsBegin extends React.Component {
     }
 
     connectSocket = () => {
+        const { playState } = this.state
+        if (this.Sound && playState == 'play') this.Sound.stop()
+
         const socket = io(this.get_resource('asr'), SOCKET_CONFIG(this.get_resource('cid')));
-        socket.on('connect', (e) => {
-            this.setState({ "socket_status": true })
-            console.log("socket connected")
-            this.on_mic_click(true)
-        });
+        socket.on('connect', ((e) => {
+            console.log("socket connected: ", socket)
+            const { speakPressed } = this.state
+            this.onSpeakPress(socket)
+            if (!speakPressed) {
+                this.onSpeakRelease()
+            }
+        }).bind(this));
         socket.on('disconnect', (async (e) => {
             console.log('Disconnected from server', e);
-            // await this.closeSession()
         }).bind(this));
+
         socket.on('response', this.onMessage.bind(this));
-        this.setState({ "socketio":socket });
+
+        this.setState({ "speakPressed": true, "socketio":socket, "playState":false });
     }
 
     async componentWillUnmount() {
-        const { socketio, socket_status, playState } = this.state
+        const { playState } = this.state
         this.setState({ "isLoaded": false })
         if (this.timeout) clearInterval(this.timeout);
-        if (socketio && socket_status) socketio?.disconnect();
         if (this.Sound && playState == 'play') this.Sound.stop()
         this.Sound = null;
         await AudioRecord.stop()
@@ -155,12 +162,6 @@ class LetsBegin extends React.Component {
     }
 
     async closeSession() {
-        const { socketio, socket_status, playState } = this.state
-
-        if (socketio) {
-            socketio?.emit('audio_bytes', 'EOS')
-            socketio?.emit('audio_end')
-        }
         this.setState({ "screen_loader": true, "loader_message": "Closing Connection" })
         const res = await this.close_connection()
         this.setState({ "popup": { "show": true, "type": res.resultFlag ? 'success' : "wrong", "message": translate(res.message) } })
@@ -228,10 +229,10 @@ class LetsBegin extends React.Component {
     }
 
     render() {
-        const { is_recording, chat_list, screen_loader = false, loader_message = false, loader } = this.state;
+        const { playState, is_recording, chat_list, screen_loader = false, loader_message = false, loader } = this.state;
 
         const _renderMessagePanel = (unique_id, obj, text, index) => {
-            const { last_played_voice, duration, playState } = this.state;
+            const { last_played_voice, duration } = this.state;
 
 
             return (
@@ -243,7 +244,7 @@ class LetsBegin extends React.Component {
                             lastPlayVoice={last_played_voice}
                             index={index}
                             unique_id={unique_id}
-                            playState={playState}
+                            playState={this.state.playState}
                             sound={this.Sound}
                             {...this}
                             onPlay={() => {
@@ -308,14 +309,12 @@ class LetsBegin extends React.Component {
                     <View style={styles.speakBtnView}>
                         <TouchableOpacity
                             style={styles.speakBtn(is_recording)}
+                            // disabled={playState}
                             onPressIn={async () => {
-                                // this.on_mic_click(true)
                                 this.connectSocket()
                             }}
                             onPressOut={async () => {
-                                await this.wait(500)
-                                abortController.abort();
-                                await this.on_mic_click(false)
+                                await this.onSpeakRelease()
                             }}>
                             <Image source={MicIcon} style={styles.speakBtnTxt(is_recording)} />
                         </TouchableOpacity>
@@ -364,7 +363,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: hp('1', '1')
     },
-    speakBtn: (is) => ({
+    speakBtn: (is, isPlay) => ({
         height: hp('10'),
         width: hp('10'),
         alignSelf: 'center',
@@ -373,6 +372,7 @@ const styles = StyleSheet.create({
         backgroundColor: is ? 'red' : theme.designColor,
         alignItems: 'center',
         justifyContent: 'center',
+        opacity: isPlay ? 0.5 : 1
     }),
     speakBtnTxt: is => ({
         width: wp('10'),

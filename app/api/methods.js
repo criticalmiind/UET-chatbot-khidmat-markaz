@@ -21,29 +21,32 @@ export const check_microphone = async () => {
 
 export const base64_into_blob = (base64, type = 'audio/x-raw') => fetch(`data:${type};base64,${base64}`).then(res => res.blob())
 
-export async function on_mic_click(recording) {
-    const { is_recording, socketio } = this.state;
+export async function onSpeakPress(socket) {
     if (this.timeout) clearInterval(this.timeout);
     let audioPermission = await check_microphone();
     if (audioPermission) {
-        if (recording) {
-            this.setState({ "is_recording": recording, "last_id": uid() })
-            if (this.Sound) this.Sound.stop()
-            await this.wait(200)
-            AudioRecord.start();
-        } else {
-            if (socketio) {
-                socketio?.emit('audio_end')
-            }
-            this.setState({ "is_recording": false, "last_id": false, "temp_text": "" })
-            let audioFile = await AudioRecord.stop();
-            await this.wait(200)
-            this.get_query_answers()
-        }
+        this.setState({ "socket_status": true, "socketio": socket, "playState": false, "is_recording": true, "last_id": uid() })
+        if (this.Sound) this.Sound.stop()
+        await this.wait(200)
+        AudioRecord.start();
     } else {
         Alert.alert("Please Allow audio permission and try again!")
     }
-    return false
+}
+
+export async function onSpeakRelease() {
+    await this.wait(500)
+    const { socketio, socket_status } = this.state;
+    if (this.timeout) clearInterval(this.timeout);
+    if (socketio && socket_status) {
+        socketio?.emit('audio_bytes', 'EOS')
+        socketio?.emit('audio_end')
+    }
+    if (socketio) socketio?.disconnect();
+    this.setState({ "speakPressed": false, "socketio": null, "playState": false, "is_recording": false, "last_id": false, "temp_text": "" })
+    let audioFile = await AudioRecord.stop();
+    await this.wait(200)
+    this.get_query_answers()
 }
 
 export async function get_query_answers() {
@@ -67,7 +70,7 @@ export async function get_query_answers() {
                 chat_list[unique_id] = { "is_question": false, "text": textArr, "voiceFiles": voiceFiles }
 
                 this.setState({ "chat_list": chat_list })
-                this.onPlayBack(unique_id, chat_list[unique_id], 0)
+                this.onPlayBack(unique_id, chat_list[unique_id], -1)
             } else {
                 // this.setState({ "popup": { "show": true, "type": 'success', "message": translate(message) } })
                 Alert.alert("Error", message)
@@ -86,6 +89,27 @@ export async function get_query_answers() {
 export async function onPlayBack(text_id, obj, index) {
 
     let i = 0
+
+    if (index > -1) {
+        for (const id in obj['voiceFiles']) {
+            const voiceFile = obj['voiceFiles'][id]
+            if (i == index) {
+                this.setState({
+                    "playState": 'paly',
+                    "last_played_voice": {
+                        "duration": voiceFile['duration'],
+                        "index": i,
+                        "text_id": text_id
+                    }
+                })
+                await this.wait(600)
+                await this.play_message_handler(voiceFile['audio'], false)
+            }
+            i++
+        }
+        return
+    }
+
     for (const id in obj['voiceFiles']) {
         const voiceFile = obj['voiceFiles'][id]
         this.setState({
