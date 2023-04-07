@@ -34,24 +34,6 @@ import PlayerView from '../components/PlayerView';
 import Popup from '../components/Popup';
 import io from 'socket.io-client';
 import { translate } from '../i18n';
-const abortController = new AbortController();
-// const dummy_data = {
-//     "is_question": false,
-//     "text": [
-//         "کیا آپ کو کچھ اور جاننا ہے؟",
-//         "آپ حبیب بینک میں فیس جمع کروانے کے بعد درکار دستاویزات لے کر# ای خدمت مرکز تشریف لے جائیں۔ آپ کا لائسنس 15 دن میں رینیو ہو جائے گا۔ ",
-//     ],
-//     "voiceFiles": {
-//         "کیا آپ کو کچھ اور جاننا ہے؟": {
-//             "audio": a2,
-//             "duration": "2.988"
-//         },
-//         "آپ حبیب بینک میں فیس جمع کروانے کے بعد درکار دستاویزات لے کر# ای خدمت مرکز تشریف لے جائیں۔ آپ کا لائسنس 15 دن میں رینیو ہو جائے گا۔ ": {
-//             "audio": a1,
-//             "duration": "11.358"
-//         },
-//     }
-// }
 
 class LetsBegin extends React.Component {
     constructor(props) {
@@ -63,7 +45,6 @@ class LetsBegin extends React.Component {
         this.onPlayBack = onPlayBack.bind(this);
 
         this.Sound = null;
-        this.socket = io(this.get_resource('asr'), SOCKET_CONFIG(this.get_resource('cid')));
         this.get_query_answers = get_query_answers.bind(this);
         this.onSpeakPress = onSpeakPress.bind(this);
         this.onSpeakRelease = onSpeakRelease.bind(this);
@@ -107,18 +88,6 @@ class LetsBegin extends React.Component {
 
     componentDidMount() {
         this.get_query_answers()
-        // this.socket?.on('connect', (e) => {
-        //     this.setState({ "socket_status": true })
-        //     console.log("socket connected")
-        //     this.get_query_answers()
-        // });
-
-        // this.socket?.on('disconnect', (async (e) => {
-        //     console.log('Disconnected from server', e);
-        //     await this.closeSession()
-        // }).bind(this));
-
-        // this.socket?.on('response', this.onMessage.bind(this));
     }
 
     connectSocket = () => {

@@ -7,6 +7,7 @@ export function getAsrLink(asrModel, connectionId) {
 export function get_resource(key) {
   const { asrModel, connectionId, dialogueManager, ttsManager } = this.props.resources;
   // if (key == 'asr') return asrModel ? `${asrModel}?content-type=audio/x-raw,+layout=(string)interleaved,+rate=(int)16000,+format=(string)S16LE,+channels=(int)1,+token=${connectionId}` : ''
+  // if (key == 'asr') return asrModel ? `${asrModel}?content-type=audio/x-raw,+layout=(string)interleaved,+rate=(int)16000,+format=(string)S16LE,+channels=(int)1` : ''
   if (key == 'asr') return asrModel ? `${asrModel}` : ''
   if (key == 'dm') return filter_url(dialogueManager)
   if (key == 'tts') return filter_url(ttsManager)
