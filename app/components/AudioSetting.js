@@ -20,10 +20,10 @@ class AudioSetting extends React.Component {
         const { config } = this.state;
         const { sampleRate, channels, bitsPerSample, chunkSize } = config;
 
-        const rates = [16000, 44100]
+        const rates = [8000, 11025, 16000, 22050, 44100, 48000]
         const channelsList = [1, 2]
         const bits = [8, 16, 32]
-        const chunks = [4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048]
+        const chunks = [4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192]
 
         const Item = ({ index, value, isSelected, field }) => {
             return (
