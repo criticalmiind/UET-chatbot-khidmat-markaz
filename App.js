@@ -13,39 +13,43 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      "loader":true
+      "loader": true
     }
   }
 
-  async UNSAFE_componentWillMount(){
+  async UNSAFE_componentWillMount() {
     this._isMounted = true;
-    if(this._isMounted){
+    if (this._isMounted) {
       LogBox.ignoreAllLogs(true)
       await this.checkForUpdate();
     }
   }
 
   async checkForUpdate() {
-    this.setState({ loader:true })
-    const a = await CodePush.sync({
-      updateDialog: true,
-      installMode: CodePush.InstallMode.IMMEDIATE
-    });
-    if(a === 1){ 
-      CodePush.restartApp();
+    this.setState({ loader: true })
+    try {
+      const a = await CodePush.sync({
+        updateDialog: true,
+        installMode: CodePush.InstallMode.IMMEDIATE
+      });
+      if (a === 1) {
+        CodePush.restartApp();
+      }
+    } catch (error) {
+      console.log(error);
     }
-    this.setState({ loader:false })
+    this.setState({ loader: false })
   }
 
-  setStateObj(obj){
-    if(this._isMounted){ this.setState({ ...this.state, ...obj }) }
+  setStateObj(obj) {
+    if (this._isMounted) { this.setState({ ...this.state, ...obj }) }
   }
 
   render() {
     const { loader } = this.state
     const Update = () => {
-      return(
-        <View style={{ flex:1, alignItems:'center', justifyContent:'center' }}>
+      return (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
           <Text>Checking For Update!</Text>
         </View>
       )
@@ -53,7 +57,7 @@ class App extends Component {
     return (<>
       <Provider store={store}>
         <PersistGate persistor={persistor}>
-          { loader ? <Update/>:<EntryPoint /> }
+          {loader ? <Update /> : <EntryPoint />}
         </PersistGate>
       </Provider>
     </>);

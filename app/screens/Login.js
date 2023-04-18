@@ -34,11 +34,11 @@ class Login extends React.Component {
         let res = await call_application_manager(obj)
         // console.log(res);
         if (res.resultFlag) {
-            this.setState({ popup:{ "show":true, "type":"success", "message":"Login Successfully!" } })
+            this.setState({ popup: { "show": true, "type": "success", "message": "Login Successfully!" } })
             this.props.updateRedux({ "userData": res })
         } else {
             this.setStateObj({ loader: false })
-            this.setState({ popup:{ "show":true, "type":"wrong", "message":translate(res.message?res.message:res.error) } })
+            this.setState({ popup: { "show": true, "type": "wrong", "message": translate(res.message ? res.message : res.error) } })
         }
     }
 
@@ -49,17 +49,17 @@ class Login extends React.Component {
     render() {
         const { loader, userName, password } = this.state;
         let disabled_login = (isNullRetNull(userName, 1) == 1 || isNullRetNull(password, 1) == 1)
-        
+
         return (<>
-            <Loader isShow={loader}/>
-            <Popup { ...this.state.popup } onClick={()=>{ this.setState({ popup:{} }) }}/>
+            <Loader isShow={loader} />
+            <Popup {...this.state.popup} onClick={() => { this.setState({ popup: {} }) }} />
             <View style={styles.safeArea}>
                 <ScrollView>
                     <View style={styles.mainView}>
                         <View style={{ height: hp("9") }} />
-                        <View style={{ justifyContent:'center' }}>
-                            <Image source={Logo} style={styles.logo_bg}/>
-                            <Image source={Logo} style={styles.logo}/>
+                        <View style={{ justifyContent: 'center' }}>
+                            <Image source={Logo} style={styles.logo_bg} />
+                            <Image source={Logo} style={styles.logo} />
                         </View>
                         <Text style={styles.title}>{translate('e-service')}</Text>
                         <View style={{ height: hp("4") }} />
@@ -69,12 +69,12 @@ class Login extends React.Component {
                             value={userName}
                             onChangeText={(str) => {
                                 this.setState({ "userName": str })
-                            }}/>
+                            }} />
 
                         <View style={{ height: hp("3") }} />
                         <Input
                             Icon={SvgPwd}
-                            iconStyle={{ paddingRight:wp('2') }}
+                            iconStyle={{ paddingRight: wp('2') }}
                             placeholder={translate("password")}
                             value={password}
                             secureTextEntry
@@ -83,17 +83,27 @@ class Login extends React.Component {
                             }} />
 
                         <View style={{ height: hp("1") }} />
-                        <TouchableOpacity
-                            style={styles.forgot_pwd_btn}
-                            onPress={()=>{
-                                this.props.navigation.navigate("ForgotPassword")
-                            }}>
-                            <Text style={styles.forgot_pwd_txt}>{translate("I forgot my password?")}</Text>
-                        </TouchableOpacity>
+                        <View style={styles.v01}>
+                            <TouchableOpacity
+                                style={styles.forgot_pwd_btn}
+                                onPress={() => {
+                                    this.props.navigation.navigate("ForgotPassword")
+                                }}>
+                                <Text style={styles.forgot_pwd_txt}>{translate("I forgot my password?")}</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={styles.forgot_pwd_btn}
+                                onPress={() => {
+                                    this.props.navigation.navigate("VideoTutorial")
+                                }}>
+                                <Text style={styles.forgot_pwd_txt}>{translate("Video Tutorial")}</Text>
+                            </TouchableOpacity>
+                        </View>
                         <View style={{ height: hp("2") }} />
                         <TouchableOpacity
                             disabled={disabled_login}
-                            style={{...styles.btn, opacity:disabled_login?0.8:1 }}
+                            style={{ ...styles.btn, opacity: disabled_login ? 0.8 : 1 }}
                             onPress={async () => {
                                 this.login()
                             }}>
@@ -120,10 +130,10 @@ class Login extends React.Component {
                 <View style={styles.helpView}>
                     <TouchableOpacity
                         style={styles.helpBtn}
-                        onPress={()=>{
-                            this.setState({ popup:{ "show":true, "type":"help", "message":translate("Would You need help?") } })
+                        onPress={() => {
+                            this.setState({ popup: { "show": true, "type": "help", "message": translate("Would You need help?") } })
                         }}>
-                        <SvgHelp/>
+                        <SvgHelp />
                     </TouchableOpacity>
                 </View>
             </View>
@@ -166,8 +176,8 @@ const styles = StyleSheet.create({
         height: wp('60'),
         width: wp('60'),
         alignSelf: 'center',
-        position:'absolute',
-        opacity:0.05
+        position: 'absolute',
+        opacity: 0.05
     },
     title: {
         alignSelf: 'center',
@@ -177,13 +187,18 @@ const styles = StyleSheet.create({
         fontFamily: theme.font01,
         fontSize: 36
     },
+    v01:{
+        flexDirection:'row',
+        width:wp('90'),
+        justifyContent:'space-between',
+        alignSelf:'center'
+    },
     forgot_pwd_btn: {
-        width: wp('90'),
         alignItems: 'flex-start',
         alignSelf: 'center'
     },
     forgot_pwd_txt: {
-        // fontFamily: "#21347E"
+        fontFamily: theme.font01
     },
     powered_view: {
         width: wp('40'),
@@ -206,20 +221,20 @@ const styles = StyleSheet.create({
         height: wp('13'),
         width: wp('24'),
         alignSelf: 'center',
-        resizeMode:'contain'
+        resizeMode: 'contain'
     },
-    helpView:{
-        position:'absolute',
-        bottom:hp('2'),
-        right:hp('2')
+    helpView: {
+        position: 'absolute',
+        top: hp('1'),
+        right: hp('1')
     },
-    helpBtn:{
-        width:hp('4'),
-        height:hp('4'),
-        borderWidth:1,
-        borderColor:"#21347E",
-        borderRadius:100,
-        alignItems:'center',
-        justifyContent:'center'
+    helpBtn: {
+        width: hp('8'),
+        height: hp('8'),
+        // borderWidth: 1,
+        // borderColor: "#21347E",
+        borderRadius: 100,
+        alignItems: 'center',
+        justifyContent: 'center'
     }
 });

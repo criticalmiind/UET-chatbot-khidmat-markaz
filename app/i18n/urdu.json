@@ -23,9 +23,11 @@
     "success": "کامیابی",
     "help": "مدد",
     "Network request failed": "نیٹ ورک کی درخواست ناکام ہوگئی",
-    "Would You need help?":"کیا آپ کو مدد کی ضرورت ہے؟",
-    "Update Password":"پاسورڈ اب ڈیٹ کریں",
-    "Forgot Password":"پاسورڈ یاد نہیں!",
-    "This Feature is under construction":"یہ فیچر زیر تعمیر ہے۔",
-    "Delete":"ڈیلیٹ کریں"
+    "Would You need help?": "کیا آپ کو مدد کی ضرورت ہے؟",
+    "Update Password": "پاسورڈ اب ڈیٹ کریں",
+    "Forgot Password": "پاسورڈ یاد نہیں!",
+    "This Feature is under construction": "یہ فیچر زیر تعمیر ہے۔",
+    "Delete": "ڈیلیٹ کریں",
+    "Video Tutorial": "ویڈیو ٹیوٹوریل",
+    "App Usage Technique":"ایپ استعمال کرنے کے لیے ان اقدامات پر عمل کریں۔"
 }
