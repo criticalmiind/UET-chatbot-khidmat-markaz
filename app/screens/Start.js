@@ -23,15 +23,15 @@ class Start extends React.Component {
     UNSAFE_componentWillMount() { }
 
     async get_resources(session) {
-        // this.props.navigation.navigate("LetsBegin")
-        // return
+        this.props.navigation.navigate("LetsBegin")
+        return
         this.setState({ loader: true })
         let obj = { 'function': method['startService'], 'sessionId': session }
         let res = await call_application_manager(obj)
         if (res.resultFlag) {
             this.props.updateRedux({ "resources": res })
-            console.log("Session Id: ",session)
-            console.log("Connection ID", res.connectionId)
+            // console.log("Session Id: ",session)
+            // console.log("Connection ID", res.connectionId)
             setTimeout(() => {
                 this.setState({ loader: false })
                 this.props.navigation.navigate("LetsBegin")

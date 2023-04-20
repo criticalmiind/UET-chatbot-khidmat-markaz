@@ -22,13 +22,14 @@ export const check_microphone = async () => {
 export const base64_into_blob = (base64, type = 'audio/x-raw') => fetch(`data:${type};base64,${base64}`).then(res => res.blob())
 
 export async function onSpeakPress(socket) {
-    if (this.timeout) clearInterval(this.timeout);
+    if (this.playTimer) clearInterval(this.playTimer);
     let audioPermission = await check_microphone();
     if (audioPermission) {
-        this.setState({ "socket_status": true, "socketio": socket, "playState": false, "is_recording": true, "last_id": uid() })
         if (this.Sound) this.Sound.stop()
         await this.wait(200)
         AudioRecord.start();
+        await this.wait(300)
+        this.setState({ "socket_status": true, "socketio": socket, "playState": false, "is_recording": true, "last_id": uid() })
     } else {
         Alert.alert("Please Allow audio permission and try again!")
     }
@@ -37,7 +38,7 @@ export async function onSpeakPress(socket) {
 export async function onSpeakRelease() {
     await this.wait(500)
     const { socketio, socket_status } = this.state;
-    if (this.timeout) clearInterval(this.timeout);
+    if (this.playTimer) clearInterval(this.playTimer);
     if (socketio && socket_status) {
         socketio?.emit('audio_bytes', 'EOS')
         socketio?.emit('audio_end')

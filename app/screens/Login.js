@@ -10,6 +10,7 @@ import Loader from '../components/Loader';
 import { translate } from '../i18n';
 import Input from '../components/Input';
 import Popup from '../components/Popup';
+import PoweredBy from '../components/PoweredBy';
 
 class Login extends React.Component {
     constructor(props) {
@@ -120,12 +121,7 @@ class Login extends React.Component {
                     </View>
                     <View style={{ height: hp("9") }} />
 
-                    <Text style={styles.powered_txt}>{translate('powered')}</Text>
-                    <View style={{ height: hp("1") }} />
-                    <View style={styles.powered_view}>
-                        <Image source={Logo} style={styles.footer_logo} />
-                        <Image source={Logo01} style={styles.footer_logo01} />
-                    </View>
+                    <PoweredBy />
                 </ScrollView>
                 <View style={styles.helpView}>
                     <TouchableOpacity
@@ -199,29 +195,6 @@ const styles = StyleSheet.create({
     },
     forgot_pwd_txt: {
         fontFamily: theme.font01
-    },
-    powered_view: {
-        width: wp('40'),
-        alignSelf: 'center',
-        flexDirection: 'row',
-        justifyContent: 'space-around'
-    },
-    powered_txt: {
-        alignSelf: 'center',
-        borderColor: "#a3a3a3",
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontFamily: theme.font01,
-        fontSize: 12,
-        lineHeight: 15,
-        letterSpacing: 6
-    },
-    footer_logo: { height: wp('13'), width: wp('13'), alignSelf: 'center' },
-    footer_logo01: {
-        height: wp('13'),
-        width: wp('24'),
-        alignSelf: 'center',
-        resizeMode: 'contain'
     },
     helpView: {
         position: 'absolute',

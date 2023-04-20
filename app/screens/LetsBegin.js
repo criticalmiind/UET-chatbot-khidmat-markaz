@@ -10,7 +10,8 @@ import {
     Platform,
     BackHandler,
     StatusBar,
-    Alert
+    Alert,
+    TouchableWithoutFeedback
 } from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from './../redux/actions/userActions';
 import { connect } from 'react-redux';
@@ -84,6 +85,7 @@ class LetsBegin extends React.Component {
             }
             return true;
         }).bind(this));
+        this.resetTimeout()
     }
 
     componentDidMount() {
@@ -96,7 +98,7 @@ class LetsBegin extends React.Component {
 
         const socket = io(this.get_resource('asr'), SOCKET_CONFIG(this.get_resource('cid')));
         socket.on('connect', ((e) => {
-            console.log("socket connected: ", socket)
+            console.log("socket connected: ")
             const { speakPressed } = this.state
             this.onSpeakPress(socket)
             if (!speakPressed) {
@@ -109,13 +111,13 @@ class LetsBegin extends React.Component {
 
         socket.on('response', this.onMessage.bind(this));
 
-        this.setState({ "speakPressed": true, "socketio":socket, "playState":false });
+        this.setState({ "speakPressed": true, "socketio": socket, "playState": false });
     }
 
     async componentWillUnmount() {
         const { playState } = this.state
         this.setState({ "isLoaded": false })
-        if (this.timeout) clearInterval(this.timeout);
+        if (this.playTimer) clearInterval(this.playTimer);
         if (this.Sound && playState == 'play') this.Sound.stop()
         this.Sound = null;
         await AudioRecord.stop()
@@ -131,6 +133,7 @@ class LetsBegin extends React.Component {
     }
 
     async closeSession() {
+        if (this.timeoutId) clearTimeout(this.timeoutId);
         this.setState({ "screen_loader": true, "loader_message": "Closing Connection" })
         const res = await this.close_connection()
         this.setState({ "popup": { "show": true, "type": res.resultFlag ? 'success' : "wrong", "message": translate(res.message) } })
@@ -173,7 +176,7 @@ class LetsBegin extends React.Component {
     }
 
     playComplete = (success) => {
-        if (this.timeout) clearInterval(this.timeout);
+        if (this.playTimer) clearInterval(this.playTimer);
         if (this.Sound) {
             if (!success) Alert.alert('Notice', '(Error code : 3) audio file error.\naudio file not stopped!');
             this.setState({ "playState": false, "duration": 0 });
@@ -185,7 +188,7 @@ class LetsBegin extends React.Component {
             Alert.alert('Notice', '(Error code : 1) audio file error.\naudio file not reachable!');
         } else {
             try {
-                this.timeout = setInterval((e) => {
+                this.playTimer = setInterval((e) => {
                     if (this.Sound)
                         this.Sound.getCurrentTime(async (seconds, isPlaying) => {
                             this.setState({ "playState": "play", "duration": seconds })
@@ -197,8 +200,20 @@ class LetsBegin extends React.Component {
         }
     }
 
+    resetTimeout = () => {
+        var TIMEOUT_SECONDS = 60
+        if (this.timeoutId) clearTimeout(this.timeoutId);
+        this.timeoutId = setTimeout(() => {
+            this.closeSession()
+        }, TIMEOUT_SECONDS*1000);
+    };
+
+    clearAllTimeouts = () => {
+        if (this.timeoutId) clearTimeout(this.timeoutId);
+    };
+
     render() {
-        const { playState, is_recording, chat_list, screen_loader = false, loader_message = false, loader } = this.state;
+        const { is_recording, chat_list, screen_loader = false, loader_message = false, loader } = this.state;
 
         const _renderMessagePanel = (unique_id, obj, text, index) => {
             const { last_played_voice, duration } = this.state;
@@ -227,70 +242,76 @@ class LetsBegin extends React.Component {
                 </View>
             )
         }
-        return (<>
-            <Loader isShow={screen_loader} mesasge={loader_message} />
-            <Popup {...this.state.popup} onClick={() => { this.setState({ popup: {} }) }} />
+        return (
+            <TouchableWithoutFeedback onPress={() => this.resetTimeout()}>
+                <>
+                    <Loader isShow={screen_loader} mesasge={loader_message} />
+                    <Popup {...this.state.popup} onClick={() => { this.setState({ popup: {} }) }} />
 
-            <SafeAreaView style={styles.safeArea} forceInset={{ top: 'always' }}>
-                <StatusBar barStyle="light-content" backgroundColor={theme.designColor} />
-                <View style={styles.headerView}>
-                    <TouchableOpacity
-                        style={styles.helpBtn}
-                        onPress={() => {
-                            this.setState({ popup: { "show": true, "type": "help", "message": translate("Would You need help?") } })
-                        }}>
-                        <Text style={styles.helpBtnTxt}>HELP</Text>
-                    </TouchableOpacity>
-                    <Image source={LogoWhite} style={{ top: -4, height: wp('14'), width: wp('14') }} />
-                    <TouchableOpacity
-                        style={{ width: wp('18') }}
-                        onPress={() => {
-                            this.closeSession()
-                        }}>
-                        <SvgBackIcon />
-                    </TouchableOpacity>
-                </View>
-                <View style={styles.mainView}>
-                    <View style={styles.v01}>
-                        <ScrollView
-                            contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', flexDirection: 'column' }}
-                            style={{ width: wp('100') }}
-                            ref={(ref) => { this.scrollViewRef = ref }}
-                            onContentSizeChange={() => {
-                                if (this.scrollViewRef) this.scrollViewRef.scrollToEnd({ animated: false })
-                            }}>
-                            {
-                                Object.entries(chat_list).map((arr, index1) => {
-                                    const unique_id = arr[0], obj = arr[1];
-                                    if (typeof (obj.text) == 'string') {
-                                        return _renderMessagePanel(unique_id, obj, obj['text'], index1)
+                    <SafeAreaView style={styles.safeArea} forceInset={{ top: 'always' }}>
+                        <StatusBar barStyle="light-content" backgroundColor={theme.designColor} />
+                        <View style={styles.headerView}>
+                            <TouchableOpacity
+                                style={styles.helpBtn}
+                                onPress={() => {
+                                    this.setState({ popup: { "show": true, "type": "help", "message": translate("Would You need help?") } })
+                                }}>
+                                <Text style={styles.helpBtnTxt}>HELP</Text>
+                            </TouchableOpacity>
+                            <Image source={LogoWhite} style={{ top: -4, height: wp('14'), width: wp('14') }} />
+                            <TouchableOpacity
+                                style={{ width: wp('18') }}
+                                onPress={() => {
+                                    this.closeSession()
+                                }}>
+                                <SvgBackIcon />
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.mainView}>
+                            <View style={styles.v01}>
+                                <ScrollView
+                                    contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', flexDirection: 'column' }}
+                                    style={{ width: wp('100') }}
+                                    ref={(ref) => { this.scrollViewRef = ref }}
+                                    onContentSizeChange={() => {
+                                        if (this.scrollViewRef) this.scrollViewRef.scrollToEnd({ animated: false })
+                                    }}>
+                                    {
+                                        Object.entries(chat_list).map((arr, index1) => {
+                                            const unique_id = arr[0], obj = arr[1];
+                                            if (typeof (obj.text) == 'string') {
+                                                return _renderMessagePanel(unique_id, obj, obj['text'], index1)
+                                            }
+                                            return <>{obj.text.map((text, index2) => {
+                                                return _renderMessagePanel(unique_id, obj, obj['text'][index2], index2)
+                                            })}</>
+                                        })
                                     }
-                                    return <>{obj.text.map((text, index2) => {
-                                        return _renderMessagePanel(unique_id, obj, obj['text'][index2], index2)
-                                    })}</>
-                                })
-                            }
-                            {loader && <ActivityIndicator size="large" color={"blue"} />}
-                            {(is_recording && !loader) && <Text style={{ textAlign: 'center' }}>Speak Now</Text>}
-                        </ScrollView>
-                    </View>
+                                    {loader && <ActivityIndicator size="large" color={"blue"} />}
+                                    {/* {(is_recording && !loader) && <Text style={{ textAlign: 'center' }}>Speak Now</Text>} */}
+                                </ScrollView>
+                            </View>
 
-                    <View style={styles.speakBtnView}>
-                        <TouchableOpacity
-                            style={styles.speakBtn(is_recording)}
-                            // disabled={playState}
-                            onPressIn={async () => {
-                                this.connectSocket()
-                            }}
-                            onPressOut={async () => {
-                                await this.onSpeakRelease()
-                            }}>
-                            <Image source={MicIcon} style={styles.speakBtnTxt(is_recording)} />
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </SafeAreaView>
-        </>);
+                            <View style={styles.speakBtnView}>
+                                <TouchableOpacity
+                                    style={styles.speakBtn(is_recording)}
+                                    // disabled={playState}
+                                    onPressIn={async () => {
+                                        // this.setState({ is_recording:!is_recording })
+                                        this.connectSocket()
+                                        this.resetTimeout()
+                                    }}
+                                    onPressOut={async () => {
+                                        await this.onSpeakRelease()
+                                    }}>
+                                    <Image source={MicIcon} style={styles.speakBtnTxt(is_recording)} />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </SafeAreaView>
+                </>
+            </TouchableWithoutFeedback>
+        );
     }
 }
 
@@ -332,16 +353,16 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: hp('1', '1')
     },
-    speakBtn: (is, isPlay) => ({
-        height: hp('10'),
-        width: hp('10'),
+    speakBtn: (is) => ({
+        height: is?hp('14'):hp('10'),
+        width: is?hp('14'):hp('10'),
         alignSelf: 'center',
         borderWidth: 2,
         borderRadius: 100,
         backgroundColor: is ? 'red' : theme.designColor,
         alignItems: 'center',
         justifyContent: 'center',
-        opacity: isPlay ? 0.5 : 1
+        opacity: is ? 0.5 : 1
     }),
     speakBtnTxt: is => ({
         width: wp('10'),
@@ -352,8 +373,8 @@ const styles = StyleSheet.create({
     v01: {
         height: hp('69', '80'),
         width: wp('100'),
-        borderWidth: 1,
-        borderColor: "#ddd",
+        // borderWidth: 1,
+        // borderColor: "#ddd",
         alignSelf: 'center',
         paddingHorizontal: wp('2'),
         paddingVertical: wp('2'),

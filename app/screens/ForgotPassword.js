@@ -10,6 +10,7 @@ import Loader from '../components/Loader';
 import { translate } from '../i18n';
 import Input from '../components/Input';
 import Popup from '../components/Popup';
+import PoweredBy from '../components/PoweredBy';
 
 class ForgotPassword extends React.Component {
     constructor(props) {
@@ -57,49 +58,67 @@ class ForgotPassword extends React.Component {
                 </View>
 
                 <View style={styles.mainView}>
-                    <Text style={styles.title}>{translate('Forgot Password')}</Text>
-                    <View style={{ height: hp("4") }} />
-                    <Input
-                        Icon={SvgPhone}
-                        placeholder={translate('phone-placeholder')}
-                        value={userName}
-                        onChangeText={(str) => {
-                            this.setState({ "userName": str })
-                        }} />
+                    <View style={{
+                        // height:hp('50'),
+                        width: wp('90'),
+                        backgroundColor: theme.designColor,
+                        alignSelf: 'center',
+                        borderRadius: 30
+                    }}>
+                        <Text style={styles.title}>{translate('Forgot Password')}</Text>
+                        <View style={{ height: hp("1.5") }} />
+                        <Input
+                            viewStyle={{ width: wp('84') }}
+                            Icon={SvgPhone}
+                            placeholder={translate('phone-placeholder')}
+                            value={userName}
+                            onChangeText={(str) => {
+                                this.setState({ "userName": str })
+                            }} />
 
-                    <View style={{ height: hp("1") }} />
-                    <Input
-                        Icon={SvgPwd}
-                        iconStyle={{ paddingRight: wp('2') }}
-                        placeholder={translate("password")}
-                        value={password}
-                        secureTextEntry
-                        onChangeText={(str) => {
-                            this.setState({ "password": str })
-                        }} />
+                        <View style={{ height: hp("1") }} />
+                        <Input
+                            viewStyle={{ width: wp('84') }}
+                            Icon={SvgPwd}
+                            iconStyle={{ paddingRight: wp('2') }}
+                            placeholder={translate("password")}
+                            value={password}
+                            secureTextEntry
+                            onChangeText={(str) => {
+                                this.setState({ "password": str })
+                            }} />
 
-                    <View style={{ height: hp("1") }} />
-                    <Input
-                        Icon={SvgPwd}
-                        placeholder={translate("Confirm Password")}
-                        value={confirm_password}
-                        secureTextEntry
-                        onChangeText={(str) => {
-                            this.setState({ "confirm_password": str })
-                        }} />
+                        <View style={{ height: hp("1") }} />
+                        <Input
+                            viewStyle={{ width: wp('84') }}
+                            Icon={SvgPwd}
+                            placeholder={translate("Confirm Password")}
+                            value={confirm_password}
+                            secureTextEntry
+                            onChangeText={(str) => {
+                                this.setState({ "confirm_password": str })
+                            }} />
 
-                    <View style={{ height: hp("2") }} />
-                    <TouchableOpacity
-                        // disabled={disabled_login}
-                        style={{ ...styles.btn, opacity: disabled_login ? 0.8 : 1 }}
-                        onPress={async () => {
-                            this.update_passowrd()
-                        }}>
-                        <Text style={styles.btnTxt}>{translate('Update Password')}</Text>
-                    </TouchableOpacity>
-                    <View style={{ height: hp("9") }} />
+                        <View style={{ height: hp("2") }} />
+                        <TouchableOpacity
+                            // disabled={disabled_login}
+                            style={{ ...styles.btn, opacity: disabled_login ? 0.9 : 1 }}
+                            onPress={async () => {
+                                this.update_passowrd()
+                            }}>
+                            <Text style={styles.btnTxt}>{translate('Update Password')}</Text>
+                        </TouchableOpacity>
+                        <View style={{ height: hp("3") }} />
+                    </View>
+                    <View style={{ height: hp("6") }} />
+                    <View style={{
+                        position:'absolute',
+                        alignSelf:'center',
+                        bottom:hp('6')
+                    }}>
+                        <PoweredBy />
+                    </View>
                 </View>
-
             </SafeAreaView>
         </>);
     }
@@ -137,28 +156,29 @@ const styles = StyleSheet.create({
     mainView: {
         backgroundColor: theme.tertiary,
         flex: 1,
-        justifyContent:'center'
+        justifyContent: 'center',
     },
     btn: {
         height: hp('6'),
         width: wp('50'),
         alignSelf: 'center',
         borderRadius: 100,
+        flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: "#21347E"
+        backgroundColor: "#ffffff"
     },
     btnTxt: {
-        color: "#fff",
+        color: theme.designColor,
         fontSize: 16,
         fontFamily: theme.font01
     },
     title: {
         alignSelf: 'center',
-        borderColor: "#a3a3a3",
         alignItems: 'center',
         justifyContent: 'center',
         fontFamily: theme.font01,
-        fontSize: 30
+        fontSize: 26,
+        color: '#fff'
     },
 });
