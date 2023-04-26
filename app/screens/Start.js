@@ -3,8 +3,8 @@ import { TouchableOpacity, StyleSheet, Text, View, TextInput, Image, ScrollView,
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
-import { hp, isNullRetNull, notify, wp } from '../utils';
-import { Logo, Logo01, SvgDrawerIcon, SvgDrawerProfileIcon, SvgPlay } from '../constants/images';
+import { hp, wp } from '../utils';
+import { Logo, SvgDrawerIcon, SvgDrawerProfileIcon, SvgHelp, SvgPlay } from '../constants/images';
 import { call_application_manager, method } from '../api';
 import Loader from '../components/Loader';
 import { translate } from '../i18n';
@@ -23,15 +23,13 @@ class Start extends React.Component {
     UNSAFE_componentWillMount() { }
 
     async get_resources(session) {
-        this.props.navigation.navigate("LetsBegin")
-        return
+        // this.props.navigation.navigate("LetsBegin")
+        // return
         this.setState({ loader: true })
         let obj = { 'function': method['startService'], 'sessionId': session }
         let res = await call_application_manager(obj)
         if (res.resultFlag) {
             this.props.updateRedux({ "resources": res })
-            // console.log("Session Id: ",session)
-            // console.log("Connection ID", res.connectionId)
             setTimeout(() => {
                 this.setState({ loader: false })
                 this.props.navigation.navigate("LetsBegin")
@@ -91,19 +89,60 @@ class Start extends React.Component {
                             onPress={() => {
                                 this.setState({ popup: { "show": true, "type": "help", "message": translate("Would You need help?") } })
                             }}>
-                            <Text style={styles.headHelpBtnTxt}>HELP</Text>
+                            <SvgHelp />
                         </TouchableOpacity>
                     </View>
                     <View style={styles.mainView}>
-                        <View style={{ height: hp("8") }} />
+                        <View style={{ height: hp("2") }} />
                         <View style={{ justifyContent: 'center' }}>
                             <Image source={Logo} style={styles.logo_bg} />
                             <Image source={Logo} style={styles.logo} />
                         </View>
+                        <View style={{ height: hp("1") }} />
                         <Text style={styles.title}>{translate('e-service')}</Text>
+                        <Text style={styles.title01}>{translate('Dear Citizen Welcome!')}</Text>
+
+                        <View style={styles.v01}>
+                            <View style={styles.v03}>
+                                <Text style={styles.txt01}>{translate('start screen instraction 1')}</Text>
+                                <Text style={styles.txt01}>{translate('start screen instraction 2')}</Text>
+                            </View>
+                            <View style={{ height: hp("2") }} />
+
+                            <View style={styles.v02}>
+                                <View style={styles.v04}>
+                                    {
+                                        translate('services_list_01').split(',').map((t, i) => {
+                                            return <Text style={styles.txt02} key={i}>{t}</Text>
+                                        })
+                                    }
+                                </View>
+                                <View style={styles.v04}>
+                                    {
+                                        translate('services_list_02').split(',').map((t, i) => {
+                                            return <Text style={styles.txt02} key={i}>{t}</Text>
+                                        })
+                                    }
+                                </View>
+                            </View>
+                            <View style={{ height: hp("3") }} />
+
+                            <TouchableOpacity
+                                style={styles.btn}
+                                onPress={async () => {
+                                    this.get_resources(sessionId)
+                                }}>
+                                <SvgPlay />
+                                <View style={{ width: wp('1') }} />
+                                <Text style={styles.btnTxt}>{translate('start')}</Text>
+                            </TouchableOpacity>
+                            <View style={{ height: hp("2") }} />
+                        </View>
 
                         <View style={{ height: hp("6") }} />
-                        <TouchableOpacity
+
+                        {/* <View style={{ height: hp("6") }} /> */}
+                        {/* <TouchableOpacity
                             style={styles.btn}
                             onPress={async () => {
                                 this.get_resources(sessionId)
@@ -111,8 +150,8 @@ class Start extends React.Component {
                             <SvgPlay />
                             <View style={{ width: wp('1') }} />
                             <Text style={styles.btnTxt}>{translate('start')}</Text>
-                        </TouchableOpacity>
-                        <View style={{ height: hp("2") }} />
+                        </TouchableOpacity> */}
+                        {/* <View style={{ height: hp("2") }} />
                         <TouchableOpacity
                             style={styles.btn}
                             onPress={async () => {
@@ -128,17 +167,9 @@ class Start extends React.Component {
                                 this.setState({ "audioSettingPopup":true })
                             }}>
                             <Text style={styles.btnTxt}>{translate('Speak Settings')}</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
 
-                        {/* <View style={{ height: hp("12") }} /> */}
-                        <View style={{ height: hp("8") }} />
 
-                        <Text style={styles.powered_txt}>{translate('powered')}</Text>
-                        <View style={{ height: hp("1") }} />
-                        <View style={styles.powered_view}>
-                            <Image source={Logo} style={styles.footer_logo} />
-                            <Image source={Logo01} style={styles.footer_logo01} />
-                        </View>
                     </View>
                 </View>
             </SafeAreaView>
@@ -151,7 +182,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(Start);
 const styles = StyleSheet.create({
     safeArea: {
         flexDirection: 'column',
-        backgroundColor: theme.designColor,
+        backgroundColor: theme.tertiary,
         flex: 1
     },
     sliderBlurView: {
@@ -175,12 +206,6 @@ const styles = StyleSheet.create({
         fontFamily: theme.font01,
         color: '#21347E'
     },
-
-    safeArea: {
-        flexDirection: 'column',
-        backgroundColor: theme.tertiary,
-        flex: 1
-    },
     mainView: {
         backgroundColor: theme.tertiary,
         flex: 1,
@@ -196,17 +221,51 @@ const styles = StyleSheet.create({
         paddingHorizontal: wp('3')
     },
     headHelpBtn: {
-        height: hp('4'),
-        width: wp('20'),
-        borderRadius: wp('1'),
-        backgroundColor: '#21347E',
+        width: hp('8'),
+        height: hp('8'),
+        borderRadius: 100,
         alignItems: 'center',
         justifyContent: 'center'
     },
-    headHelpBtnTxt: {
-        color: '#fff',
-        fontSize: 16,
-        // fontFamily:theme.font01,
+    v01: {
+        backgroundColor: '#ECECEC',
+        width: wp('86'),
+        alignSelf: 'center',
+        borderRadius: 15,
+        overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 1, height: 2 },
+        shadowOpacity: 0.5,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    v02: {
+        flexDirection:'row-reverse',
+        backgroundColor: theme.designColor,
+        width: wp('80'),
+        alignSelf: 'center',
+        borderRadius: 15,
+        paddingHorizontal: hp('2'),
+        paddingVertical: hp('1'),
+    },
+    v03: {
+        paddingVertical: hp('1'),
+        paddingHorizontal: hp('1'),
+        backgroundColor: theme.designColor,
+    },
+    v04:{
+        width:'50%'
+    },
+    txt01: {
+        fontSize: 14,
+        color: theme.tertiary,
+        fontFamily: theme.font01,
+        textAlign: 'center'
+    },
+    txt02: {
+        fontSize: 12,
+        color: theme.tertiary,
+        fontFamily: theme.font01,
     },
     btn: {
         height: hp('6'),
@@ -234,13 +293,15 @@ const styles = StyleSheet.create({
         fontFamily: theme.font01
     },
     logo: {
-        height: wp('35'),
-        width: wp('35'),
+        height: wp('22'),
+        width: wp('22'),
+        // height: wp('35'),
+        // width: wp('35'),
         alignSelf: 'center'
     },
     logo_bg: {
-        height: wp('60'),
-        width: wp('60'),
+        height: wp('30'),
+        width: wp('30'),
         alignSelf: 'center',
         position: 'absolute',
         opacity: 0.05
@@ -251,66 +312,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         fontFamily: theme.font01,
-        fontSize: 36
+        fontSize: 22
     },
-    powered_view: {
-        width: wp('40'),
-        alignSelf: 'center',
-        flexDirection: 'row',
-        justifyContent: 'space-around'
-    },
-    powered_txt: {
+    title01: {
         alignSelf: 'center',
         borderColor: "#a3a3a3",
         alignItems: 'center',
         justifyContent: 'center',
         fontFamily: theme.font01,
-        fontSize: 12,
-        lineHeight: 15,
-        letterSpacing: 6
+        fontSize: 30
     },
-    footer_logo: {
-        height: wp('13'),
-        width: wp('13'),
-        alignSelf: 'center',
-        resizeMode: 'contain'
-    },
-    footer_logo01: {
-        height: wp('13'),
-        width: wp('24'),
-        alignSelf: 'center',
-        resizeMode: 'contain'
-    },
-    helpView: {
-        position: 'absolute',
-        bottom: hp('2'),
-        right: hp('2')
-    },
-    helpBtn: {
-        width: hp('4'),
-        height: hp('4'),
-        borderWidth: 1,
-        borderColor: "#21347E",
-        borderRadius: 100,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    v01: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0
-    },
-    deleteBtn: {
-        paddingHorizontal: wp("3"),
-        paddingVertical: wp("0.4"),
-        backgroundColor: "#D9D9D9",
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderTopRightRadius: 20,
-    },
-    deleteBtnTxt: {
-        fontSize: 14,
-        color: "#21347E",
-        fontFamily: theme.font01
-    }
 });
