@@ -14,6 +14,13 @@ export function get_resource(key) {
   if (key == 'cid') return connectionId
 }
 
+
+export const wait = (time = 100) => {
+  return new Promise((resolve) => {
+      setTimeout(() => { resolve() }, time)
+  });
+}
+
 export function filter_url(str) {
   let arr = str.split("//")
   return `https://${arr[1]}`

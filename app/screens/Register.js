@@ -5,15 +5,17 @@ import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userAction
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
 import { hp, isNullRetNull, notify, wp } from '../utils';
-import { Logo, Logo01, SvgCalenderIcon, SvgCity, SvgHelp, SvgPhone, SvgPwd, SvgUser } from '../constants/images';
+import { Logo, Logo01, SvgCPwd, SvgCalenderIcon, SvgCity, SvgGender, SvgHelp, SvgMap, SvgPhone, SvgPwd, SvgReg, SvgUser } from '../constants/images';
 import { call_application_manager, method } from '../api';
 import Loader from '../components/Loader';
 import { translate } from '../i18n';
 import cities from './../constants/cities.json';
+import tehseel from './../constants/tehseel.json';
 import Input from '../components/Input';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Popup from '../components/Popup';
 import PoweredBy from '../components/PoweredBy';
+import HelpIcon from '../components/HelpIcon';
 
 const GENDER_LIST = [
     { name: "Male" },
@@ -33,7 +35,7 @@ class Register extends React.Component {
             'district': '',
             'gender': 'Male',
             'dateOfBirth': false,
-            
+
             // 'name': 'Khan',
             // 'userName': 'khan123',
             // 'password': '123456',
@@ -128,14 +130,14 @@ class Register extends React.Component {
                             <Image source={Logo} style={styles.logo} />
                         </View>
                         <Text style={styles.title}>{translate('e-service')}</Text>
-                        <View style={{ height: hp("2") }} />
+                        {/* <View style={{ height: hp("2") }} />
                         <Input
                             Icon={SvgUser}
                             placeholder={translate('Full Name')}
                             value={name}
                             onChangeText={(str) => {
                                 this.setState({ "name": str })
-                            }} />
+                            }} /> */}
 
                         <View style={{ height: hp("2") }} />
                         <Input
@@ -159,7 +161,7 @@ class Register extends React.Component {
 
                         <View style={{ height: hp("2") }} />
                         <Input
-                            Icon={SvgPwd}
+                            Icon={SvgCPwd}
                             placeholder={translate("Confirm Password")}
                             value={confirm_password}
                             secureTextEntry
@@ -169,16 +171,32 @@ class Register extends React.Component {
 
                         <View style={{ height: hp("2") }} />
                         <View style={{ flexDirection: 'row-reverse', alignSelf: 'center', justifyContent: 'space-between', width: wp('90') }}>
-                            <Input
+                            <SelectDropdown
+                                renderSearchInputLeftIcon={() => <SvgCity />}
+                                renderDropdownIcon={() => <SvgCity />}
+                                data={tehseel}
+                                buttonStyle={{ width: wp('44.5'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
+                                buttonTextStyle={styles.txt01}
+                                defaultButtonText={translate('City')}
+                                search={true}
+                                defaultValue={city}
+                                onSelect={(selectedItem) => {
+                                    this.setStateObj({ 'city': selectedItem.name })
+                                }}
+                                buttonTextAfterSelection={(selectedItem) => selectedItem.name}
+                                rowTextForSelection={(item) => item.name}
+                            />
+                            {/* <Input
                                 Icon={SvgCity}
                                 viewStyle={{ width: wp('44.5') }}
                                 placeholder={translate("City")}
                                 value={city}
                                 onChangeText={(str) => {
                                     this.setState({ "city": str })
-                                }} />
+                                }} /> */}
                             <SelectDropdown
-                                renderSearchInputLeftIcon={() => <SvgCity />}
+                                renderSearchInputLeftIcon={() => <SvgMap />}
+                                renderDropdownIcon={() => <SvgMap />}
                                 data={cities}
                                 buttonStyle={{ width: wp('44.5'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
                                 buttonTextStyle={styles.txt01}
@@ -186,7 +204,7 @@ class Register extends React.Component {
                                 search={true}
                                 defaultValue={district}
                                 onSelect={(selectedItem) => {
-                                    this.setStateObj({ district: selectedItem.name })
+                                    this.setStateObj({ 'district': selectedItem.name })
                                 }}
                                 buttonTextAfterSelection={(selectedItem) => selectedItem.name}
                                 rowTextForSelection={(item) => item.name}
@@ -226,6 +244,7 @@ class Register extends React.Component {
                         <SelectDropdown
                             searchPlaceHolder={translate('Gender')}
                             searchInputTxtStyle={{ textAlign: "right" }}
+                            renderDropdownIcon={() => <SvgGender />}
                             data={GENDER_LIST}
                             buttonStyle={{ width: wp('90'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
                             buttonTextStyle={styles.txt01}
@@ -245,6 +264,7 @@ class Register extends React.Component {
                             onPress={async () => {
                                 this.register()
                             }}>
+                            <SvgReg />
                             <Text style={styles.btnTxt}>{translate('register')}</Text>
                         </TouchableOpacity>
                     </View>
@@ -253,15 +273,10 @@ class Register extends React.Component {
                     <PoweredBy />
                     <View style={{ height: hp("6") }} />
                 </ScrollView>
-                <View style={styles.helpView}>
-                    <TouchableOpacity
-                        style={styles.helpBtn}
-                        onPress={() => {
-                            this.setState({ popup: { "show": true, "type": "help", "message": translate("Would You need help?") } })
-                        }}>
-                        <SvgHelp />
-                    </TouchableOpacity>
-                </View>
+                <HelpIcon
+                    onPress={() => {
+                        this.setState({ popup: { "show": true, "title":"Instractions", "audio":"RegistrationScreen", "btnTitle":"Back", "type": "help", "message": translate("reg screen help") } })
+                    }} />
             </View>
         </>);
     }
@@ -286,7 +301,8 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: "#21347E"
+        backgroundColor: "#21347E",
+        flexDirection: 'row-reverse'
     },
     btnTxt: {
         color: "#fff",
@@ -327,20 +343,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         fontFamily: theme.font01,
         fontSize: 36
-    },
-    helpView: {
-        position: 'absolute',
-        bottom: hp('2'),
-        right: hp('2')
-    },
-    helpBtn: {
-        width: hp('4'),
-        height: hp('4'),
-        borderWidth: 1,
-        borderColor: "#21347E",
-        borderRadius: 100,
-        alignItems: 'center',
-        justifyContent: 'center'
     },
     txt01: { fontFamily: theme.font01, textAlign: 'right', color: "#a3a3a3" }
 });

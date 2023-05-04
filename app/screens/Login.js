@@ -4,13 +4,15 @@ import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userAction
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
 import { hp, isNullRetNull, wp } from '../utils';
-import { Logo, Logo01, SvgHelp, SvgPhone, SvgPwd } from '../constants/images';
+import { Logo, Logo01, SvgHelp, SvgPhone, SvgPwd, SvgReg } from '../constants/images';
 import { call_application_manager, method } from '../api';
 import Loader from '../components/Loader';
 import { translate } from '../i18n';
 import Input from '../components/Input';
 import Popup from '../components/Popup';
 import PoweredBy from '../components/PoweredBy';
+import HelpIcon from '../components/HelpIcon';
+import LoginVideoTutorial from '../components/LoginVideoTutorial';
 
 class Login extends React.Component {
     constructor(props) {
@@ -57,12 +59,13 @@ class Login extends React.Component {
             <View style={styles.safeArea}>
                 <ScrollView>
                     <View style={styles.mainView}>
-                        <View style={{ height: hp("9") }} />
+                        <View style={{ height: hp("5") }} />
                         <View style={{ justifyContent: 'center' }}>
                             <Image source={Logo} style={styles.logo_bg} />
                             <Image source={Logo} style={styles.logo} />
                         </View>
                         <Text style={styles.title}>{translate('e-service')}</Text>
+                        <LoginVideoTutorial />
                         <View style={{ height: hp("4") }} />
                         <Input
                             Icon={SvgPhone}
@@ -72,7 +75,7 @@ class Login extends React.Component {
                                 this.setState({ "userName": str })
                             }} />
 
-                        <View style={{ height: hp("3") }} />
+                        <View style={{ height: hp("1") }} />
                         <Input
                             Icon={SvgPwd}
                             iconStyle={{ paddingRight: wp('2') }}
@@ -83,7 +86,7 @@ class Login extends React.Component {
                                 this.setState({ "password": str })
                             }} />
 
-                        <View style={{ height: hp("1") }} />
+                        {/* <View style={{ height: hp("1") }} /> */}
                         <View style={styles.v01}>
                             <TouchableOpacity
                                 style={styles.forgot_pwd_btn}
@@ -93,15 +96,15 @@ class Login extends React.Component {
                                 <Text style={styles.forgot_pwd_txt}>{translate("I forgot my password?")}</Text>
                             </TouchableOpacity>
 
-                            <TouchableOpacity
+                            {/* <TouchableOpacity
                                 style={styles.forgot_pwd_btn}
                                 onPress={() => {
                                     this.props.navigation.navigate("VideoTutorial")
                                 }}>
                                 <Text style={styles.forgot_pwd_txt}>{translate("Video Tutorial")}</Text>
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
                         </View>
-                        <View style={{ height: hp("2") }} />
+                        <View style={{ height: hp("1") }} />
                         <TouchableOpacity
                             disabled={disabled_login}
                             style={{ ...styles.btn, opacity: disabled_login ? 0.8 : 1 }}
@@ -110,7 +113,7 @@ class Login extends React.Component {
                             }}>
                             <Text style={styles.btnTxt}>{translate('login')}</Text>
                         </TouchableOpacity>
-                        <View style={{ height: hp("2") }} />
+                        <View style={{ height: hp("1") }} />
                         <TouchableOpacity
                             style={styles.btn}
                             onPress={async () => {
@@ -119,19 +122,22 @@ class Login extends React.Component {
                             <Text style={styles.btnTxt}>{translate('create_new_account')}</Text>
                         </TouchableOpacity>
                     </View>
-                    <View style={{ height: hp("9") }} />
-
+                    <View style={{ height: hp("3") }} />
                     <PoweredBy />
                 </ScrollView>
-                <View style={styles.helpView}>
-                    <TouchableOpacity
-                        style={styles.helpBtn}
-                        onPress={() => {
-                            this.setState({ popup: { "show": true, "type": "help", "message": translate("Would You need help?") } })
-                        }}>
-                        <SvgHelp />
-                    </TouchableOpacity>
-                </View>
+                <HelpIcon
+                    onPress={() => {
+                        this.setState({
+                            "popup": {
+                                "show": true,
+                                "title": "Instractions",
+                                "btnTitle": "Back",
+                                "type": "help",
+                                "audio": "LoginScreen",
+                                "message": translate("login screen help")
+                            }
+                        })
+                    }} />
             </View>
         </>);
     }
@@ -156,7 +162,9 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: "#21347E"
+        backgroundColor: "#21347E",
+        borderRadius: 10,
+        flexDirection: 'row-reverse'
     },
     btnTxt: {
         color: "#fff",
@@ -164,13 +172,13 @@ const styles = StyleSheet.create({
         fontFamily: theme.font01
     },
     logo: {
-        height: wp('35'),
-        width: wp('35'),
+        height: wp('24'),
+        width: wp('24'),
         alignSelf: 'center'
     },
     logo_bg: {
-        height: wp('60'),
-        width: wp('60'),
+        height: wp('35'),
+        width: wp('35'),
         alignSelf: 'center',
         position: 'absolute',
         opacity: 0.05
@@ -181,13 +189,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         fontFamily: theme.font01,
-        fontSize: 36
+        fontSize: 22
     },
-    v01:{
-        flexDirection:'row',
-        width:wp('90'),
-        justifyContent:'space-between',
-        alignSelf:'center'
+    v01: {
+        flexDirection: 'row',
+        width: wp('90'),
+        justifyContent: 'space-between',
+        alignSelf: 'center'
     },
     forgot_pwd_btn: {
         alignItems: 'flex-start',
@@ -195,19 +203,5 @@ const styles = StyleSheet.create({
     },
     forgot_pwd_txt: {
         fontFamily: theme.font01
-    },
-    helpView: {
-        position: 'absolute',
-        top: hp('1'),
-        right: hp('1')
-    },
-    helpBtn: {
-        width: hp('8'),
-        height: hp('8'),
-        // borderWidth: 1,
-        // borderColor: "#21347E",
-        borderRadius: 100,
-        alignItems: 'center',
-        justifyContent: 'center'
     }
 });

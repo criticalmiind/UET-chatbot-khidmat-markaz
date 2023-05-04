@@ -27,7 +27,7 @@ import {
     close_connection,
     onPlayBack
 } from '../api/methods';
-import { LogoWhite, MicIcon, SvgBackIcon } from '../constants/images';
+import { LogoWhite, MicIcon, SvgBackIcon, SvgHelp1 } from '../constants/images';
 import { dialogue_manager, run_scripts, SOCKET_CONFIG, tts_manager } from '../api';
 import Loader from '../components/Loader';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -205,7 +205,7 @@ class LetsBegin extends React.Component {
         if (this.timeoutId) clearTimeout(this.timeoutId);
         this.timeoutId = setTimeout(() => {
             this.closeSession()
-        }, TIMEOUT_SECONDS*1000);
+        }, TIMEOUT_SECONDS * 1000);
     };
 
     clearAllTimeouts = () => {
@@ -252,11 +252,10 @@ class LetsBegin extends React.Component {
                         <StatusBar barStyle="light-content" backgroundColor={theme.designColor} />
                         <View style={styles.headerView}>
                             <TouchableOpacity
-                                style={styles.helpBtn}
                                 onPress={() => {
-                                    this.setState({ popup: { "show": true, "type": "help", "message": translate("Would You need help?") } })
+                                    this.setState({ popup: { "show": true, "title": "Instractions", "audio":"SpeakScreen", "btnTitle": "Back", "type": "help", "message": translate("speak screen help") } })
                                 }}>
-                                <Text style={styles.helpBtnTxt}>HELP</Text>
+                                <SvgHelp1 />
                             </TouchableOpacity>
                             <Image source={LogoWhite} style={{ top: -4, height: wp('14'), width: wp('14') }} />
                             <TouchableOpacity
@@ -331,19 +330,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
     },
-    helpBtn: {
-        height: hp('4.5'),
-        width: wp('18'),
-        borderRadius: 6,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    helpBtnTxt: {
-        fontSize: 16,
-        color: theme.designColor,
-        fontWeight: '700'
-    },
     mainView: {
         backgroundColor: theme.tertiary,
         flex: 1
@@ -354,8 +340,8 @@ const styles = StyleSheet.create({
         bottom: hp('1', '1')
     },
     speakBtn: (is) => ({
-        height: is?hp('14'):hp('10'),
-        width: is?hp('14'):hp('10'),
+        height: is ? hp('14') : hp('10'),
+        width: is ? hp('14') : hp('10'),
         alignSelf: 'center',
         borderWidth: 2,
         borderRadius: 100,

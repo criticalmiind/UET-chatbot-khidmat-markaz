@@ -4,13 +4,14 @@ import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userAction
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
 import { hp, isNullRetNull, notify, wp } from '../utils';
-import { Logo, Logo01, LogoWhite, SvgBackIcon, SvgHelp, SvgPhone, SvgPwd } from '../constants/images';
+import { Logo, Logo01, LogoWhite, SvgBackIcon, SvgHelp, SvgHelp1, SvgPhone, SvgPwd, SvgUpdate } from '../constants/images';
 import { call_application_manager, method } from '../api';
 import Loader from '../components/Loader';
 import { translate } from '../i18n';
 import Input from '../components/Input';
 import Popup from '../components/Popup';
 import PoweredBy from '../components/PoweredBy';
+import HelpIcon from '../components/HelpIcon';
 
 class ForgotPassword extends React.Component {
     constructor(props) {
@@ -43,11 +44,10 @@ class ForgotPassword extends React.Component {
                 <StatusBar barStyle="light-content" backgroundColor={theme.designColor} />
                 <View style={styles.headerView}>
                     <TouchableOpacity
-                        style={styles.helpBtn}
                         onPress={() => {
-                            this.setState({ popup: { "show": true, "type": "help", "message": translate("Would You need help?") } })
+                            this.setState({ popup: { "show": true, "title":"Instractions", "audio":"ChangePasswordScreen", "btnTitle":"Back", "type": "help", "message": translate("forgot password screen help") } })
                         }}>
-                        <Text style={styles.helpBtnTxt}>HELP</Text>
+                        <SvgHelp1 />
                     </TouchableOpacity>
                     <Image source={LogoWhite} style={{ top: -4, height: wp('14'), width: wp('14') }} />
                     <TouchableOpacity
@@ -63,7 +63,7 @@ class ForgotPassword extends React.Component {
                         width: wp('90'),
                         backgroundColor: theme.designColor,
                         alignSelf: 'center',
-                        borderRadius: 30
+                        borderRadius: 10
                     }}>
                         <Text style={styles.title}>{translate('Forgot Password')}</Text>
                         <View style={{ height: hp("1.5") }} />
@@ -106,16 +106,13 @@ class ForgotPassword extends React.Component {
                             onPress={async () => {
                                 this.update_passowrd()
                             }}>
+                            <SvgUpdate />
                             <Text style={styles.btnTxt}>{translate('Update Password')}</Text>
                         </TouchableOpacity>
                         <View style={{ height: hp("3") }} />
                     </View>
                     <View style={{ height: hp("6") }} />
-                    <View style={{
-                        position:'absolute',
-                        alignSelf:'center',
-                        bottom:hp('6')
-                    }}>
+                    <View style={{ position: 'absolute', alignSelf: 'center', bottom: hp('6') }}>
                         <PoweredBy />
                     </View>
                 </View>
@@ -140,19 +137,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
     },
-    helpBtn: {
-        height: hp('4.5'),
-        width: wp('18'),
-        borderRadius: 6,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    helpBtnTxt: {
-        fontSize: 16,
-        color: theme.designColor,
-        fontWeight: '700'
-    },
     mainView: {
         backgroundColor: theme.tertiary,
         flex: 1,
@@ -162,8 +146,8 @@ const styles = StyleSheet.create({
         height: hp('6'),
         width: wp('50'),
         alignSelf: 'center',
-        borderRadius: 100,
-        flexDirection: 'row',
+        borderRadius: 10,
+        flexDirection: 'row-reverse',
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: "#ffffff"
@@ -171,7 +155,8 @@ const styles = StyleSheet.create({
     btnTxt: {
         color: theme.designColor,
         fontSize: 16,
-        fontFamily: theme.font01
+        fontFamily: theme.font01,
+        bottom: 3
     },
     title: {
         alignSelf: 'center',

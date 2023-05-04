@@ -1,9 +1,8 @@
 import { PermissionsAndroid, Alert, Platform } from 'react-native';
 import AudioRecord from "react-native-audio-recording-stream";
-import { makeAudioFileObj, uid } from "../utils";
+import { uid } from "../utils";
 import Sound from "react-native-sound";
 import { call_application_manager, method } from '.';
-import { translate } from '../i18n';
 var RNFS = require('react-native-fs');
 
 export const check_microphone = async () => {

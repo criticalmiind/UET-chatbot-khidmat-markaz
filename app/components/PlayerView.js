@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Slider, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';

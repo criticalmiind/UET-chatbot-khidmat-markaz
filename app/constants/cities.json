@@ -1,38 +1,155 @@
 [
-  { "name":"Bahawalpur" },
-  { "name":"Bahawalnagar" },
-  { "name":"Rahim Yar Khan" },
-  { "name":"Gujranwala" },
-  { "name":"Gujrat" },
-  { "name":"Hafizabad" },
-  { "name":"Mandi Bahauddin" },
-  { "name":"Narowal" },
-  { "name":"Sialkot" },
-  { "name":"Rawalpindi" },
-  { "name":"Jhelum" },
-  { "name":"Chakwal" },
-  { "name":"Attock" },
-  { "name":"Dera Ghazi Khan" },
-  { "name":"Layyah" },
-  { "name":"Muzaffargarh" },
-  { "name":"Rajanpur" },
-  { "name":"Lahore" },
-  { "name":"Kasur" },
-  { "name":"Nankana Sahib" },
-  { "name":"Sheikhupura" },
-  { "name":"Sahiwal" },
-  { "name":"Pakpattan" },
-  { "name":"Okara" },
-  { "name":"Faisalabad" },
-  { "name":"Chiniot" },
-  { "name":"Toba Tek Singh" },
-  { "name":"Jhang" },
-  { "name":"Multan" },
-  { "name":"Lodhran" },
-  { "name":"Khanewal" },
-  { "name":"Vehari" },
-  { "name":"Sargodha" },
-  { "name":"Khushab" },
-  { "name":"Mianwali" },
-  { "name":"Bhakkar" }
+    {
+        "name": "لاہور"
+    },
+    {
+        "name": "فیصل آباد"
+    },
+    {
+        "name": "بہاولپور"
+    },
+    {
+        "name": "جھنگ"
+    },
+    {
+        "name": "خانیوال"
+    },
+    {
+        "name": "حافظ آباد"
+    },
+    {
+        "name": "گوجرانوالہ"
+    },
+    {
+        "name": "ڈیرہ غازی خان"
+    },
+    {
+        "name": "گجرات"
+    },
+    {
+        "name": "قصور"
+    },
+    {
+        "name": "ملتان"
+    },
+    {
+        "name": "چنیوٹ"
+    },
+    {
+        "name": "ساہیوال"
+    },
+    {
+        "name": "رحیم یار خان"
+    },
+    {
+        "name": "راولپنڈی"
+    },
+    {
+        "name": "بہاولنگر"
+    },
+    {
+        "name": "سرگودھا"
+    },
+    {
+        "name": "بھکر"
+    },
+    {
+        "name": "اوکاڑہ"
+    },
+    {
+        "name": "سیالکوٹ"
+    },
+    {
+        "name": "مظفر گڑھ"
+    },
+    {
+        "name": "جہلم"
+    },
+    {
+        "name": "منڈی بہاوالدین"
+    },
+    {
+        "name": "چکوال"
+    },
+    {
+        "name": "شیخوپورا"
+    },
+    {
+        "name": "پاک پتن"
+    },
+    {
+        "name": "اٹک"
+    },
+    {
+        "name": "وہاڑی"
+    },
+    {
+        "name": "لیہ"
+    },
+    {
+        "name": "لودھراں"
+    },
+    {
+        "name": "نارووال"
+    },
+    {
+        "name": "میانوالی"
+    },
+    {
+        "name": "مریدکے"
+    },
+    {
+        "name": "کوٹ اددو"
+    },
+    {
+        "name": "ٹوبہ ٹیک سنگھ"
+    },
+    {
+        "name": "بورے والا"
+    },
+    {
+        "name": "خوشاب"
+    },
+    {
+        "name": "خان پور"
+    },
+    {
+        "name": "صادق آباد"
+    },
+    {
+        "name": "راجن پور"
+    },
+    {
+        "name": "ڈسکہ"
+    },
+    {
+        "name": "گوجراں"
+    },
+    {
+        "name": "احمد پور"
+    },
+    {
+        "name": "کامونکی"
+    },
+    {
+        "name": "جڑانولہ"
+    },
+    {
+        "name": "وزیرآباد"
+    },
+    {
+        "name": "چشتیاں"
+    },
+    {
+        "name": "حاصل پور"
+    },
+    {
+        "name": "بھلوال"
+    },
+    {
+        "name": "کمالیہ"
+    },
+    {
+        "name": "جام پور"
+    }
 ]

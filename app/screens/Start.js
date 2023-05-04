@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, TextInput, Image, ScrollView, Platform } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, View, Image, Platform } from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
@@ -11,6 +11,7 @@ import { translate } from '../i18n';
 import Popup from '../components/Popup';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AudioSetting from '../components/AudioSetting';
+import Slider from '../components/Slider';
 
 class Start extends React.Component {
     constructor(props) {
@@ -42,42 +43,62 @@ class Start extends React.Component {
     render() {
         const { loader, isSlider, audioSettingPopup } = this.state;
         const { sessionId, name } = this.props.userData;
+
+        const renderPanel = (isHideStartBtn) => {
+            return (<>
+                <Text style={styles.title01}>{translate('Dear Citizen Welcome!')}</Text>
+                <View style={styles.v01}>
+                    <View style={styles.v03}>
+                        <Text style={styles.txt01}>{translate('start screen instraction 1')}</Text>
+                        <Text style={styles.txt01}>{translate('start screen instraction 2')}</Text>
+                    </View>
+                    <View style={{ height: hp("2") }} />
+
+                    <View style={styles.v02}>
+                        <View style={styles.v04}>
+                            {
+                                translate('services_list_01').split(',').map((t, i) => {
+                                    return <Text style={styles.txt02} key={i}>{t}</Text>
+                                })
+                            }
+                        </View>
+                        <View style={styles.v04}>
+                            {
+                                translate('services_list_02').split(',').map((t, i) => {
+                                    return <Text style={styles.txt02} key={i}>{t}</Text>
+                                })
+                            }
+                        </View>
+                    </View>
+                    <View style={{ height: hp("2") }} />
+
+                    <View style={styles.v03}>
+                        <Text style={styles.txt01}>{translate('start screen instraction 3')}</Text>
+                    </View>
+                    <View style={{ height: hp("2") }} />
+                    {!isHideStartBtn && <>
+                        <TouchableOpacity
+                            style={styles.btn}
+                            onPress={async () => {
+                                this.get_resources(sessionId)
+                            }}>
+                            <SvgPlay />
+                            <View style={{ width: wp('1') }} />
+                            <Text style={styles.btnTxt}>{translate('start')}</Text>
+                        </TouchableOpacity>
+                        <View style={{ height: hp("2") }} />
+                    </>
+                    }
+                </View>
+            </>)
+        }
+
         return (<>
             <Loader isShow={loader} />
-            <Popup {...this.state.popup} onClick={() => { this.setState({ popup: {} }) }} />
+            <Popup {...this.state.popup} onClick={() => { this.setState({ popup: {} }) }} >{renderPanel(true)}</Popup>
             {audioSettingPopup && <AudioSetting onClick={(is) => { this.setState({ "audioSettingPopup": is }) }} />}
             <SafeAreaView style={styles.safeArea} forceInset={{ top: 'always' }}>
-                {isSlider && <>
-                    <TouchableOpacity
-                        style={styles.sliderBlurView}
-                        onPress={() => {
-                            this.setState({ isSlider: false })
-                        }}>
-                    </TouchableOpacity>
-                    <View style={styles.sliderView}>
-                        <View style={{ height: hp('10') }} />
-                        <SvgDrawerProfileIcon />
-                        <Text style={styles.userNameTxt}>{name}</Text>
-
-                        <View style={{ height: hp('50') }} />
-                        <TouchableOpacity
-                            style={styles.btn01}
-                            onPress={async () => {
-                                this.setState({ isSlider: false })
-                                this.props.navigation.navigate("DeleteAccount")
-                            }}>
-                            <Text style={styles.btnTxt}>{translate('Delete Account')}</Text>
-                        </TouchableOpacity>
-                        <View style={{ height: hp('1') }} />
-                        <TouchableOpacity
-                            style={styles.btn01}
-                            onPress={async () => {
-                                this.props.updateRedux({ "userData": {}, "resources": {} })
-                            }}>
-                            <Text style={styles.btnTxt}>{translate('Logout')}</Text>
-                        </TouchableOpacity>
-                    </View>
-                </>}
+                {isSlider && <Slider onClose={() => { this.setState({ isSlider: false }) }} />}
                 <View style={styles.safeArea}>
                     <View style={styles.header}>
                         <TouchableOpacity onPress={() => { this.setState({ isSlider: true }) }}>
@@ -87,89 +108,30 @@ class Start extends React.Component {
                         <TouchableOpacity
                             style={styles.headHelpBtn}
                             onPress={() => {
-                                this.setState({ popup: { "show": true, "type": "help", "message": translate("Would You need help?") } })
+                                this.setState({ popup: { "show": true, "title": "Instractions", "audio": "HomeScreen", "btnTitle": "Back", "type": "help" } })
+                                // this.setState({ popup: { "show": true, "title": "Instractions", "audio": "HomeScreen", "btnTitle": "Back", "type": "help", "message": translate("start screen help") } })
                             }}>
                             <SvgHelp />
                         </TouchableOpacity>
                     </View>
                     <View style={styles.mainView}>
-                        <View style={{ height: hp("2") }} />
                         <View style={{ justifyContent: 'center' }}>
                             <Image source={Logo} style={styles.logo_bg} />
                             <Image source={Logo} style={styles.logo} />
                         </View>
                         <View style={{ height: hp("1") }} />
                         <Text style={styles.title}>{translate('e-service')}</Text>
-                        <Text style={styles.title01}>{translate('Dear Citizen Welcome!')}</Text>
 
-                        <View style={styles.v01}>
-                            <View style={styles.v03}>
-                                <Text style={styles.txt01}>{translate('start screen instraction 1')}</Text>
-                                <Text style={styles.txt01}>{translate('start screen instraction 2')}</Text>
-                            </View>
-                            <View style={{ height: hp("2") }} />
-
-                            <View style={styles.v02}>
-                                <View style={styles.v04}>
-                                    {
-                                        translate('services_list_01').split(',').map((t, i) => {
-                                            return <Text style={styles.txt02} key={i}>{t}</Text>
-                                        })
-                                    }
-                                </View>
-                                <View style={styles.v04}>
-                                    {
-                                        translate('services_list_02').split(',').map((t, i) => {
-                                            return <Text style={styles.txt02} key={i}>{t}</Text>
-                                        })
-                                    }
-                                </View>
-                            </View>
-                            <View style={{ height: hp("3") }} />
-
-                            <TouchableOpacity
-                                style={styles.btn}
-                                onPress={async () => {
-                                    this.get_resources(sessionId)
-                                }}>
-                                <SvgPlay />
-                                <View style={{ width: wp('1') }} />
-                                <Text style={styles.btnTxt}>{translate('start')}</Text>
-                            </TouchableOpacity>
-                            <View style={{ height: hp("2") }} />
-                        </View>
+                        {renderPanel()}
 
                         <View style={{ height: hp("6") }} />
-
-                        {/* <View style={{ height: hp("6") }} /> */}
                         {/* <TouchableOpacity
-                            style={styles.btn}
-                            onPress={async () => {
-                                this.get_resources(sessionId)
-                            }}>
-                            <SvgPlay />
-                            <View style={{ width: wp('1') }} />
-                            <Text style={styles.btnTxt}>{translate('start')}</Text>
-                        </TouchableOpacity> */}
-                        {/* <View style={{ height: hp("2") }} />
-                        <TouchableOpacity
-                            style={styles.btn}
-                            onPress={async () => {
-                                this.props.updateRedux({ "userData": {}, "resources": {} })
-                            }}>
-                            <Text style={styles.btnTxt}>{translate('Logout')}</Text>
-                        </TouchableOpacity>
-
-                        <View style={{ height: hp("2") }} />
-                        <TouchableOpacity
                             style={styles.btn}
                             onPress={async () => {
                                 this.setState({ "audioSettingPopup":true })
                             }}>
                             <Text style={styles.btnTxt}>{translate('Speak Settings')}</Text>
                         </TouchableOpacity> */}
-
-
                     </View>
                 </View>
             </SafeAreaView>
@@ -185,35 +147,14 @@ const styles = StyleSheet.create({
         backgroundColor: theme.tertiary,
         flex: 1
     },
-    sliderBlurView: {
-        height: hp('100'),
-        width: wp('100'),
-        backgroundColor: '#333',
-        position: 'absolute',
-        opacity: 0.8,
-        zIndex: 99
-    },
-    sliderView: {
-        height: hp('100'),
-        width: wp('54'),
-        alignItems: 'center',
-        backgroundColor: '#D9D9D9',
-        position: 'absolute',
-        zIndex: 100,
-    },
-    userNameTxt: {
-        fontSize: 20,
-        fontFamily: theme.font01,
-        color: '#21347E'
-    },
     mainView: {
         backgroundColor: theme.tertiary,
         flex: 1,
-        justifyContent: 'center'
+        justifyContent: 'center',
     },
     header: {
         // height: hp('10'),
-        ...Platform.select({ "ios": {}, "android": { "height": hp('10') } }),
+        ...Platform.select({ "ios": {}, "android": { "marginTop": hp('2') } }),
         width: wp('100%'),
         flexDirection: 'row',
         alignItems: 'center',
@@ -221,8 +162,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: wp('3')
     },
     headHelpBtn: {
-        width: hp('8'),
-        height: hp('8'),
+        width: hp('4.5'),
+        height: hp('4.5'),
         borderRadius: 100,
         alignItems: 'center',
         justifyContent: 'center'
@@ -240,7 +181,7 @@ const styles = StyleSheet.create({
         elevation: 5,
     },
     v02: {
-        flexDirection:'row-reverse',
+        flexDirection: 'row-reverse',
         backgroundColor: theme.designColor,
         width: wp('80'),
         alignSelf: 'center',
@@ -253,8 +194,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: hp('1'),
         backgroundColor: theme.designColor,
     },
-    v04:{
-        width:'50%'
+    v04: {
+        width: '50%'
     },
     txt01: {
         fontSize: 14,
@@ -271,17 +212,7 @@ const styles = StyleSheet.create({
         height: hp('6'),
         width: wp('50'),
         alignSelf: 'center',
-        borderRadius: 100,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: "#21347E",
-        flexDirection: 'row-reverse'
-    },
-    btn01: {
-        height: hp('6'),
-        width: wp('40'),
-        alignSelf: 'center',
-        borderRadius: 100,
+        borderRadius: 10,
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: "#21347E",
@@ -295,8 +226,6 @@ const styles = StyleSheet.create({
     logo: {
         height: wp('22'),
         width: wp('22'),
-        // height: wp('35'),
-        // width: wp('35'),
         alignSelf: 'center'
     },
     logo_bg: {
@@ -320,6 +249,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         fontFamily: theme.font01,
-        fontSize: 30
+        fontSize: 30,
+        lineHeight:40,
     },
 });
