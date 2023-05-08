@@ -28,20 +28,47 @@ class Slider extends React.Component {
                 }}>
             </TouchableOpacity>
             <View style={styles.sliderView}>
-                <View style={{ height: hp('10') }} />
-                <SvgDrawerProfileIcon />
-                <Text style={styles.userNameTxt}>{'name'}</Text>
+                <View style={{
+                    height:hp('30'),
+                    width:'100%',
+                    backgroundColor:theme.designColor
+                }}>
+                    <Text style={styles.userNameTxt}>{translate('Full Name')}</Text>
+                </View>
 
-                <View style={{ height: hp('50') }} />
                 <TouchableOpacity
                     style={styles.btn01}
                     onPress={async () => {
                         if(onClose) onClose()
-                        this.props.navigation.navigate("DeleteAccount")
+                        this.props.navigation.navigate("Profile")
+                    }}>
+                    <Text style={styles.btnTxt}>{translate('Profile')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.btn01}
+                    onPress={async () => {
+                        if(onClose) onClose()
+                        // this.props.navigation.navigate("Settings")
+                    }}>
+                    <Text style={styles.btnTxt}>{translate('Settings')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.btn01}
+                    onPress={async () => {
+                        if(onClose) onClose()
+                        this.props.navigation.navigate("Help")
+                    }}>
+                    <Text style={styles.btnTxt}>{translate('Help')}</Text>
+                </TouchableOpacity>
+
+                {/* <TouchableOpacity
+                    style={styles.btn01}
+                    onPress={async () => {
+                        if(onClose) onClose()
+                        // this.props.navigation.navigate("DeleteAccount")
                     }}>
                     <Text style={styles.btnTxt}>{translate('Delete Account')}</Text>
-                </TouchableOpacity>
-                <View style={{ height: hp('1') }} />
+                </TouchableOpacity> */}
                 <TouchableOpacity
                     style={styles.btn01}
                     onPress={async () => {
@@ -75,23 +102,25 @@ const styles = StyleSheet.create({
         zIndex: 100,
     },
     userNameTxt: {
-        fontSize: 20,
+        position:'absolute',
+        bottom:hp('2'),
+        right:hp('2'),
+        fontSize: 40,
         fontFamily: theme.font01,
-        color: '#21347E'
+        color: '#fff'
     },
     btn01: {
         height: hp('6'),
-        width: wp('40'),
-        alignSelf: 'center',
-        borderRadius: 100,
+        paddingHorizontal:hp('2'),
+        width: '100%',
+        borderBottomWidth:2,
+        borderBottomColor:theme.secondary,
         alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: "#21347E",
         flexDirection: 'row-reverse'
     },
     btnTxt: {
-        color: "#fff",
-        fontSize: 16,
+        color: theme.designColor,
+        fontSize: 18,
         fontFamily: theme.font01
     },
 });

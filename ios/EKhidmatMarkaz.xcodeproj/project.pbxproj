@@ -8,13 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* EKhidmatMarkazTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* EKhidmatMarkazTests.m */; };
-		0C80B921A6F3F58F76C31292 /* libPods-EKhidmatMarkaz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DCACB8F33CDC322A6C60F78 /* libPods-EKhidmatMarkaz.a */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		279D59990D1645588CCB63FF /* Alvi-Nastaleeq-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C20406E9D72747DF8B420CE7 /* Alvi-Nastaleeq-Regular.ttf */; };
-		7699B88040F8A987B510C191 /* libPods-EKhidmatMarkaz-EKhidmatMarkazTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-EKhidmatMarkaz-EKhidmatMarkazTests.a */; };
+		2D8497CAA67CDF663CE94B15 /* libPods-EKhidmatMarkaz-EKhidmatMarkazTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CB6285F3F365FBA190434FFD /* libPods-EKhidmatMarkaz-EKhidmatMarkazTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		D5F0CAEBD973B853CEAFB08C /* libPods-EKhidmatMarkaz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBB49EE67757268887DD3C9 /* libPods-EKhidmatMarkaz.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,6 +33,7 @@
 		00E356F21AD99517003FC87E /* EKhidmatMarkazTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EKhidmatMarkazTests.m; sourceTree = "<group>"; };
 		0797FD657BDC4EB4B7200AB2 /* Alvi_Nastaleeq_Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Alvi_Nastaleeq_Regular.ttf; path = ../app/assets/fonts/Alvi_Nastaleeq_Regular.ttf; sourceTree = "<group>"; };
 		095BD43A21AA4269BAA37B8D /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
+		0DDC6783410B4BCFCB2AAA61 /* Pods-EKhidmatMarkaz-EKhidmatMarkazTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EKhidmatMarkaz-EKhidmatMarkazTests.release.xcconfig"; path = "Target Support Files/Pods-EKhidmatMarkaz-EKhidmatMarkazTests/Pods-EKhidmatMarkaz-EKhidmatMarkazTests.release.xcconfig"; sourceTree = "<group>"; };
 		10137C38AD264670BEC84697 /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* EKhidmatMarkaz.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EKhidmatMarkaz.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = EKhidmatMarkaz/AppDelegate.h; sourceTree = "<group>"; };
@@ -40,26 +41,25 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = EKhidmatMarkaz/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = EKhidmatMarkaz/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = EKhidmatMarkaz/main.m; sourceTree = "<group>"; };
-		19F6CBCC0A4E27FBF8BF4A61 /* libPods-EKhidmatMarkaz-EKhidmatMarkazTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-EKhidmatMarkaz-EKhidmatMarkazTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		184DA1BFABC15E5FBB79D06A /* Pods-EKhidmatMarkaz.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EKhidmatMarkaz.release.xcconfig"; path = "Target Support Files/Pods-EKhidmatMarkaz/Pods-EKhidmatMarkaz.release.xcconfig"; sourceTree = "<group>"; };
 		1CBFF01183CD4B2381E60C65 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		2416C099E1004F7097BD7E76 /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
+		2780C4D7539F1EDA37BE027B /* Pods-EKhidmatMarkaz-EKhidmatMarkazTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EKhidmatMarkaz-EKhidmatMarkazTests.debug.xcconfig"; path = "Target Support Files/Pods-EKhidmatMarkaz-EKhidmatMarkazTests/Pods-EKhidmatMarkaz-EKhidmatMarkazTests.debug.xcconfig"; sourceTree = "<group>"; };
 		2DC7C7C641424194883ABB0C /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
-		3B4392A12AC88292D35C810B /* Pods-EKhidmatMarkaz.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EKhidmatMarkaz.debug.xcconfig"; path = "Target Support Files/Pods-EKhidmatMarkaz/Pods-EKhidmatMarkaz.debug.xcconfig"; sourceTree = "<group>"; };
 		4B69D981B5D64A35AB88F8B6 /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Brands.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf"; sourceTree = "<group>"; };
-		5709B34CF0A7D63546082F79 /* Pods-EKhidmatMarkaz.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EKhidmatMarkaz.release.xcconfig"; path = "Target Support Files/Pods-EKhidmatMarkaz/Pods-EKhidmatMarkaz.release.xcconfig"; sourceTree = "<group>"; };
-		5B7EB9410499542E8C5724F5 /* Pods-EKhidmatMarkaz-EKhidmatMarkazTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EKhidmatMarkaz-EKhidmatMarkazTests.debug.xcconfig"; path = "Target Support Files/Pods-EKhidmatMarkaz-EKhidmatMarkazTests/Pods-EKhidmatMarkaz-EKhidmatMarkazTests.debug.xcconfig"; sourceTree = "<group>"; };
-		5DCACB8F33CDC322A6C60F78 /* libPods-EKhidmatMarkaz.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-EKhidmatMarkaz.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5EFDFD79A3DD2F9730095535 /* Pods-EKhidmatMarkaz.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EKhidmatMarkaz.debug.xcconfig"; path = "Target Support Files/Pods-EKhidmatMarkaz/Pods-EKhidmatMarkaz.debug.xcconfig"; sourceTree = "<group>"; };
 		622815B25D02455AAC13E4BE /* Fontisto.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Fontisto.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf"; sourceTree = "<group>"; };
 		6B4E021C540948A3AB08641E /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = EKhidmatMarkaz/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		822FD3FFDCD44830B20FB70E /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
-		89C6BE57DB24E9ADA2F236DE /* Pods-EKhidmatMarkaz-EKhidmatMarkazTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EKhidmatMarkaz-EKhidmatMarkazTests.release.xcconfig"; path = "Target Support Files/Pods-EKhidmatMarkaz-EKhidmatMarkazTests/Pods-EKhidmatMarkaz-EKhidmatMarkazTests.release.xcconfig"; sourceTree = "<group>"; };
 		8EC3E73AE5DD45808E39C29C /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Regular.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf"; sourceTree = "<group>"; };
 		9A0985E1BAAB42F1B5F34DF0 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		A097BE0F76284856BF9F0F86 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
+		ADBB49EE67757268887DD3C9 /* libPods-EKhidmatMarkaz.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-EKhidmatMarkaz.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B63D04D66F6E4B1A975C0F20 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
 		BECE896C5C1F46B9AD27D343 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
 		C20406E9D72747DF8B420CE7 /* Alvi-Nastaleeq-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Alvi-Nastaleeq-Regular.ttf"; path = "../app/assets/fonts/Alvi-Nastaleeq-Regular.ttf"; sourceTree = "<group>"; };
+		CB6285F3F365FBA190434FFD /* libPods-EKhidmatMarkaz-EKhidmatMarkazTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-EKhidmatMarkaz-EKhidmatMarkazTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE869848EDED4EF2AADC865F /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
 		EBD2796EDDFA462FBB2F4A10 /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -70,7 +70,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7699B88040F8A987B510C191 /* libPods-EKhidmatMarkaz-EKhidmatMarkazTests.a in Frameworks */,
+				2D8497CAA67CDF663CE94B15 /* libPods-EKhidmatMarkaz-EKhidmatMarkazTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,7 +78,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C80B921A6F3F58F76C31292 /* libPods-EKhidmatMarkaz.a in Frameworks */,
+				D5F0CAEBD973B853CEAFB08C /* libPods-EKhidmatMarkaz.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,8 +119,8 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				5DCACB8F33CDC322A6C60F78 /* libPods-EKhidmatMarkaz.a */,
-				19F6CBCC0A4E27FBF8BF4A61 /* libPods-EKhidmatMarkaz-EKhidmatMarkazTests.a */,
+				ADBB49EE67757268887DD3C9 /* libPods-EKhidmatMarkaz.a */,
+				CB6285F3F365FBA190434FFD /* libPods-EKhidmatMarkaz-EKhidmatMarkazTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -160,10 +160,10 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				3B4392A12AC88292D35C810B /* Pods-EKhidmatMarkaz.debug.xcconfig */,
-				5709B34CF0A7D63546082F79 /* Pods-EKhidmatMarkaz.release.xcconfig */,
-				5B7EB9410499542E8C5724F5 /* Pods-EKhidmatMarkaz-EKhidmatMarkazTests.debug.xcconfig */,
-				89C6BE57DB24E9ADA2F236DE /* Pods-EKhidmatMarkaz-EKhidmatMarkazTests.release.xcconfig */,
+				5EFDFD79A3DD2F9730095535 /* Pods-EKhidmatMarkaz.debug.xcconfig */,
+				184DA1BFABC15E5FBB79D06A /* Pods-EKhidmatMarkaz.release.xcconfig */,
+				2780C4D7539F1EDA37BE027B /* Pods-EKhidmatMarkaz-EKhidmatMarkazTests.debug.xcconfig */,
+				0DDC6783410B4BCFCB2AAA61 /* Pods-EKhidmatMarkaz-EKhidmatMarkazTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -200,12 +200,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "EKhidmatMarkazTests" */;
 			buildPhases = (
-				A55EABD7B0C7F3A422A6CC61 /* [CP] Check Pods Manifest.lock */,
+				88F5A109B7B10AFA9CE6D4E0 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				C59DA0FBD6956966B86A3779 /* [CP] Embed Pods Frameworks */,
-				F6A41C54EA430FDDC6A6ED99 /* [CP] Copy Pods Resources */,
+				9211CA757D291A607CA45C32 /* [CP] Embed Pods Frameworks */,
+				06BEC091292D47DB37EE8DCB /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -221,14 +221,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "EKhidmatMarkaz" */;
 			buildPhases = (
-				C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */,
+				CAC08BE29DDB1A3ABECCDB76 /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */,
-				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
+				A69CBFEAED6CFCA90EC44AE5 /* [CP] Embed Pods Frameworks */,
+				A03B6658C0425C55CCBE4335 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -310,24 +310,24 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nexport NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
-		00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */ = {
+		06BEC091292D47DB37EE8DCB /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-EKhidmatMarkaz/Pods-EKhidmatMarkaz-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-EKhidmatMarkaz-EKhidmatMarkazTests/Pods-EKhidmatMarkaz-EKhidmatMarkazTests-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			name = "[CP] Embed Pods Frameworks";
+			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-EKhidmatMarkaz/Pods-EKhidmatMarkaz-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-EKhidmatMarkaz-EKhidmatMarkazTests/Pods-EKhidmatMarkaz-EKhidmatMarkazTests-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-EKhidmatMarkaz/Pods-EKhidmatMarkaz-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-EKhidmatMarkaz-EKhidmatMarkazTests/Pods-EKhidmatMarkaz-EKhidmatMarkazTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		A55EABD7B0C7F3A422A6CC61 /* [CP] Check Pods Manifest.lock */ = {
+		88F5A109B7B10AFA9CE6D4E0 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -349,7 +349,58 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */ = {
+		9211CA757D291A607CA45C32 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-EKhidmatMarkaz-EKhidmatMarkazTests/Pods-EKhidmatMarkaz-EKhidmatMarkazTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-EKhidmatMarkaz-EKhidmatMarkazTests/Pods-EKhidmatMarkaz-EKhidmatMarkazTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-EKhidmatMarkaz-EKhidmatMarkazTests/Pods-EKhidmatMarkaz-EKhidmatMarkazTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A03B6658C0425C55CCBE4335 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-EKhidmatMarkaz/Pods-EKhidmatMarkaz-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-EKhidmatMarkaz/Pods-EKhidmatMarkaz-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-EKhidmatMarkaz/Pods-EKhidmatMarkaz-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A69CBFEAED6CFCA90EC44AE5 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-EKhidmatMarkaz/Pods-EKhidmatMarkaz-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-EKhidmatMarkaz/Pods-EKhidmatMarkaz-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-EKhidmatMarkaz/Pods-EKhidmatMarkaz-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CAC08BE29DDB1A3ABECCDB76 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -369,57 +420,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		C59DA0FBD6956966B86A3779 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-EKhidmatMarkaz-EKhidmatMarkazTests/Pods-EKhidmatMarkaz-EKhidmatMarkazTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-EKhidmatMarkaz-EKhidmatMarkazTests/Pods-EKhidmatMarkaz-EKhidmatMarkazTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-EKhidmatMarkaz-EKhidmatMarkazTests/Pods-EKhidmatMarkaz-EKhidmatMarkazTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		E235C05ADACE081382539298 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-EKhidmatMarkaz/Pods-EKhidmatMarkaz-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-EKhidmatMarkaz/Pods-EKhidmatMarkaz-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-EKhidmatMarkaz/Pods-EKhidmatMarkaz-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		F6A41C54EA430FDDC6A6ED99 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-EKhidmatMarkaz-EKhidmatMarkazTests/Pods-EKhidmatMarkaz-EKhidmatMarkazTests-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-EKhidmatMarkaz-EKhidmatMarkazTests/Pods-EKhidmatMarkaz-EKhidmatMarkazTests-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-EKhidmatMarkaz-EKhidmatMarkazTests/Pods-EKhidmatMarkaz-EKhidmatMarkazTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -474,7 +474,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5B7EB9410499542E8C5724F5 /* Pods-EKhidmatMarkaz-EKhidmatMarkazTests.debug.xcconfig */;
+			baseConfigurationReference = 2780C4D7539F1EDA37BE027B /* Pods-EKhidmatMarkaz-EKhidmatMarkazTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -501,7 +501,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 89C6BE57DB24E9ADA2F236DE /* Pods-EKhidmatMarkaz-EKhidmatMarkazTests.release.xcconfig */;
+			baseConfigurationReference = 0DDC6783410B4BCFCB2AAA61 /* Pods-EKhidmatMarkaz-EKhidmatMarkazTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -525,7 +525,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3B4392A12AC88292D35C810B /* Pods-EKhidmatMarkaz.debug.xcconfig */;
+			baseConfigurationReference = 5EFDFD79A3DD2F9730095535 /* Pods-EKhidmatMarkaz.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -551,7 +551,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5709B34CF0A7D63546082F79 /* Pods-EKhidmatMarkaz.release.xcconfig */;
+			baseConfigurationReference = 184DA1BFABC15E5FBB79D06A /* Pods-EKhidmatMarkaz.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;

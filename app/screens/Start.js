@@ -98,7 +98,7 @@ class Start extends React.Component {
             <Popup {...this.state.popup} onClick={() => { this.setState({ popup: {} }) }} >{renderPanel(true)}</Popup>
             {audioSettingPopup && <AudioSetting onClick={(is) => { this.setState({ "audioSettingPopup": is }) }} />}
             <SafeAreaView style={styles.safeArea} forceInset={{ top: 'always' }}>
-                {isSlider && <Slider onClose={() => { this.setState({ isSlider: false }) }} />}
+                {isSlider && <Slider onClose={() => { this.setState({ isSlider: false }) }} navigation={this.props.navigation} />}
                 <View style={styles.safeArea}>
                     <View style={styles.header}>
                         <TouchableOpacity onPress={() => { this.setState({ isSlider: true }) }}>
@@ -250,6 +250,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         fontFamily: theme.font01,
         fontSize: 30,
-        lineHeight:40,
+        lineHeight: 40,
     },
 });

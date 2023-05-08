@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { hp, wp } from '../utils';
 import { theme } from '../constants/theme';
 import { translate } from '../i18n';
-import { SvgHelp, SvgPopupSuccessIcon, SvgPopupWrongIcon } from '../constants/images';
+import { SvgHelp, SvgHelp1, SvgPopupHelpIcon, SvgPopupSuccessIcon, SvgPopupWrongIcon } from '../constants/images';
 import AudioPlayer from './AudioPlayer';
 
 class Popup extends React.Component {
@@ -28,19 +28,20 @@ class Popup extends React.Component {
                             <View style={{ alignItems: 'center' }}>
                                 <View style={{ height: hp('2') }} />
                                 {type == 'help' && <SvgHelp style={{ height: hp('6'), width: hp('6') }} />}
+                                {type == 'help1' && <SvgPopupHelpIcon />}
                                 {type == 'success' && <SvgPopupSuccessIcon />}
                                 {type == 'wrong' && <SvgPopupWrongIcon />}
                                 {title && <Text style={{ ...styles.txt, fontSize: 24, lineHeight: 40, }}>{translate(title)}</Text>}
                             </View>
-                            {message && <Text style={{ ...styles.txt, fontSize: 14, textAlign: 'center' }}>{translate(message)}</Text>}
-                            {children}
+                            {message && <Text style={{ ...styles.txt, fontSize: type == 'help' ? 14 : 22, textAlign: 'center' }}>{translate(message)}</Text>}
+                            {type == 'help' ? children : <></>}
                             <View style={{ height: hp('2') }} />
-                            {audio && <>
+                            {audio && (type == 'help' || type == 'help1') && <>
                                 <AudioPlayer
                                     audio={audio}
-                                    updateParent={(obj)=>{
+                                    updateParent={(obj) => {
                                         this.setState(obj)
-                                    }}/>
+                                    }} />
                                 <View style={{ height: hp('2') }} />
                             </>}
                         </View>
@@ -50,8 +51,8 @@ class Popup extends React.Component {
                             <TouchableOpacity
                                 style={{ ...styles.btn, borderRightWidth: 1, width: '100%' }}
                                 onPress={() => {
-                                    if(isPlaying == 'play'){
-                                        Alert.alert("Sorry!","Please stop audio player first!")
+                                    if (isPlaying == 'play') {
+                                        Alert.alert("Sorry!", "Please stop audio player first!")
                                         return
                                     }
                                     if (onClick) onClick(false)

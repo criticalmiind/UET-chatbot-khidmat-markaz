@@ -1,21 +1,22 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, Image, ScrollView } from 'react-native';
-import SelectDropdown from 'react-native-select-dropdown'
+import { TouchableOpacity, StyleSheet, Text, View, Image, ScrollView, StatusBar, SafeAreaView } from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
-import { hp, isNullRetNull, notify, wp } from '../utils';
-import { Logo, Logo01, SvgCPwd, SvgCalenderIcon, SvgCity, SvgGender, SvgHelp, SvgMap, SvgPhone, SvgPwd, SvgReg, SvgUser } from '../constants/images';
-import { call_application_manager, method } from '../api';
+import { hp, isNullRetNull, wp } from '../utils';
 import Loader from '../components/Loader';
 import { translate } from '../i18n';
-import cities from './../constants/cities.json';
-import tehseel from './../constants/tehseel.json';
 import Input from '../components/Input';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import Popup from '../components/Popup';
 import PoweredBy from '../components/PoweredBy';
 import HelpIcon from '../components/HelpIcon';
+import SelectDropdown from 'react-native-select-dropdown'
+import { Logo, SvgCPwd, SvgCalenderIcon, SvgCity, SvgGender, SvgMap, SvgPhone, SvgPwd, SvgReg, SvgUser } from '../constants/images';
+import cities from './../constants/cities.json';
+import tehseel from './../constants/tehseel.json';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import Header from '../components/Header';
+import Button1 from '../components/Button1';
 
 const GENDER_LIST = [
     { name: "Male" },
@@ -23,12 +24,14 @@ const GENDER_LIST = [
     { name: "Other" }
 ]
 
-class Register extends React.Component {
+
+class Profile extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
             "loader": false,
             'name': '',
+            'cnic': '',
             'userName': '',
             'password': '',
             'city': '',
@@ -38,44 +41,7 @@ class Register extends React.Component {
         }
     }
 
-    async register() {
-        const {
-            name,
-            userName,
-            password,
-            confirm_password,
-            city,
-            district,
-            gender,
-            dateOfBirth
-        } = this.state;
-        if (password !== confirm_password) {
-            notify({ "title": "Failed!", "message": "Passwords doesn't match!", "success": false })
-            return
-        }
-        this.setStateObj({ loader: true })
-        let obj = {
-            'function': method['signUpUser'],
-            // 'name': name,
-            'userName': userName,
-            'password': password,
-            'city': city,
-            // 'district':district,
-            'tehsil': district,
-            'gender': gender,
-            'dataOfBirth': dateOfBirth
-        }
-        let res = await call_application_manager(obj)
-        this.setStateObj({ loader: false })
-        if (res.resultFlag) {
-            this.setState({ popup: { "show": true, "type": "success", "message": "Registered Successfully! Now please login!" } })
-            setTimeout(() => {
-                this.props.navigation.navigate("Login")
-            }, 1500);
-        } else {
-            this.setState({ popup: { "show": true, "type": "wrong", "message": translate(res.message) } })
-
-        }
+    async update() {
     }
 
     setStateObj(data) {
@@ -86,8 +52,8 @@ class Register extends React.Component {
         const {
             loader,
             showDatePicker,
-
             name,
+            cnic,
             userName,
             password,
             confirm_password,
@@ -97,33 +63,51 @@ class Register extends React.Component {
             dateOfBirth,
         } = this.state;
 
-        let disabled_reg = () => {
-            if (isNullRetNull(name, 1) == 1) return true
-            if (isNullRetNull(userName, 1) == 1) return true
-            if (isNullRetNull(password, 1) == 1) return true
-            if (isNullRetNull(confirm_password, 1) == 1) return true
-            if (password != confirm_password) return true
-            if (isNullRetNull(city, 1) == 1) return true
-            if (isNullRetNull(district, 1) == 1) return true
-            if (isNullRetNull(gender, 1) == 1) return true
-            return false
-        }
-
         return (<>
             <Loader isShow={loader} />
             <Popup {...this.state.popup} onClick={() => { this.setState({ popup: {} }) }} />
-            <View style={styles.safeArea}>
+            <SafeAreaView style={styles.safeArea} forceInset={{ top: 'always' }}>
+                <StatusBar barStyle="light-content" backgroundColor={theme.designColor} />
+                <Header
+                    onClickHelp={() => {
+                        this.setState({ popup: { "show": true, "title": "Instractions", "audio": "ChangePasswordScreen", "btnTitle": "Back", "type": "help", "message": translate("forgot password screen help") } })
+                    }}
+                    onClickBack={() => {
+                        this.props.navigation.goBack()
+                    }} />
+
                 <ScrollView>
                     <View style={styles.mainView}>
-                        <View style={{ height: hp("6") }} />
+                        <View style={{ height: hp("1") }} />
+
+                        <Text style={{ ...styles.title, lineHeight: 60, fontSize: 40 }}>{translate('Profile')}</Text>
+
                         <View style={{ justifyContent: 'center' }}>
                             <Image source={Logo} style={styles.logo_bg} />
                             <Image source={Logo} style={styles.logo} />
                         </View>
                         <Text style={styles.title}>{translate('e-service')}</Text>
 
-
                         <View style={{ height: hp("2") }} />
+
+                        <Input
+                            Icon={SvgUser}
+                            placeholder={translate('Full Name')}
+                            value={name}
+                            onChangeText={(str) => {
+                                this.setState({ "name": str })
+                            }} />
+                        <View style={{ height: hp("2") }} />
+
+                        <Input
+                            Icon={SvgReg}
+                            placeholder={translate('CNIC')}
+                            value={cnic}
+                            onChangeText={(str) => {
+                                this.setState({ "cnic": str })
+                            }} />
+                        <View style={{ height: hp("2") }} />
+
                         <Input
                             Icon={SvgPhone}
                             placeholder={translate('phone-placeholder')}
@@ -132,7 +116,7 @@ class Register extends React.Component {
                                 this.setState({ "userName": str })
                             }} />
 
-                        <View style={{ height: hp("2") }} />
+                        {/* <View style={{ height: hp("2") }} />
                         <Input
                             Icon={SvgPwd}
                             placeholder={translate("Confirm Password")}
@@ -150,7 +134,7 @@ class Register extends React.Component {
                             secureTextEntry
                             onChangeText={(str) => {
                                 this.setState({ "confirm_password": str })
-                            }} />
+                            }} /> */}
 
                         <View style={{ height: hp("2") }} />
                         <View style={{ flexDirection: 'row-reverse', alignSelf: 'center', justifyContent: 'space-between', width: wp('90') }}>
@@ -222,31 +206,47 @@ class Register extends React.Component {
                             rowTextForSelection={(item) => item.name}
                         />
                         <View style={{ height: hp("2") }} />
-                        <TouchableOpacity
-                            disabled={disabled_reg()}
-                            style={{ ...styles.btn, opacity: disabled_reg() ? 0.8 : 1 }}
-                            onPress={async () => {
-                                this.register()
-                            }}>
-                            <SvgReg />
-                            <Text style={styles.btnTxt}>{translate('register')}</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={{ height: hp("5") }} />
 
+                        <Button1
+                            title="Update Profile"
+                            onPress={() => {
+                                this.update()
+                            }} />
+
+                    </View>
+                    <View style={{ height: hp("3") }} />
                     <PoweredBy />
-                    <View style={{ height: hp("6") }} />
+                    <View style={{ height: hp("3") }} />
                 </ScrollView>
+
+                {showDatePicker && <DateTimePicker
+                    testID="dateTimePicker"
+                    value={dateOfBirth ? dateOfBirth : new Date()}
+                    mode={"date"}
+                    is24Hour={true}
+                    onChange={(e) => {
+                        this.setState({ "dateOfBirth": e.nativeEvent.timestamp, "showDatePicker": false })
+                    }} />
+                }
                 <HelpIcon
                     onPress={() => {
-                        this.setState({ popup: { "show": true, "title":"Instractions", "audio":"RegistrationScreen", "btnTitle":"Back", "type": "help", "message": translate("reg screen help") } })
+                        this.setState({
+                            "popup": {
+                                "show": true,
+                                "title": "Instractions",
+                                "btnTitle": "Back",
+                                "type": "help",
+                                "audio": "LoginScreen",
+                                "message": translate("login screen help")
+                            }
+                        })
                     }} />
-            </View>
+            </SafeAreaView>
         </>);
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Register);
+export default connect(mapStateToProps, mapDispatchToProps)(Profile);
 
 const styles = StyleSheet.create({
     safeArea: {
@@ -258,43 +258,27 @@ const styles = StyleSheet.create({
         backgroundColor: theme.tertiary,
         flex: 1,
     },
-    btn: {
-        height: hp('6'),
-        width: wp('50'),
-        alignSelf: 'center',
-        borderRadius: 100,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: "#21347E",
-        flexDirection: 'row-reverse'
-    },
-    btnTxt: {
-        color: "#fff",
-        fontSize: 16,
-        fontFamily: theme.font01
-    },
-
     logo: {
-        height: wp('35'),
-        width: wp('35'),
+        height: wp('24'),
+        width: wp('24'),
         alignSelf: 'center'
     },
     logo_bg: {
-        height: wp('60'),
-        width: wp('60'),
+        height: wp('35'),
+        width: wp('35'),
         alignSelf: 'center',
         position: 'absolute',
         opacity: 0.05
     },
     title: {
         alignSelf: 'center',
-        borderColor: "#a3a3a3",
         alignItems: 'center',
         justifyContent: 'center',
         fontFamily: theme.font01,
-        fontSize: 36
+        fontSize: 22,
+        color: theme.designColor
     },
-    btnDatePicker:{
+    btnDatePicker: {
         width: wp('90'),
         alignSelf: 'center',
         alignItems: 'center',

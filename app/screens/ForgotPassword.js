@@ -1,17 +1,17 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, TextInput, Image, ScrollView, StatusBar, SafeAreaView } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, View, StatusBar, SafeAreaView } from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
-import { hp, isNullRetNull, notify, wp } from '../utils';
-import { Logo, Logo01, LogoWhite, SvgBackIcon, SvgHelp, SvgHelp1, SvgPhone, SvgPwd, SvgUpdate } from '../constants/images';
-import { call_application_manager, method } from '../api';
+import { hp, isNullRetNull, wp } from '../utils';
+import { SvgPhone, SvgPwd, SvgUpdate } from '../constants/images';
 import Loader from '../components/Loader';
 import { translate } from '../i18n';
 import Input from '../components/Input';
 import Popup from '../components/Popup';
 import PoweredBy from '../components/PoweredBy';
-import HelpIcon from '../components/HelpIcon';
+import Header from '../components/Header';
+import Button1 from '../components/Button1';
 
 class ForgotPassword extends React.Component {
     constructor(props) {
@@ -42,24 +42,16 @@ class ForgotPassword extends React.Component {
 
             <SafeAreaView style={styles.safeArea} forceInset={{ top: 'always' }}>
                 <StatusBar barStyle="light-content" backgroundColor={theme.designColor} />
-                <View style={styles.headerView}>
-                    <TouchableOpacity
-                        onPress={() => {
-                            this.setState({ popup: { "show": true, "title":"Instractions", "audio":"ChangePasswordScreen", "btnTitle":"Back", "type": "help", "message": translate("forgot password screen help") } })
-                        }}>
-                        <SvgHelp1 />
-                    </TouchableOpacity>
-                    <Image source={LogoWhite} style={{ top: -4, height: wp('14'), width: wp('14') }} />
-                    <TouchableOpacity
-                        style={{ width: wp('18') }}
-                        onPress={() => { this.props.navigation.goBack() }}>
-                        <SvgBackIcon />
-                    </TouchableOpacity>
-                </View>
+                <Header
+                    onClickHelp={() => {
+                        this.setState({ popup: { "show": true, "title": "Instractions", "audio": "ChangePasswordScreen", "btnTitle": "Back", "type": "help", "message": translate("forgot password screen help") } })
+                    }}
+                    onClickBack={() => {
+                        this.props.navigation.goBack()
+                    }} />
 
                 <View style={styles.mainView}>
                     <View style={{
-                        // height:hp('50'),
                         width: wp('90'),
                         backgroundColor: theme.designColor,
                         alignSelf: 'center',
@@ -100,15 +92,17 @@ class ForgotPassword extends React.Component {
                             }} />
 
                         <View style={{ height: hp("2") }} />
-                        <TouchableOpacity
-                            // disabled={disabled_login}
-                            style={{ ...styles.btn, opacity: disabled_login ? 0.9 : 1 }}
-                            onPress={async () => {
+
+                        <Button1
+                            title="Update Password"
+                            style={styles.btn}
+                            btnTxt={styles.btnTxt}
+                            onPress={() => {
                                 this.update_passowrd()
                             }}>
                             <SvgUpdate />
-                            <Text style={styles.btnTxt}>{translate('Update Password')}</Text>
-                        </TouchableOpacity>
+                        </Button1>
+
                         <View style={{ height: hp("3") }} />
                     </View>
                     <View style={{ height: hp("6") }} />
@@ -129,34 +123,16 @@ const styles = StyleSheet.create({
         backgroundColor: theme.designColor,
         flex: 1
     },
-    headerView: {
-        height: hp('8'),
-        width: wp('100'),
-        paddingHorizontal: wp('2'),
-        flexDirection: 'row-reverse',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    },
     mainView: {
         backgroundColor: theme.tertiary,
         flex: 1,
         justifyContent: 'center',
     },
     btn: {
-        height: hp('6'),
-        width: wp('50'),
-        alignSelf: 'center',
-        borderRadius: 10,
-        flexDirection: 'row-reverse',
-        alignItems: 'center',
-        justifyContent: 'center',
         backgroundColor: "#ffffff"
     },
     btnTxt: {
         color: theme.designColor,
-        fontSize: 16,
-        fontFamily: theme.font01,
-        bottom: 3
     },
     title: {
         alignSelf: 'center',
