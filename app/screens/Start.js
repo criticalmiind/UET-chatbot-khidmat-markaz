@@ -45,7 +45,7 @@ class Start extends React.Component {
         const { loader, isSlider, audioSettingPopup } = this.state;
         const { sessionId } = this.props.userData;
 
-        const renderPanel = (isHideStartBtn) => {
+        const renderPanel = (isPopup) => {
             return (<>
                 <Text style={styles.title01}>{translate('Dear Citizen Welcome!')}</Text>
                 <View style={styles.v01}>
@@ -74,10 +74,10 @@ class Start extends React.Component {
                     <View style={{ height: hp("2") }} />
 
                     <View style={styles.v03}>
-                        <Text style={styles.txt01}>{translate('start screen instraction 3')}</Text>
+                        <Text style={styles.txt01}>{translate(`start screen instraction ${isPopup ? 4 : 3}`)}</Text>
                     </View>
                     <View style={{ height: hp("2") }} />
-                    {!isHideStartBtn && <>
+                    {!isPopup && <>
                         <Button1
                             title="start"
                             onPress={() => {

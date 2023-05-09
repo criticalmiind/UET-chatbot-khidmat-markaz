@@ -16,6 +16,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Popup from '../components/Popup';
 import PoweredBy from '../components/PoweredBy';
 import HelpIcon from '../components/HelpIcon';
+import Button1 from '../components/Button1';
 
 const GENDER_LIST = [
     { name: translate("Male") },
@@ -98,14 +99,14 @@ class Register extends React.Component {
         } = this.state;
 
         let disabled_reg = () => {
-            if (isNullRetNull(name, 1) == 1) return true
-            if (isNullRetNull(userName, 1) == 1) return true
-            if (isNullRetNull(password, 1) == 1) return true
-            if (isNullRetNull(confirm_password, 1) == 1) return true
-            if (password != confirm_password) return true
-            if (isNullRetNull(city, 1) == 1) return true
-            if (isNullRetNull(district, 1) == 1) return true
-            if (isNullRetNull(gender, 1) == 1) return true
+            // if (isNullRetNull(name, 1) == 1) return true
+            // if (isNullRetNull(userName, 1) == 1) return true
+            // if (isNullRetNull(password, 1) == 1) return true
+            // if (isNullRetNull(confirm_password, 1) == 1) return true
+            // if (password != confirm_password) return true
+            // if (isNullRetNull(city, 1) == 1) return true
+            // if (isNullRetNull(district, 1) == 1) return true
+            // if (isNullRetNull(gender, 1) == 1) return true
             return false
         }
 
@@ -222,7 +223,14 @@ class Register extends React.Component {
                             rowTextForSelection={(item) => item.name}
                         />
                         <View style={{ height: hp("2") }} />
-                        <TouchableOpacity
+                        <Button1
+                            title="register"
+                            onPress={async () => {
+                                this.register()
+                            }}>
+                            <SvgReg />
+                        </Button1>
+                        {/* <TouchableOpacity
                             disabled={disabled_reg()}
                             style={{ ...styles.btn, opacity: disabled_reg() ? 0.8 : 1 }}
                             onPress={async () => {
@@ -230,7 +238,7 @@ class Register extends React.Component {
                             }}>
                             <SvgReg />
                             <Text style={styles.btnTxt}>{translate('register')}</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                     </View>
                     <View style={{ height: hp("5") }} />
 
@@ -239,7 +247,7 @@ class Register extends React.Component {
                 </ScrollView>
                 <HelpIcon
                     onPress={() => {
-                        this.setState({ popup: { "show": true, "title":"Instractions", "audio":"RegistrationScreen", "btnTitle":"Back", "type": "help", "message": translate("reg screen help") } })
+                        this.setState({ popup: { "show": true, "title": "Instractions", "audio": "RegistrationScreen", "btnTitle": "Back", "type": "help", "message": translate("reg screen help") } })
                     }} />
             </View>
         </>);
@@ -257,21 +265,6 @@ const styles = StyleSheet.create({
     mainView: {
         backgroundColor: theme.tertiary,
         flex: 1,
-    },
-    btn: {
-        height: hp('6'),
-        width: wp('50'),
-        alignSelf: 'center',
-        borderRadius: 100,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: "#21347E",
-        flexDirection: 'row-reverse'
-    },
-    btnTxt: {
-        color: "#fff",
-        fontSize: 16,
-        fontFamily: theme.font01
     },
 
     logo: {
@@ -294,7 +287,7 @@ const styles = StyleSheet.create({
         fontFamily: theme.font01,
         fontSize: 36
     },
-    btnDatePicker:{
+    btnDatePicker: {
         width: wp('90'),
         alignSelf: 'center',
         alignItems: 'center',
