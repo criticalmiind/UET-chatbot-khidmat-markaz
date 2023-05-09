@@ -35,7 +35,7 @@ class Help extends React.Component {
                 <StatusBar barStyle="light-content" backgroundColor={theme.designColor} />
                 <Header
                     onClickHelp={() => {
-                        this.setState({ popup: { "show": true, "title": "Instractions", "audio": "ChangePasswordScreen", "btnTitle": "Back", "type": "help", "message": translate("forgot password screen help") } })
+                        this.setState({ popup: { "show": true, "title": "Instractions", "audio": "HelpScreen", "btnTitle": "Back", "type": "help", "message": translate("help screen help") } })
                     }}
                     onClickBack={() => {
                         this.props.navigation.goBack()
@@ -67,7 +67,7 @@ class Help extends React.Component {
                         <TouchableOpacity
                             style={styles.btn}
                             onPress={()=>{
-                                // this.props.navigation.navigate("")
+                                this.props.navigation.navigate("Rating")
                             }}>
                             <Text style={styles.btnTxt}>{translate("Complaints")}</Text>
                         </TouchableOpacity>
@@ -76,7 +76,7 @@ class Help extends React.Component {
                         <TouchableOpacity
                             style={styles.btn}
                             onPress={()=>{
-                                // this.props.navigation.navigate("")
+                                this.props.navigation.navigate("Rating")
                             }}>
                             <Text style={styles.btnTxt}>{translate("Suggestions")}</Text>
                         </TouchableOpacity>
@@ -95,20 +95,6 @@ class Help extends React.Component {
                     <PoweredBy />
                     <View style={{ height: hp("3") }} />
                 </ScrollView>
-
-                <HelpIcon
-                    onPress={() => {
-                        this.setState({
-                            "popup": {
-                                "show": true,
-                                "title": "Instractions",
-                                "btnTitle": "Back",
-                                "type": "help",
-                                "audio": "LoginScreen",
-                                "message": translate("login screen help")
-                            }
-                        })
-                    }} />
             </SafeAreaView>
         </>);
     }

@@ -14,16 +14,16 @@ class Button1 extends React.Component {
     }
 
     render() {
-        const { title, style, btnTxt, children } = this.props;
+        const { title, style, btnTxt, children, onPress } = this.props;
 
         return (
             <TouchableOpacity
                 style={{ ...styles.btn, ...style }}
                 onPress={async () => {
-                    if(onPress)onPress()
+                    if (onPress) onPress()
                 }}>
                 {children}
-                {title&&<Text style={{...styles.btnTxt, ...btnTxt}}>{translate(title)}</Text>}
+                {title && <Text style={{ ...styles.btnTxt, ...btnTxt }}>{translate(title)}</Text>}
             </TouchableOpacity>
         );
     }
@@ -48,6 +48,6 @@ const styles = StyleSheet.create({
         color: "#fff",
         fontSize: 16,
         fontFamily: theme.font01,
-        lineHeight:22
+        lineHeight: 22
     },
 });

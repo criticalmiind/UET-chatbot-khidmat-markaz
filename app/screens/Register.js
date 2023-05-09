@@ -18,9 +18,9 @@ import PoweredBy from '../components/PoweredBy';
 import HelpIcon from '../components/HelpIcon';
 
 const GENDER_LIST = [
-    { name: "Male" },
-    { name: "Female" },
-    { name: "Other" }
+    { name: translate("Male") },
+    { name: translate("Female") },
+    { name: translate("Other") }
 ]
 
 class Register extends React.Component {
@@ -33,7 +33,7 @@ class Register extends React.Component {
             'password': '',
             'city': '',
             'district': '',
-            'gender': 'Male',
+            'gender': translate("Male"),
             'dateOfBirth': false,
         }
     }

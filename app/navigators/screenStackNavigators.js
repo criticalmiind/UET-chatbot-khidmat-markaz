@@ -11,6 +11,8 @@ import VideoTutorial from "../screens/VideoTutorial";
 import Profile from "../screens/Profile";
 import Help from "../screens/Help";
 import CommonQuestions from "../screens/CommonQuestions";
+import Rating from "../screens/Rating";
+import Settings from "../screens/Settings";
 
 export const MainNav = createStackNavigator({
   Start: { screen: Start, navigationOptions: { headerShown: false } },
@@ -19,6 +21,9 @@ export const MainNav = createStackNavigator({
   Profile: { screen: Profile, navigationOptions: { headerShown: false } },
   Help: { screen: Help, navigationOptions: { headerShown: false } },
   CommonQuestions: { screen: CommonQuestions, navigationOptions: { headerShown: false } },
+  Rating: { screen: Rating, navigationOptions: { headerShown: false } },
+  Settings: { screen: Settings, navigationOptions: { headerShown: false } },
+  ForgotPassword: { screen: ForgotPassword, navigationOptions: { headerShown: false } },
 });
 
 export const AuthNav = createStackNavigator({

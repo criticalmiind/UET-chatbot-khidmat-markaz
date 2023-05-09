@@ -28,11 +28,12 @@ class AudioPlayer extends Component {
       "currentTime": 0,
       "sliderValue": 0,
     };
+    
+
   }
 
-  stopAudio = async () => {
-    if (this.sound) await this.sound.stop()
-    this.sound = null
+  stopAudio() {
+    if (this.sound) this.sound.stop()
   }
 
   togglePlay = async () => {
@@ -40,6 +41,7 @@ class AudioPlayer extends Component {
       Alert.alert("Invalid Audio", "Please pass valid audio");
       return
     }
+    // console.log(this.props.audio);
     if (this.state.isPlaying == false) {
       let path = await base64IntoPath(AUDIO[this.props.audio])
       this.sound = new Sound(path, '', (error) => {
@@ -137,4 +139,4 @@ class AudioPlayer extends Component {
   }
 }
 
-export default AudioPlayer;
+export default connect(mapStateToProps, mapDispatchToProps)(AudioPlayer);

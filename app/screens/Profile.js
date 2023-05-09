@@ -19,9 +19,9 @@ import Header from '../components/Header';
 import Button1 from '../components/Button1';
 
 const GENDER_LIST = [
-    { name: "Male" },
-    { name: "Female" },
-    { name: "Other" }
+    { name: translate("Male") },
+    { name: translate("Female") },
+    { name: translate("Other") },
 ]
 
 
@@ -36,7 +36,7 @@ class Profile extends React.Component {
             'password': '',
             'city': '',
             'district': '',
-            'gender': 'Male',
+            'gender': translate('Male'),
             'dateOfBirth': false,
         }
     }
@@ -70,7 +70,7 @@ class Profile extends React.Component {
                 <StatusBar barStyle="light-content" backgroundColor={theme.designColor} />
                 <Header
                     onClickHelp={() => {
-                        this.setState({ popup: { "show": true, "title": "Instractions", "audio": "ChangePasswordScreen", "btnTitle": "Back", "type": "help", "message": translate("forgot password screen help") } })
+                        this.setState({ popup: { "show": true, "title": "Instractions", "audio": "ProfileScreen", "btnTitle": "Back", "type": "help", "message": translate("profile screen help") } })
                     }}
                     onClickBack={() => {
                         this.props.navigation.goBack()

@@ -57,6 +57,7 @@ const SvgPopupHelpIcon = () => <Image source={help_popup} style={{ width: 40, he
 const ThumbImg = () => <Image source={thumb} style={{ width: 3, height: 40, resizeMode: 'contain' }} /> //<SvgXml xml={popup_help}/>
 const SvgGender = () => <Image source={gender} style={{ width: 18, height: 40 }} /> //<SvgXml xml={popup_help}/>
 const SvgUpdate = () => <Image source={update} style={{ width: 28, height: 28, resizeMode: 'contain' }} /> //<SvgXml xml={popup_help}/>
+const SvgDelete = () => <Image source={delte} style={{ width: 28, height: 28, resizeMode: 'contain' }} /> //<SvgXml xml={popup_help}/>
 const SvgReg = () => <Image source={register} style={{ width: 20, height: 32 }} /> //<SvgXml xml={popup_help}/>
 
 export {
@@ -88,5 +89,6 @@ export {
     SvgCPwd,
     SvgUpdate,
     SvgReg,
-    SvgHelp1
+    SvgHelp1,
+    SvgDelete
 }

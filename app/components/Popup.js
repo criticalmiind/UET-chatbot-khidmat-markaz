@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View, } from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { hp, wp } from '../utils';
@@ -11,13 +11,13 @@ import AudioPlayer from './AudioPlayer';
 class Popup extends React.Component {
     constructor(props) {
         super(props)
+        this.audioRef = React.createRef()
         this.state = {
             isPlaying: false
         }
     }
 
     render() {
-        const { isPlaying } = this.state;
         const { show, type, title, audio, message, onClick = (e) => { }, btnTitle = "Back", children } = this.props;
 
         return (<>
@@ -38,6 +38,7 @@ class Popup extends React.Component {
                             <View style={{ height: hp('2') }} />
                             {audio && (type == 'help' || type == 'help1') && <>
                                 <AudioPlayer
+                                    ref={this.audioRef}
                                     audio={audio}
                                     updateParent={(obj) => {
                                         this.setState(obj)
@@ -49,12 +50,9 @@ class Popup extends React.Component {
                         <View style={styles.v03}>
                             {/* {type == 'help' ? */}
                             <TouchableOpacity
-                                style={{ ...styles.btn, borderRightWidth: 1, width: '100%' }}
-                                onPress={() => {
-                                    if (isPlaying == 'play') {
-                                        Alert.alert("Sorry!", "Please stop audio player first!")
-                                        return
-                                    }
+                                style={{ ...styles.btn, width: '100%' }}
+                                onPress={async() => {
+                                    if(this.audioRef.current) await this.audioRef.current.stopAudio()
                                     if (onClick) onClick(false)
                                 }}>
                                 <Text style={{ ...styles.txt, lineHeight: 30, }}>{translate(btnTitle)}</Text>
@@ -80,6 +78,14 @@ class Popup extends React.Component {
                         </View>
                     </View>
                     <View style={styles.mainView}>
+                        <TouchableOpacity
+                            style={{ flex:1 }}
+                            onPress={async() => {
+                                if(this.audioRef.current) await this.audioRef.current.stopAudio()
+                                onClick(false)
+                            }}>
+                            <></>
+                        </TouchableOpacity>
                     </View>
                 </View>
             }
@@ -104,7 +110,7 @@ const styles = StyleSheet.create({
         width: wp('100'),
         height: hp('100'),
         zIndex: 10,
-        opacity: 0.5,
+        opacity: 0.7,
     },
     v01: {
         width: wp('86'),
@@ -121,10 +127,10 @@ const styles = StyleSheet.create({
         paddingHorizontal: wp('3')
     },
     v03: {
-        width: wp('82'),
         borderBottomLeftRadius: 10,
         borderBottomRightRadius: 10,
-        flexDirection: 'row'
+        flexDirection: 'row',
+        overflow: 'hidden'
     },
     btn: {
         height: hp('6'),

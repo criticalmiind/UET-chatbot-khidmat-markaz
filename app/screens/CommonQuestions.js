@@ -8,23 +8,26 @@ import Loader from '../components/Loader';
 import { translate } from '../i18n';
 import Popup from '../components/Popup';
 import PoweredBy from '../components/PoweredBy';
-import HelpIcon from '../components/HelpIcon';
 import Header from '../components/Header';
 import AudioPlayer from '../components/AudioPlayer';
 
 class CommonQuestions extends React.Component {
     constructor(props) {
         super(props)
+        this.audioRef = React.createRef()
         this.state = {
             "loader": false,
             "expended": {},
             "data_list": [
-                { "id": 1, "question": "help_q_01", "ans": "help_ans_01" },
-                { "id": 2, "question": "help_q_02", "ans": "help_ans_02" },
-                { "id": 3, "question": "help_q_03", "ans": "help_ans_03" },
-                { "id": 4, "question": "help_q_04", "ans": "help_ans_04" },
-                { "id": 5, "question": "help_q_05", "ans": "help_ans_05" },
-                { "id": 6, "question": "help_q_06", "ans": "help_ans_06" }
+                { "id": 1, "question": "help_q_01", "ans": "help_ans_01", "audio": "FAQSQUESTION1" },
+                { "id": 2, "question": "help_q_02", "ans": "help_ans_02", "audio": "FAQSQUESTION2" },
+                { "id": 3, "question": "help_q_03", "ans": "help_ans_03", "audio": "FAQSQUESTION3" },
+                { "id": 4, "question": "help_q_04", "ans": "help_ans_04", "audio": "FAQSQUESTION4" },
+                { "id": 5, "question": "help_q_05", "ans": "help_ans_05", "audio": "FAQSQUESTION5" },
+                { "id": 6, "question": "help_q_06", "ans": "help_ans_06", "audio": "FAQSQUESTION6" },
+                { "id": 7, "question": "help_q_07", "ans": "help_ans_07", "audio": "FAQSQUESTION7" },
+                { "id": 8, "question": "help_q_08", "ans": "help_ans_08", "audio": "FAQSQUESTION8" },
+                { "id": 9, "question": "help_q_09", "ans": "help_ans_09", "audio": "FAQSQUESTION9" },
             ]
         }
     }
@@ -43,7 +46,7 @@ class CommonQuestions extends React.Component {
                 <StatusBar barStyle="light-content" backgroundColor={theme.designColor} />
                 <Header
                     onClickHelp={() => {
-                        this.setState({ popup: { "show": true, "title": "Instractions", "audio": "ChangePasswordScreen", "btnTitle": "Back", "type": "help", "message": translate("forgot password screen help") } })
+                        this.setState({ popup: { "show": true, "title": "Instractions", "audio": "FAQsScreen", "btnTitle": "Back", "type": "help", "message": translate("feqs screen help") } })
                     }}
                     onClickBack={() => {
                         this.props.navigation.goBack()
@@ -63,7 +66,8 @@ class CommonQuestions extends React.Component {
                                     <View key={i} style={styles.v04}>
                                         <TouchableOpacity
                                             style={styles.btn01}
-                                            onPress={() => {
+                                            onPress={async () => {
+                                                if (this.audioRef.current) await this.audioRef.current.stopAudio()
                                                 this.setStateObj({ "expended": item.id == expended.id ? {} : item })
                                             }}>
                                             <Text style={styles.txt03}>{translate(item.id)}</Text>
@@ -85,13 +89,14 @@ class CommonQuestions extends React.Component {
                                                     </View>
 
                                                 </View>
-                                                {/* <View style={styles.v03}>
-                                                <AudioPlayer
-                                                    audio={"audio"}
-                                                    updateParent={(obj) => {
-                                                        // this.setState(obj)
-                                                    }} />
-                                            </View> */}
+                                                <View style={styles.v03}>
+                                                    <AudioPlayer
+                                                        ref={this.audioRef}
+                                                        audio={item.audio}
+                                                        updateParent={(obj) => {
+                                                            // this.setState(obj)
+                                                        }} />
+                                                </View>
                                             </>
                                         }
                                     </View>
@@ -100,24 +105,10 @@ class CommonQuestions extends React.Component {
                         }
 
                     </View>
-                    <View style={{ height: hp("22") }} />
+                    <View style={{ height: hp("2") }} />
                     <PoweredBy />
                     <View style={{ height: hp("3") }} />
                 </ScrollView>
-
-                <HelpIcon
-                    onPress={() => {
-                        this.setState({
-                            "popup": {
-                                "show": true,
-                                "title": "Instractions",
-                                "btnTitle": "Back",
-                                "type": "help",
-                                "audio": "LoginScreen",
-                                "message": translate("login screen help")
-                            }
-                        })
-                    }} />
             </SafeAreaView>
         </>);
     }
@@ -168,12 +159,12 @@ const styles = StyleSheet.create({
         width: wp('4'),
         textAlign: 'center'
     },
-    v04:{
+    v04: {
         borderTopColor: "#d3d3d3",
         borderTopWidth: 1,
         borderBottomColor: "#d3d3d3",
         borderBottomWidth: 1,
-        paddingVertical:hp('1')
+        paddingVertical: hp('1')
     },
     btn01: {
         width: wp('100'),

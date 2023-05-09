@@ -48,7 +48,7 @@ class Slider extends React.Component {
                     style={styles.btn01}
                     onPress={async () => {
                         if(onClose) onClose()
-                        // this.props.navigation.navigate("Settings")
+                        this.props.navigation.navigate("Settings")
                     }}>
                     <Text style={styles.btnTxt}>{translate('Settings')}</Text>
                 </TouchableOpacity>
@@ -60,15 +60,6 @@ class Slider extends React.Component {
                     }}>
                     <Text style={styles.btnTxt}>{translate('Help')}</Text>
                 </TouchableOpacity>
-
-                {/* <TouchableOpacity
-                    style={styles.btn01}
-                    onPress={async () => {
-                        if(onClose) onClose()
-                        // this.props.navigation.navigate("DeleteAccount")
-                    }}>
-                    <Text style={styles.btnTxt}>{translate('Delete Account')}</Text>
-                </TouchableOpacity> */}
                 <TouchableOpacity
                     style={styles.btn01}
                     onPress={async () => {

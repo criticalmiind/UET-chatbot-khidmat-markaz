@@ -4,7 +4,7 @@ import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userAction
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
 import { hp, wp } from '../utils';
-import { Logo, SvgDrawerIcon, SvgDrawerProfileIcon, SvgHelp, SvgPlay } from '../constants/images';
+import { Logo, SvgDrawerIcon, SvgHelp, SvgPlay } from '../constants/images';
 import { call_application_manager, method } from '../api';
 import Loader from '../components/Loader';
 import { translate } from '../i18n';
@@ -12,6 +12,7 @@ import Popup from '../components/Popup';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AudioSetting from '../components/AudioSetting';
 import Slider from '../components/Slider';
+import Button1 from '../components/Button1';
 
 class Start extends React.Component {
     constructor(props) {
@@ -42,7 +43,7 @@ class Start extends React.Component {
 
     render() {
         const { loader, isSlider, audioSettingPopup } = this.state;
-        const { sessionId, name } = this.props.userData;
+        const { sessionId } = this.props.userData;
 
         const renderPanel = (isHideStartBtn) => {
             return (<>
@@ -77,15 +78,14 @@ class Start extends React.Component {
                     </View>
                     <View style={{ height: hp("2") }} />
                     {!isHideStartBtn && <>
-                        <TouchableOpacity
-                            style={styles.btn}
-                            onPress={async () => {
+                        <Button1
+                            title="start"
+                            onPress={() => {
                                 this.get_resources(sessionId)
                             }}>
                             <SvgPlay />
                             <View style={{ width: wp('1') }} />
-                            <Text style={styles.btnTxt}>{translate('start')}</Text>
-                        </TouchableOpacity>
+                        </Button1>
                         <View style={{ height: hp("2") }} />
                     </>
                     }
@@ -109,7 +109,6 @@ class Start extends React.Component {
                             style={styles.headHelpBtn}
                             onPress={() => {
                                 this.setState({ popup: { "show": true, "title": "Instractions", "audio": "HomeScreen", "btnTitle": "Back", "type": "help" } })
-                                // this.setState({ popup: { "show": true, "title": "Instractions", "audio": "HomeScreen", "btnTitle": "Back", "type": "help", "message": translate("start screen help") } })
                             }}>
                             <SvgHelp />
                         </TouchableOpacity>
@@ -125,13 +124,6 @@ class Start extends React.Component {
                         {renderPanel()}
 
                         <View style={{ height: hp("6") }} />
-                        {/* <TouchableOpacity
-                            style={styles.btn}
-                            onPress={async () => {
-                                this.setState({ "audioSettingPopup":true })
-                            }}>
-                            <Text style={styles.btnTxt}>{translate('Speak Settings')}</Text>
-                        </TouchableOpacity> */}
                     </View>
                 </View>
             </SafeAreaView>
@@ -207,21 +199,6 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: theme.tertiary,
         fontFamily: theme.font01,
-    },
-    btn: {
-        height: hp('6'),
-        width: wp('50'),
-        alignSelf: 'center',
-        borderRadius: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: "#21347E",
-        flexDirection: 'row-reverse'
-    },
-    btnTxt: {
-        color: "#fff",
-        fontSize: 16,
-        fontFamily: theme.font01
     },
     logo: {
         height: wp('22'),
