@@ -43,9 +43,10 @@ export default connect(mapStateToProps, mapDispatchToProps)(Header);
 
 const styles = StyleSheet.create({
     headerView: {
-        flex: 1,
-        paddingHorizontal: wp('2'),
-        paddingVertical: hp('2'),
+        // flex: 1,
+        // height:hp('7'),
+        paddingHorizontal: wp('1'),
+        paddingVertical: hp('1'),
         flexDirection: 'row-reverse',
         alignItems: 'center',
         justifyContent: 'space-between',

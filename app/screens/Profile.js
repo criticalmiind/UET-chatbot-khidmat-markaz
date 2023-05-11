@@ -228,19 +228,6 @@ class Profile extends React.Component {
                         this.setState({ "dateOfBirth": e.nativeEvent.timestamp, "showDatePicker": false })
                     }} />
                 }
-                <HelpIcon
-                    onPress={() => {
-                        this.setState({
-                            "popup": {
-                                "show": true,
-                                "title": "Instractions",
-                                "btnTitle": "Back",
-                                "type": "help",
-                                "audio": "LoginScreen",
-                                "message": translate("login screen help")
-                            }
-                        })
-                    }} />
             </SafeAreaView>
         </>);
     }

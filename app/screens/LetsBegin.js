@@ -7,7 +7,6 @@ import {
     ScrollView,
     ActivityIndicator,
     Image,
-    Platform,
     BackHandler,
     StatusBar,
     Alert,
@@ -27,14 +26,16 @@ import {
     close_connection,
     onPlayBack
 } from '../api/methods';
-import { LogoWhite, MicIcon, SvgBackIcon, SvgHelp1 } from '../constants/images';
-import { dialogue_manager, run_scripts, SOCKET_CONFIG, tts_manager } from '../api';
+import { MicIcon } from '../constants/images';
+import { dialogue_manager, SOCKET_CONFIG, tts_manager } from '../api';
 import Loader from '../components/Loader';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PlayerView from '../components/PlayerView';
 import Popup from '../components/Popup';
 import io from 'socket.io-client';
 import { translate } from '../i18n';
+import Header from '../components/Header';
+import AudioPlayer from '../components/AudioPlayer';
 
 class LetsBegin extends React.Component {
     constructor(props) {
@@ -63,7 +64,6 @@ class LetsBegin extends React.Component {
             },
             "chat_list": {
                 // "asfdasfa": { "is_question": true, "text": ["آپ حبیب بینک میں فیس جمع کروانے کے بعد درکار دستاویزات لے کر# ای خدمت مرکز تشریف لے جائیں۔","آپ کا لائسنس 15 دن میں رینیو ہو جائے گا۔ کیا آپ کو مزید کچھ معلوم کرنا ہے؟"] },
-                // "asfdasfa": dummy_data,
             },
             "last_played_voice": {},
             "play_text_id": false,
@@ -217,13 +217,13 @@ class LetsBegin extends React.Component {
 
         const renderInfoMessage = () => {
             return (<>
-                <Text style={styles.title01}>{translate('Dear Citizen Welcome!')}</Text>
+                {/* <Text style={styles.title01}>{translate('Dear Citizen Welcome!')}</Text> */}
                 <View style={styles.v05}>
-                    <View style={styles.v03}>
+                    {/* <View style={styles.v03}>
                         <Text style={styles.txt01}>{translate('start screen instraction 1')}</Text>
                         <Text style={styles.txt01}>{translate('start screen instraction 2')}</Text>
                     </View>
-                    <View style={{ height: hp("2") }} />
+                    <View style={{ height: hp("2") }} /> */}
 
                     <View style={styles.v02}>
                         <View style={styles.v04}>
@@ -241,11 +241,11 @@ class LetsBegin extends React.Component {
                             }
                         </View>
                     </View>
-                    <View style={{ height: hp("2") }} />
+                    {/* <View style={{ height: hp("2") }} />
 
                     <View style={styles.v03}>
                         <Text style={styles.txt01}>{translate(`start screen instraction 3`)}</Text>
-                    </View>
+                    </View> */}
                 </View>
             </>)
         }
@@ -271,7 +271,13 @@ class LetsBegin extends React.Component {
                                 this.onPlayBack(unique_id, obj, index)
                             }}>
                         </PlayerView>}
-                        <Text style={styles.chatTxt(obj.is_question)}>{text?text.replace("#",""):''}</Text>
+                        {/* <AudioPlayer
+                            ref={this.audioRef}
+                            audio={item.audio}
+                            updateParent={(obj) => {
+                                // this.setState(obj)
+                            }} /> */}
+                        <Text style={styles.chatTxt(obj.is_question)}>{text ? text.replace("#", "") : ''}</Text>
                     </View>
                     {obj.is_question ? <View style={styles.chatViewIcon(obj.is_question)} /> : <></>}
                 </View>
@@ -286,22 +292,14 @@ class LetsBegin extends React.Component {
 
                     <SafeAreaView style={styles.safeArea} forceInset={{ top: 'always' }}>
                         <StatusBar barStyle="light-content" backgroundColor={theme.designColor} />
-                        <View style={styles.headerView}>
-                            <TouchableOpacity
-                                onPress={() => {
-                                    this.setState({ popup: { "show": true, "title": "Instractions", "audio":"SpeakScreen", "btnTitle": "Back", "type": "help", "message": translate("speak screen help") } })
-                                }}>
-                                <SvgHelp1 />
-                            </TouchableOpacity>
-                            <Image source={LogoWhite} style={{ top: -4, height: wp('14'), width: wp('14') }} />
-                            <TouchableOpacity
-                                style={{ width: wp('18') }}
-                                onPress={() => {
-                                    this.closeSession()
-                                }}>
-                                <SvgBackIcon />
-                            </TouchableOpacity>
-                        </View>
+                        <Header
+                            onClickHelp={() => {
+                                this.setState({ popup: { "show": true, "title": "Instractions", "audio": "SpeakScreen", "btnTitle": "Back", "type": "help", "message": translate("speak screen help") } })
+                            }}
+                            onClickBack={() => {
+                                this.closeSession()
+                            }} />
+
                         <View style={styles.mainView}>
                             <View style={styles.v01}>
                                 <ScrollView
@@ -311,8 +309,8 @@ class LetsBegin extends React.Component {
                                     onContentSizeChange={() => {
                                         if (this.scrollViewRef) this.scrollViewRef.scrollToEnd({ animated: false })
                                     }}>
-                                        {renderInfoMessage()}
-                                        <View style={{ height:hp('8') }}/>
+                                    {renderInfoMessage()}
+                                    <View style={{ height: hp('8') }} />
                                     {
                                         Object.entries(chat_list).map((arr, index1) => {
                                             const unique_id = arr[0], obj = arr[1];
@@ -360,14 +358,6 @@ const styles = StyleSheet.create({
         backgroundColor: theme.designColor,
         flex: 1
     },
-    headerView: {
-        height: hp('8'),
-        width: wp('100'),
-        paddingHorizontal: wp('2'),
-        flexDirection: 'row-reverse',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    },
     mainView: {
         backgroundColor: theme.tertiary,
         flex: 1
@@ -397,8 +387,6 @@ const styles = StyleSheet.create({
     v01: {
         height: hp('69', '80'),
         width: wp('100'),
-        // borderWidth: 1,
-        // borderColor: "#ddd",
         alignSelf: 'center',
         paddingHorizontal: wp('2'),
         paddingVertical: wp('2'),
@@ -452,7 +440,7 @@ const styles = StyleSheet.create({
     v02: {
         flexDirection: 'row-reverse',
         backgroundColor: theme.designColor,
-        width: wp('80'),
+        width: '100%',
         alignSelf: 'center',
         borderRadius: 15,
         paddingHorizontal: hp('2'),

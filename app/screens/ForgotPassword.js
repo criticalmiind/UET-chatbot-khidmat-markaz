@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, StatusBar, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, StatusBar, SafeAreaView } from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';

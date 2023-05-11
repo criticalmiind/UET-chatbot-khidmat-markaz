@@ -36,12 +36,12 @@ class AudioPlayer extends Component {
   }
 
   togglePlay = async () => {
-    if(!this.props.audio){
+    if (!this.props.audio) {
       Alert.alert("Invalid Audio", "Please pass valid audio");
       return
     }
     if (this.state.isPlaying == false) {
-      let path = await base64IntoPath(AUDIO[this.props.audio])
+      let path = await base64IntoPath(this.isBase64 ? this.props.audio : AUDIO[this.props.audio])
       this.sound = new Sound(path, '', (error) => {
         this.onSoundPlay(error)
         this.sound.play((success) => {
