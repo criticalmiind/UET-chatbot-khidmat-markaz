@@ -20,14 +20,15 @@ class Header extends React.Component {
         return (<>
             <View style={styles.headerView}>
                 <TouchableOpacity
+                    style={styles.btn01}
                     onPress={() => {
                         if (onClickHelp) onClickHelp()
                     }}>
                     <SvgHelp1 />
                 </TouchableOpacity>
-                <Image source={LogoWhite} style={{ top: -4, height: wp('13'), width: wp('13') }} />
+                <Image source={LogoWhite} style={styles.logo} />
                 <TouchableOpacity
-                    style={{ width: wp('18') }}
+                    style={styles.btn02}
                     onPress={() => {
                         if (onClickBack) onClickBack()
                     }}>
@@ -42,12 +43,29 @@ export default connect(mapStateToProps, mapDispatchToProps)(Header);
 
 const styles = StyleSheet.create({
     headerView: {
-        height: hp('8'),
-        width: wp('100'),
+        flex: 1,
         paddingHorizontal: wp('2'),
+        paddingVertical: hp('2'),
         flexDirection: 'row-reverse',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor:theme.designColor
+        backgroundColor: theme.designColor,
     },
+    logo: {
+        height: wp('12'),
+        width: wp('12'),
+        top: -4
+    },
+    btn01: {
+        width: wp('10'),
+        height: wp('10'),
+        alignItems: 'flex-end',
+        borderRadius: 100,
+        borderWidth: 1.5,
+        borderColor: "#ffffff",
+        overflow: 'hidden',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    btn02: { width: wp('10'), alignItems: 'flex-start' }
 });

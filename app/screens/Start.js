@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     },
     title: {
         alignSelf: 'center',
-        borderColor: "#a3a3a3",
+        color: theme.designColor,
         alignItems: 'center',
         justifyContent: 'center',
         fontFamily: theme.font01,
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     },
     title01: {
         alignSelf: 'center',
-        borderColor: "#a3a3a3",
+        color: theme.designColor,
         alignItems: 'center',
         justifyContent: 'center',
         fontFamily: theme.font01,

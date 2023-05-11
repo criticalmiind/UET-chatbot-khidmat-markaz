@@ -1,11 +1,11 @@
 import React from 'react';
-import { Alert, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View, } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { hp, wp } from '../utils';
 import { theme } from '../constants/theme';
 import { translate } from '../i18n';
-import { SvgHelp, SvgHelp1, SvgPopupHelpIcon, SvgPopupSuccessIcon, SvgPopupWrongIcon } from '../constants/images';
+import { SvgClose, SvgHelp, SvgPopupHelpIcon, SvgPopupSuccessIcon, SvgPopupWrongIcon } from '../constants/images';
 import AudioPlayer from './AudioPlayer';
 
 class Popup extends React.Component {
@@ -18,15 +18,24 @@ class Popup extends React.Component {
     }
 
     render() {
-        const { show, type, title, audio, message, onClick = (e) => { }, btnTitle = "Back", children } = this.props;
+        const { show, type, title, audio, message, onClick = (e) => { }, btnTitle = "Okay", children } = this.props;
 
         return (<>
             {show &&
                 <View style={styles.safeArea}>
                     <View style={styles.v01}>
                         <View style={styles.v02}>
+                            <View style={{ position: 'absolute', top: hp('2'), right: hp('2') }}>
+                                <TouchableOpacity
+                                    onPress={async () => {
+                                        if (this.audioRef.current) await this.audioRef.current.stopAudio()
+                                        if (onClick) onClick(false)
+                                    }}>
+                                    <SvgClose />
+                                </TouchableOpacity>
+                            </View>
                             <View style={{ alignItems: 'center' }}>
-                                <View style={{ height: hp('2') }} />
+                                <View style={{ height: hp('4') }} />
                                 {type == 'help' && <SvgHelp style={{ height: hp('6'), width: hp('6') }} />}
                                 {type == 'help1' && <SvgPopupHelpIcon />}
                                 {type == 'success' && <SvgPopupSuccessIcon />}
@@ -47,17 +56,21 @@ class Popup extends React.Component {
                             </>}
                         </View>
 
-                        <View style={styles.v03}>
-                            {/* {type == 'help' ? */}
-                            <TouchableOpacity
-                                style={{ ...styles.btn, width: '100%' }}
-                                onPress={async() => {
-                                    if(this.audioRef.current) await this.audioRef.current.stopAudio()
-                                    if (onClick) onClick(false)
-                                }}>
-                                <Text style={{ ...styles.txt, lineHeight: 30, }}>{translate(btnTitle)}</Text>
-                            </TouchableOpacity>
-                            {/* :
+                        {
+                            ['wrong', 'success'].includes(type) &&
+                            <View style={styles.v03}>
+                                <TouchableOpacity
+                                    style={{ ...styles.btn, width: '100%' }}
+                                    onPress={async () => {
+                                        if (this.audioRef.current) await this.audioRef.current.stopAudio()
+                                        if (onClick) onClick(false)
+                                    }}>
+                                    <Text style={{ ...styles.txt, lineHeight: 30, }}>{translate(btnTitle)}</Text>
+                                </TouchableOpacity>
+                            </View>
+                        }
+
+                        {/* 
                                 <>
                                     <TouchableOpacity
                                         style={{ ...styles.btn, borderRightWidth: 1 }}
@@ -74,14 +87,13 @@ class Popup extends React.Component {
                                         <Text style={{ ...styles.txt, lineHeight: 30, color: '#1E88E5' }}>{translate("Yes")}</Text>
                                     </TouchableOpacity>
                                 </>
-                            } */}
-                        </View>
+                         */}
                     </View>
                     <View style={styles.mainView}>
                         <TouchableOpacity
-                            style={{ flex:1 }}
-                            onPress={async() => {
-                                if(this.audioRef.current) await this.audioRef.current.stopAudio()
+                            style={{ flex: 1 }}
+                            onPress={async () => {
+                                if (this.audioRef.current) await this.audioRef.current.stopAudio()
                                 onClick(false)
                             }}>
                             <></>
@@ -117,7 +129,8 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         backgroundColor: '#fff',
         zIndex: 11,
-        borderRadius: 10
+        borderRadius: 10,
+        overflow: 'hidden'
     },
     v02: {
         borderBottomColor: '#ddd',
@@ -133,12 +146,12 @@ const styles = StyleSheet.create({
         overflow: 'hidden'
     },
     btn: {
-        height: hp('6'),
+        height: hp('7'),
         width: wp('41'),
         borderRightWidth: 1,
         borderColor: '#ddd',
         alignItems: 'center',
         justifyContent: 'center'
     },
-    txt: { fontFamily: theme.font01, fontSize: 20, color: '#333' },
+    txt: { fontFamily: theme.font01, fontSize: 20, color: theme.designColor },
 });

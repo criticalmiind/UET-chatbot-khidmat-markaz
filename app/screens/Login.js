@@ -4,7 +4,7 @@ import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userAction
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
 import { hp, isNullRetNull, wp } from '../utils';
-import { Logo, Logo01, SvgHelp, SvgPhone, SvgPwd, SvgReg } from '../constants/images';
+import { Logo, SvgPhone, SvgPwd } from '../constants/images';
 import { call_application_manager, method } from '../api';
 import Loader from '../components/Loader';
 import { translate } from '../i18n';
@@ -24,7 +24,9 @@ class Login extends React.Component {
             // 'userName': "cleUser",
             // 'password': "cle@Password",
             'userName': '03345354727',
-            'password': "12345678"
+            'password': "12345678",
+            'userName': "",
+            'password': "",
         }
     }
 

@@ -16,5 +16,6 @@ export const theme = {
     octonary01: "#535353",
     success: "#4CD963",
 
+    // font01: Platform.OS == 'ios'?undefined:'Jameel-Noori-Nastaleeq',
     font01: Platform.OS == 'ios'?undefined:'Alvi-Nastaleeq-Regular',
 }

@@ -201,7 +201,7 @@ class LetsBegin extends React.Component {
     }
 
     resetTimeout = () => {
-        var TIMEOUT_SECONDS = 60
+        var TIMEOUT_SECONDS = 120
         if (this.timeoutId) clearTimeout(this.timeoutId);
         this.timeoutId = setTimeout(() => {
             this.closeSession()
@@ -214,6 +214,41 @@ class LetsBegin extends React.Component {
 
     render() {
         const { is_recording, chat_list, screen_loader = false, loader_message = false, loader } = this.state;
+
+        const renderInfoMessage = () => {
+            return (<>
+                <Text style={styles.title01}>{translate('Dear Citizen Welcome!')}</Text>
+                <View style={styles.v05}>
+                    <View style={styles.v03}>
+                        <Text style={styles.txt01}>{translate('start screen instraction 1')}</Text>
+                        <Text style={styles.txt01}>{translate('start screen instraction 2')}</Text>
+                    </View>
+                    <View style={{ height: hp("2") }} />
+
+                    <View style={styles.v02}>
+                        <View style={styles.v04}>
+                            {
+                                translate('services_list_01').split(',').map((t, i) => {
+                                    return <Text style={styles.txt02} key={i}>{t}</Text>
+                                })
+                            }
+                        </View>
+                        <View style={styles.v04}>
+                            {
+                                translate('services_list_02').split(',').map((t, i) => {
+                                    return <Text style={styles.txt02} key={i}>{t}</Text>
+                                })
+                            }
+                        </View>
+                    </View>
+                    <View style={{ height: hp("2") }} />
+
+                    <View style={styles.v03}>
+                        <Text style={styles.txt01}>{translate(`start screen instraction 3`)}</Text>
+                    </View>
+                </View>
+            </>)
+        }
 
         const _renderMessagePanel = (unique_id, obj, text, index) => {
             const { last_played_voice, duration } = this.state;
@@ -236,12 +271,13 @@ class LetsBegin extends React.Component {
                                 this.onPlayBack(unique_id, obj, index)
                             }}>
                         </PlayerView>}
-                        <Text style={styles.chatTxt(obj.is_question)}>{text}</Text>
+                        <Text style={styles.chatTxt(obj.is_question)}>{text?text.replace("#",""):''}</Text>
                     </View>
                     {obj.is_question ? <View style={styles.chatViewIcon(obj.is_question)} /> : <></>}
                 </View>
             )
         }
+
         return (
             <TouchableWithoutFeedback onPress={() => this.resetTimeout()}>
                 <>
@@ -275,6 +311,8 @@ class LetsBegin extends React.Component {
                                     onContentSizeChange={() => {
                                         if (this.scrollViewRef) this.scrollViewRef.scrollToEnd({ animated: false })
                                     }}>
+                                        {renderInfoMessage()}
+                                        <View style={{ height:hp('8') }}/>
                                     {
                                         Object.entries(chat_list).map((arr, index1) => {
                                             const unique_id = arr[0], obj = arr[1];
@@ -348,7 +386,7 @@ const styles = StyleSheet.create({
         backgroundColor: is ? 'red' : theme.designColor,
         alignItems: 'center',
         justifyContent: 'center',
-        opacity: is ? 0.5 : 1
+        // opacity: is ? 0.5 : 1
     }),
     speakBtnTxt: is => ({
         width: wp('10'),
@@ -382,10 +420,10 @@ const styles = StyleSheet.create({
         padding: hp('1')
     }),
     chatTxt: (is) => ({
-        fontSize: 18,
-        textAlign: 'right',
+        fontSize: 16,
         color: '#333',
-        fontFamily: theme.font01
+        fontFamily: theme.font01,
+        // textAlign:'center',
     }),
     chatViewIcon: (is) => ({
         backgroundColor: "transparent",
@@ -400,4 +438,55 @@ const styles = StyleSheet.create({
         borderRightWidth: is ? 0 : hp('2.8'),
         borderBottomWidth: hp('2.8'),
     }),
+
+
+    title01: {
+        alignSelf: 'center',
+        color: theme.designColor,
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: theme.font01,
+        fontSize: 30,
+        lineHeight: 40,
+    },
+    v02: {
+        flexDirection: 'row-reverse',
+        backgroundColor: theme.designColor,
+        width: wp('80'),
+        alignSelf: 'center',
+        borderRadius: 15,
+        paddingHorizontal: hp('2'),
+        paddingVertical: hp('1'),
+    },
+    v03: {
+        paddingVertical: hp('1'),
+        paddingHorizontal: hp('1'),
+        backgroundColor: theme.designColor,
+    },
+    v04: {
+        width: '50%'
+    },
+    v05: {
+        backgroundColor: '#ECECEC',
+        width: wp('86'),
+        alignSelf: 'center',
+        borderRadius: 15,
+        overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 1, height: 2 },
+        shadowOpacity: 0.5,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    txt01: {
+        fontSize: 14,
+        color: theme.tertiary,
+        fontFamily: theme.font01,
+        textAlign: 'center'
+    },
+    txt02: {
+        fontSize: 12,
+        color: theme.tertiary,
+        fontFamily: theme.font01,
+    },
 });
