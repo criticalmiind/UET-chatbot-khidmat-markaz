@@ -84,7 +84,7 @@ class ForgotPassword extends React.Component {
                         <Input
                             viewStyle={{ width: wp('84') }}
                             Icon={SvgPwd}
-                            placeholder={translate("Confirm Password")}
+                            placeholder={translate("Password")}
                             value={confirm_password}
                             secureTextEntry
                             onChangeText={(str) => {

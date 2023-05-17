@@ -51,7 +51,7 @@ class Register extends React.Component {
             dateOfBirth
         } = this.state;
         if (password !== confirm_password) {
-            notify({ "title": "Failed!", "message": "Passwords doesn't match!", "success": false })
+            this.setState({ popup: { "show": true, "type": "wrong", "message": translate("Passwords don't match") } })
             return
         }
         this.setStateObj({ loader: true })
@@ -136,7 +136,7 @@ class Register extends React.Component {
                         <View style={{ height: hp("2") }} />
                         <Input
                             Icon={SvgPwd}
-                            placeholder={translate("Confirm Password")}
+                            placeholder={translate("Password")}
                             value={password}
                             secureTextEntry
                             onChangeText={(str) => {
@@ -160,6 +160,11 @@ class Register extends React.Component {
                                 renderDropdownIcon={() => <SvgCity />}
                                 data={tehseel}
                                 buttonStyle={{ width: wp('44.5'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
+                                searchInputStyle={{ flexDirection:'row-reverse' }}
+                                searchInputTxtStyle={{ textAlign: "right", fontFamily:theme.font01 }}
+                                rowTextStyle={{ fontFamily:theme.font01 }}
+                                selectedRowStyle={{ backgroundColor:theme.designColor }}
+                                selectedRowTextStyle={{ color:"#fff" }}
                                 buttonTextStyle={styles.txt01}
                                 defaultButtonText={translate('City')}
                                 search={true}
@@ -175,6 +180,11 @@ class Register extends React.Component {
                                 renderDropdownIcon={() => <SvgMap />}
                                 data={cities}
                                 buttonStyle={{ width: wp('44.5'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
+                                searchInputStyle={{ flexDirection:'row-reverse' }}
+                                searchInputTxtStyle={{ textAlign: "right", fontFamily:theme.font01 }}
+                                rowTextStyle={{ fontFamily:theme.font01 }}
+                                selectedRowStyle={{ backgroundColor:theme.designColor }}
+                                selectedRowTextStyle={{ color:"#fff" }}
                                 buttonTextStyle={styles.txt01}
                                 defaultButtonText={translate('District')}
                                 search={true}
@@ -208,10 +218,15 @@ class Register extends React.Component {
 
                         <SelectDropdown
                             searchPlaceHolder={translate('Gender')}
-                            searchInputTxtStyle={{ textAlign: "right" }}
                             renderDropdownIcon={() => <SvgGender />}
+                            renderSearchInputLeftIcon={() => <SvgGender />}
                             data={GENDER_LIST}
                             buttonStyle={{ width: wp('90'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
+                            searchInputStyle={{ flexDirection:'row-reverse' }}
+                            searchInputTxtStyle={{ textAlign: "right", fontFamily:theme.font01 }}
+                            rowTextStyle={{ fontFamily:theme.font01 }}
+                            selectedRowStyle={{ backgroundColor:theme.designColor }}
+                            selectedRowTextStyle={{ color:"#fff" }}
                             buttonTextStyle={styles.txt01}
                             defaultButtonText={translate('Gender')}
                             search={true}

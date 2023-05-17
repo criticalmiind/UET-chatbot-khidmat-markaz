@@ -119,7 +119,7 @@ class Profile extends React.Component {
                         {/* <View style={{ height: hp("2") }} />
                         <Input
                             Icon={SvgPwd}
-                            placeholder={translate("Confirm Password")}
+                            placeholder={translate("Password")}
                             value={password}
                             secureTextEntry
                             onChangeText={(str) => {

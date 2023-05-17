@@ -217,14 +217,7 @@ class LetsBegin extends React.Component {
 
         const renderInfoMessage = () => {
             return (<>
-                {/* <Text style={styles.title01}>{translate('Dear Citizen Welcome!')}</Text> */}
                 <View style={styles.v05}>
-                    {/* <View style={styles.v03}>
-                        <Text style={styles.txt01}>{translate('start screen instraction 1')}</Text>
-                        <Text style={styles.txt01}>{translate('start screen instraction 2')}</Text>
-                    </View>
-                    <View style={{ height: hp("2") }} /> */}
-
                     <View style={styles.v02}>
                         <View style={styles.v04}>
                             {
@@ -241,11 +234,6 @@ class LetsBegin extends React.Component {
                             }
                         </View>
                     </View>
-                    {/* <View style={{ height: hp("2") }} />
-
-                    <View style={styles.v03}>
-                        <Text style={styles.txt01}>{translate(`start screen instraction 3`)}</Text>
-                    </View> */}
                 </View>
             </>)
         }
@@ -427,16 +415,6 @@ const styles = StyleSheet.create({
         borderBottomWidth: hp('2.8'),
     }),
 
-
-    title01: {
-        alignSelf: 'center',
-        color: theme.designColor,
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontFamily: theme.font01,
-        fontSize: 30,
-        lineHeight: 40,
-    },
     v02: {
         flexDirection: 'row-reverse',
         backgroundColor: theme.designColor,
@@ -445,11 +423,6 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         paddingHorizontal: hp('2'),
         paddingVertical: hp('1'),
-    },
-    v03: {
-        paddingVertical: hp('1'),
-        paddingHorizontal: hp('1'),
-        backgroundColor: theme.designColor,
     },
     v04: {
         width: '50%'
@@ -465,12 +438,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.5,
         shadowRadius: 3.84,
         elevation: 5,
-    },
-    txt01: {
-        fontSize: 14,
-        color: theme.tertiary,
-        fontFamily: theme.font01,
-        textAlign: 'center'
     },
     txt02: {
         fontSize: 12,

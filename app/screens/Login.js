@@ -25,19 +25,16 @@ class Login extends React.Component {
             // 'password': "cle@Password",
             'userName': '03345354727',
             'password': "12345678",
-            // 'userName': "",
-            // 'password': "",
+            'userName': "",
+            'password': "",
         }
     }
 
     async login() {
-        // this.props.updateRedux({ "userData": {"id":2} })
-        // return
         const { userName, password } = this.state;
         this.setStateObj({ loader: true })
         let obj = { 'function': method['loginUser'], 'userName': userName, 'password': password }
         let res = await call_application_manager(obj)
-        // console.log(res);
         if (res.resultFlag) {
             this.setState({ popup: { "show": true, "type": "success", "message": "Login Successfully!" } })
             this.props.updateRedux({ "userData": res })

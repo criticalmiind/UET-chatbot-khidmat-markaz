@@ -41,7 +41,6 @@ class AudioPlayer extends Component {
       Alert.alert("Invalid Audio", "Please pass valid audio");
       return
     }
-    // console.log(this.props.audio);
     if (this.state.isPlaying == false) {
       let path = await base64IntoPath(AUDIO[this.props.audio])
       this.sound = new Sound(path, '', (error) => {

@@ -74,7 +74,7 @@ class Start extends React.Component {
                     <View style={{ height: hp("2") }} />
 
                     <View style={styles.v03}>
-                        <Text style={styles.txt01}>{translate(`start screen instraction ${isPopup ? 4 : 3}`)}</Text>
+                        <Text style={styles.txt01}>{translate(`start screen instraction 3`)}</Text>
                     </View>
                     <View style={{ height: hp("2") }} />
                     {!isPopup && <>
