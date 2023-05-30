@@ -25,8 +25,8 @@ class Start extends React.Component {
     UNSAFE_componentWillMount() { }
 
     async get_resources(session) {
-        this.props.navigation.navigate("LetsBegin")
-        return
+        // this.props.navigation.navigate("LetsBegin")
+        // return
         this.setState({ loader: true })
         let obj = { 'function': method['startService'], 'sessionId': session }
         let res = await call_application_manager(obj)

@@ -62,19 +62,19 @@ class LetsBegin extends React.Component {
             "socketio": null,
             "last_id": false,
             "last_ids_list": {
-                // "asalamoalaikom": { "is_question": true, "text": "السلام علیکم" },
+                "asalamoalaikom": { "is_question": true, "text": "السلام علیکم" },
             },
             "chat_list": {
-                "asfdasfa": {
-                    "unique_id": "asfdasfa",
-                    "is_question": false,
-                    "text": ["آپ حبیب بینک میں فیس جمع کروانے کے بعد درکار دستاویزات لے کر# ای خدمت مرکز تشریف لے جائیں۔", "آپ کا لائسنس 15 دن میں رینیو ہو جائے گا۔ کیا آپ کو مزید کچھ معلوم کرنا ہے؟"],
-                    "audio_files": [
-                        // AUDIO['ChangePasswordScreen'], AUDIO['ContactUsScreen']
-                        { "audio": AUDIO['ChangePasswordScreen'], "duration": 10.00 },
-                        { "audio": AUDIO['ContactUsScreen'], "duration": 15.00 }
-                    ]
-                },
+                // "asfdasfa": {
+                //     "unique_id": "asfdasfa",
+                //     "is_question": false,
+                //     "text": ["آپ حبیب بینک میں فیس جمع کروانے کے بعد درکار دستاویزات لے کر# ای خدمت مرکز تشریف لے جائیں۔", "آپ کا لائسنس 15 دن میں رینیو ہو جائے گا۔ کیا آپ کو مزید کچھ معلوم کرنا ہے؟"],
+                //     "audio_files": [
+                //         // AUDIO['ChangePasswordScreen'], AUDIO['ContactUsScreen']
+                //         { "audio": AUDIO['ChangePasswordScreen'], "duration": 10.00 },
+                //         { "audio": AUDIO['ContactUsScreen'], "duration": 15.00 }
+                //     ]
+                // },
             },
             "last_played_voice": {},
             "temp_text": ""
@@ -99,7 +99,7 @@ class LetsBegin extends React.Component {
     }
 
     componentDidMount() {
-        // this.get_query_answers()
+        this.get_query_answers()
     }
 
     connectSocket = async () => {
@@ -203,11 +203,11 @@ class LetsBegin extends React.Component {
     }
 
     resetTimeout = () => {
-        // var TIMEOUT_SECONDS = 120
-        // if (this.timeoutId) clearTimeout(this.timeoutId);
-        // this.timeoutId = setTimeout(() => {
-        //     this.closeSession()
-        // }, TIMEOUT_SECONDS * 1000);
+        var TIMEOUT_SECONDS = 120
+        if (this.timeoutId) clearTimeout(this.timeoutId);
+        this.timeoutId = setTimeout(() => {
+            this.closeSession()
+        }, TIMEOUT_SECONDS * 1000);
     };
 
     clearAllTimeouts = () => {

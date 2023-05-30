@@ -25,8 +25,8 @@ class Login extends React.Component {
             // 'password': "cle@Password",
             'userName': '03345354727',
             'password': "12345678",
-            // 'userName': "",
-            // 'password': "",
+            'userName': "",
+            'password': "",
         }
     }
 
