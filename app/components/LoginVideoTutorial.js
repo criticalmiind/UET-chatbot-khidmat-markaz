@@ -26,6 +26,7 @@ class LoginVideoTutorial extends React.Component {
                 backgroundColor: '#333'
             }}>
 
+                {/* webview */}
             </View>
         </>);
     }

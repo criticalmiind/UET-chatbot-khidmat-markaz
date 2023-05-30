@@ -36,6 +36,8 @@ import io from 'socket.io-client';
 import { translate } from '../i18n';
 import Header from '../components/Header';
 import AudioPlayer from '../components/AudioPlayer';
+import { AUDIO } from '../assets/audio';
+import PlayerView1 from '../components/PlayerView1';
 
 class LetsBegin extends React.Component {
     constructor(props) {
@@ -60,13 +62,21 @@ class LetsBegin extends React.Component {
             "socketio": null,
             "last_id": false,
             "last_ids_list": {
-                "asalamoalaikom": { "is_question": true, "text": "السلام علیکم" },
+                // "asalamoalaikom": { "is_question": true, "text": "السلام علیکم" },
             },
             "chat_list": {
-                // "asfdasfa": { "is_question": true, "text": ["آپ حبیب بینک میں فیس جمع کروانے کے بعد درکار دستاویزات لے کر# ای خدمت مرکز تشریف لے جائیں۔","آپ کا لائسنس 15 دن میں رینیو ہو جائے گا۔ کیا آپ کو مزید کچھ معلوم کرنا ہے؟"] },
+                "asfdasfa": {
+                    "unique_id": "asfdasfa",
+                    "is_question": false,
+                    "text": ["آپ حبیب بینک میں فیس جمع کروانے کے بعد درکار دستاویزات لے کر# ای خدمت مرکز تشریف لے جائیں۔", "آپ کا لائسنس 15 دن میں رینیو ہو جائے گا۔ کیا آپ کو مزید کچھ معلوم کرنا ہے؟"],
+                    "audio_files": [
+                        // AUDIO['ChangePasswordScreen'], AUDIO['ContactUsScreen']
+                        { "audio": AUDIO['ChangePasswordScreen'], "duration": 10.00 },
+                        { "audio": AUDIO['ContactUsScreen'], "duration": 15.00 }
+                    ]
+                },
             },
             "last_played_voice": {},
-            "play_text_id": false,
             "temp_text": ""
         }
     }
@@ -89,13 +99,13 @@ class LetsBegin extends React.Component {
     }
 
     componentDidMount() {
-        this.get_query_answers()
+        // this.get_query_answers()
     }
 
-    connectSocket = () => {
+    connectSocket = async () => {
         const { playState } = this.state
-        if (this.Sound && playState == 'play') this.Sound.stop()
-
+        if (this.Sound ) await this.Sound.stop()
+        // this.setState({ "last_played_voice":{}, "playState":false })
         const socket = io(this.get_resource('asr'), SOCKET_CONFIG(this.get_resource('cid')));
         socket.on('connect', ((e) => {
             console.log("socket connected: ")
@@ -111,14 +121,19 @@ class LetsBegin extends React.Component {
 
         socket.on('response', this.onMessage.bind(this));
 
-        this.setState({ "speakPressed": true, "socketio": socket, "playState": false });
+        this.setState({
+            "speakPressed": true,
+            "socketio": socket,
+            "playState": false,
+            "last_played_voice":{}
+        });
     }
 
     async componentWillUnmount() {
         const { playState } = this.state
         this.setState({ "isLoaded": false })
         if (this.playTimer) clearInterval(this.playTimer);
-        if (this.Sound && playState == 'play') this.Sound.stop()
+        if (this.Sound) await this.Sound.stop()
         this.Sound = null;
         await AudioRecord.stop()
         BackHandler.addEventListener('hardwareBackPress', (async function () {
@@ -177,40 +192,43 @@ class LetsBegin extends React.Component {
 
     playComplete = (success) => {
         if (this.playTimer) clearInterval(this.playTimer);
-        if (this.Sound) {
-            if (!success) Alert.alert('Notice', '(Error code : 3) audio file error.\naudio file not stopped!');
-            this.setState({ "playState": false, "duration": 0 });
-        }
     }
 
     onSoundPlay(error) {
         if (error) {
             Alert.alert('Notice', '(Error code : 1) audio file error.\naudio file not reachable!');
         } else {
-            try {
-                this.playTimer = setInterval((e) => {
-                    if (this.Sound)
-                        this.Sound.getCurrentTime(async (seconds, isPlaying) => {
-                            this.setState({ "playState": "play", "duration": seconds })
-                        })
-                }, 500)
-            } catch (e) {
-                Alert.alert('Notice', '(Error code : 2) ' + e);
-            }
+            this.voicePlayerDurationService('on')
         }
     }
 
     resetTimeout = () => {
-        var TIMEOUT_SECONDS = 120
-        if (this.timeoutId) clearTimeout(this.timeoutId);
-        this.timeoutId = setTimeout(() => {
-            this.closeSession()
-        }, TIMEOUT_SECONDS * 1000);
+        // var TIMEOUT_SECONDS = 120
+        // if (this.timeoutId) clearTimeout(this.timeoutId);
+        // this.timeoutId = setTimeout(() => {
+        //     this.closeSession()
+        // }, TIMEOUT_SECONDS * 1000);
     };
 
     clearAllTimeouts = () => {
         if (this.timeoutId) clearTimeout(this.timeoutId);
     };
+
+    voicePlayerDurationService(state = 'on') {
+        if (state == 'on') {
+            this.voicePlayerDurationInterval = setInterval((s) => {
+                if (this.Sound) {
+                    this.Sound.getCurrentTime(async (seconds, isPlaying) => {
+                        this.setState({ ...this, "sliderValue": seconds, "playState": isPlaying ? 'play' : false })
+                    })
+                } else {
+                    if (this.voicePlayerDurationInterval) clearInterval(this.voicePlayerDurationInterval)
+                }
+            }, 1000)
+        } else {
+            if (this.voicePlayerDurationInterval) clearInterval(this.voicePlayerDurationInterval)
+        }
+    }
 
     render() {
         const { is_recording, chat_list, screen_loader = false, loader_message = false, loader } = this.state;
@@ -238,33 +256,34 @@ class LetsBegin extends React.Component {
             </>)
         }
 
-        const _renderMessagePanel = (unique_id, obj, text, index) => {
-            const { last_played_voice, duration } = this.state;
-
-
+        const _renderMessagePanel = (obj, text, index) => {
+            const { last_played_voice, playState } = this.state;
+            let isPlay = false
+            let sliderValue = obj['audio_files'][index]['duration']
+            let lastPlayVoice = {}
+            if (obj['unique_id'] == last_played_voice['unique_id'] && last_played_voice['index'] == index) {
+                isPlay = playState
+                sliderValue = this.state.sliderValue
+                lastPlayVoice = {
+                    ...last_played_voice,
+                    "duration": this.Sound ? this.Sound._duration : 0.0,
+                }
+            }
             return (
                 <View style={styles.chatRow(obj.is_question)} key={uid()}>
                     {!obj.is_question ? <View style={styles.chatViewIcon(obj.is_question)} /> : <></>}
                     <View style={styles.chatTextView(obj.is_question)}>
-                        {!obj.is_question && <PlayerView
-                            voice_timer={duration}
-                            lastPlayVoice={last_played_voice}
-                            index={index}
-                            unique_id={unique_id}
-                            playState={this.state.playState}
-                            sound={this.Sound}
-                            {...this}
-                            onPlay={() => {
-                                if (this.Sound) this.Sound.stop()
-                                this.onPlayBack(unique_id, obj, index)
-                            }}>
-                        </PlayerView>}
-                        {/* <AudioPlayer
-                            ref={this.audioRef}
-                            audio={item.audio}
-                            updateParent={(obj) => {
-                                // this.setState(obj)
-                            }} /> */}
+                        {!obj.is_question &&
+                            <PlayerView1
+                                index={index}
+                                playState={isPlay}
+                                lastPlayVoice={lastPlayVoice}
+                                sliderValue={sliderValue}
+                                sound={this.Sound}
+                                onTogglePlay={() => {
+                                    this.onPlayBack(obj, index)
+                                }} />
+                        }
                         <Text style={styles.chatTxt(obj.is_question)}>{text ? text.replace("#", "") : ''}</Text>
                     </View>
                     {obj.is_question ? <View style={styles.chatViewIcon(obj.is_question)} /> : <></>}
@@ -301,12 +320,12 @@ class LetsBegin extends React.Component {
                                     <View style={{ height: hp('8') }} />
                                     {
                                         Object.entries(chat_list).map((arr, index1) => {
-                                            const unique_id = arr[0], obj = arr[1];
+                                            const obj = arr[1];
                                             if (typeof (obj.text) == 'string') {
-                                                return _renderMessagePanel(unique_id, obj, obj['text'], index1)
+                                                return _renderMessagePanel(obj, obj['text'], index1)
                                             }
                                             return <>{obj.text.map((text, index2) => {
-                                                return _renderMessagePanel(unique_id, obj, obj['text'][index2], index2)
+                                                return _renderMessagePanel(obj, text, index2)
                                             })}</>
                                         })
                                     }
@@ -320,7 +339,6 @@ class LetsBegin extends React.Component {
                                     style={styles.speakBtn(is_recording)}
                                     // disabled={playState}
                                     onPressIn={async () => {
-                                        // this.setState({ is_recording:!is_recording })
                                         this.connectSocket()
                                         this.resetTimeout()
                                     }}

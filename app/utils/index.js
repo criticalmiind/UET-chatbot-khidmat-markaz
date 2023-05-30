@@ -17,7 +17,7 @@ export function get_resource(key) {
 
 export const wait = (time = 100) => {
   return new Promise((resolve) => {
-      setTimeout(() => { resolve() }, time)
+    setTimeout(() => { resolve() }, time)
   });
 }
 
@@ -144,5 +144,5 @@ export function formatTime(secondsElapsed) {
   let seconds = Math.floor(secondsElapsed % 60);
   minutes = minutes < 10 ? '0' + minutes : minutes;
   seconds = seconds < 10 ? '0' + seconds : seconds;
-  return `${minutes}:${seconds}`;
+  return `${minutes || '00'}:${seconds || '00'}`;
 }

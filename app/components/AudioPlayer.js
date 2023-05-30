@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import { View, Text, Slider, TouchableOpacity, Alert } from 'react-native';
 import Sound from 'react-native-sound';
 import { AUDIO } from '../assets/audio';
-import { connect } from 'react-redux';
-import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { hp, wait, wp } from '../utils';
 import { SvgPauseIcon, SvgPlayIcon } from '../constants/images';
 var RNFS = require('react-native-fs');

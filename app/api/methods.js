@@ -1,6 +1,6 @@
 import { PermissionsAndroid, Alert, Platform } from 'react-native';
 import AudioRecord from "react-native-audio-recording-stream";
-import { uid } from "../utils";
+import { uid, wait } from "../utils";
 import Sound from "react-native-sound";
 import { call_application_manager, method } from '.';
 var RNFS = require('react-native-fs');
@@ -18,13 +18,10 @@ export const check_microphone = async () => {
     }
 };
 
-export const base64_into_blob = (base64, type = 'audio/x-raw') => fetch(`data:${type};base64,${base64}`).then(res => res.blob())
-
 export async function onSpeakPress(socket) {
     if (this.playTimer) clearInterval(this.playTimer);
     let audioPermission = await check_microphone();
     if (audioPermission) {
-        if (this.Sound) this.Sound.stop()
         await this.wait(200)
         AudioRecord.start();
         await this.wait(300)
@@ -58,23 +55,20 @@ export async function get_query_answers() {
         if (qs.resultFlag) {
             const textArr = qs.textResponse
 
-            const unique_id = uid();
-            chat_list[unique_id] = { "is_question": false, "text": textArr }
-            this.setState({ "chat_list": chat_list })
-
             const { resultFlag, audioResponse, message } = await this.tts_manager({ "textMessage": textArr })
 
-            if (resultFlag) {
-                let voiceFiles = {}
-                textArr.forEach((txt, i) => { voiceFiles[txt] = audioResponse[i] });
-                chat_list[unique_id] = { "is_question": false, "text": textArr, "voiceFiles": voiceFiles }
-
-                this.setState({ "chat_list": chat_list })
-                this.onPlayBack(unique_id, chat_list[unique_id], -1)
-            } else {
-                // this.setState({ "popup": { "show": true, "type": 'success', "message": translate(message) } })
-                Alert.alert("Error", message)
+            const unique_id = uid();
+            chat_list[unique_id] = {
+                "unique_id": unique_id,
+                "is_question": false,
+                "text": textArr,
+                "audio_files": resultFlag?audioResponse:[]
             }
+            this.setState({ "chat_list": chat_list })
+
+            await wait(500)
+            if (resultFlag)  this.onPlayBack(chat_list[unique_id], -1)
+            else Alert.alert("Error", message)
         }
         await this.wait(500)
         this.setState({
@@ -86,58 +80,78 @@ export async function get_query_answers() {
 }
 
 
-export async function onPlayBack(text_id, obj, index) {
+export async function onPlayBack(obj, index) {
+    const { playState, last_played_voice } = this.state;
 
-    let i = 0
-
-    if (index > -1) {
-        for (const id in obj['voiceFiles']) {
-            const voiceFile = obj['voiceFiles'][id]
-            if (i == index) {
-                this.setState({
-                    "playState": 'paly',
-                    "last_played_voice": {
-                        "duration": voiceFile['duration'],
-                        "index": i,
-                        "text_id": text_id
-                    }
-                })
-                await this.wait(600)
-                await this.play_message_handler(voiceFile['audio'], false)
-            }
-            i++
+    await wait(100)
+    if (obj['unique_id'] == last_played_voice['unique_id'] && last_played_voice['index'] == index) {
+        if (playState == 'play') {
+            if (this.Sound) this.Sound.pause()
+            this.setState({ "playState": 'pause' })
+            await wait(200)
+            this.voicePlayerDurationService('off')
+        }
+        if (playState == 'pause' || playState == false) {
+            if (this.Sound) this.Sound.play(() => { this.playComplete() })
+            this.setState({ "playState": 'play' })
+            await wait(200)
+            this.voicePlayerDurationService('on')
         }
         return
     }
 
-    for (const id in obj['voiceFiles']) {
-        const voiceFile = obj['voiceFiles'][id]
-        this.setState({
-            "playState": 'paly',
-            "last_played_voice": {
-                "duration": voiceFile['duration'],
-                "index": i,
-                "text_id": text_id
+    if (this.Sound) await this.Sound.stop()
+    this.Sound = null
+
+    let i = 0
+    if (index > -1) {
+        for (let j = 0; j < obj['audio_files'].length; j++) {
+            const el = obj['audio_files'][j];
+            if (i == index) {
+                this.setState({
+                    "playState": 'paly',
+                    "sliderValue": 0.0,
+                    "last_played_voice": {
+                        "unique_id": obj['unique_id'],
+                        "duration": el['duration'],
+                        "index": i
+                    }
+                })
+                await this.play_message_handler(el['audio'], false)
             }
-        })
-        await this.wait(600)
-        await this.play_message_handler(voiceFile['audio'], false)
-        i++
+            i++
+        };
+        return
+    } else {
+        for (let j = 0; j < obj['audio_files'].length; j++) {
+            const el = obj['audio_files'][j];
+            this.setState({
+                "playState": 'paly',
+                "last_played_voice": {
+                    "unique_id": obj['unique_id'],
+                    "duration": el['duration'],
+                    "index": i
+                }
+            })
+            await this.play_message_handler(el['audio'], false)
+            i++
+        }
     }
 }
 
 export async function play_message_handler(url, is_path = false) {
     let new_url = url
+    if (this.Sound) await this.Sound.stop()
+    this.Sound = null
 
+    await this.wait(500)
     // if url is base64 string then make base64 into temp file path
     if (!is_path) {
         const path = `${RNFS.DocumentDirectoryPath}/temp_audio_file.wav`;
         await RNFS.writeFile(path, url.replace("data:audio/wav;base64,", ""), 'base64')
         new_url = path
     }
-
     return await new Promise(resolve => {
-        if (this.Sound) this.Sound.stop()
         this.Sound = new Sound(new_url, '', (err) => {
             this.onSoundPlay(err)
             if (err) {
@@ -152,58 +166,6 @@ export async function play_message_handler(url, is_path = false) {
         })
     })
 }
-
-// export async function onPlayBack(text_id, obj, index) {
-//     const { chat_list } = this.state
-//     const text = obj.text[index]
-//     if (obj['voiceFiles'] && obj['voiceFiles'][text]) {
-//         this.setState({
-//             "playState": 'paly',
-//             "last_played_voice": {
-//                 "duration": obj['voiceFiles'][text]['duration'],
-//                 "index": index,
-//                 "text_id": text_id
-//             },
-//             "chat_list": chat_list
-//         })
-//         await this.wait(600)
-//         this.play_message_handler(obj['voiceFiles'][text]['audio'], false)
-//         return
-//     }
-//     const { resultFlag, audioResponse, message } = await this.tts_manager({ "textMessage": [obj.text[text]] })
-//     if (resultFlag) {
-//         const voiceBase64 = audioResponse.length > 0 ? audioResponse[0] : false
-//         const files = makeAudioFileObj(obj.text[text], voiceBase64, obj['voiceFiles'])
-//         chat_list[text_id] = { ...obj, "voiceFiles": files }
-//         this.setState({
-//             "playState": 'paly',
-//             "last_played_voice": {
-//                 "duration": voiceBase64['duration'],
-//                 "index": index,
-//                 "text_id": text_id
-//             },
-//             "chat_list": chat_list
-//         })
-//         await this.wait(600)
-//         this.play_message_handler(voiceBase64['audio'], false)
-//     } else {
-//         this.setState({ popup: { "show": true, "type": "wrong", "message": translate(message + "") } })
-//     }
-// }
-
-// export async function play_message_handler(url, is_path = false) {
-//     if (!is_path) {
-//         const path = `${RNFS.DocumentDirectoryPath}/test_audio_file.wav`;
-//         await RNFS.writeFile(path, url.replace("data:audio/wav;base64,", ""), 'base64')
-//             .then(() => {
-//                 if (this.Sound) this.Sound.stop()
-//                 this.Sound = new Sound(path, '', this.onSoundPlay.bind(this))
-//             })
-//     } else {
-//         if (this.Sound) this.Sound.stop()
-//         this.Sound = new Sound(url, '', this.onSoundPlay.bind(this))
-//     }
-// }
 
 export async function close_connection() {
     const { sessionId } = this.props.userData;
