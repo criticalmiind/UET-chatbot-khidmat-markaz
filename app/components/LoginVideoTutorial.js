@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
 import { hp, wp } from '../utils';
 import { translate } from '../i18n';
+import WebView from 'react-native-webview';
 
 class LoginVideoTutorial extends React.Component {
     constructor(props) {
@@ -20,13 +21,16 @@ class LoginVideoTutorial extends React.Component {
         return (<>
             <Text style={styles.btnTxt}>{translate('App Usage Technique')}</Text>
             <View style={{
-                height: hp('20'),
+                height: hp('21'),
                 width: wp('76'),
                 alignSelf: 'center',
                 backgroundColor: '#333'
             }}>
-
-                {/* webview */}
+                <WebView
+                    style={{ flex:1 }}
+                    containerStyle={{ borderWidth:1 }}
+                    allowsFullscreenVideo={true}
+                    source={{ "uri":"https://bot.cle.org.pk/static/videos/PITB.mp4" }}/>
             </View>
         </>);
     }
