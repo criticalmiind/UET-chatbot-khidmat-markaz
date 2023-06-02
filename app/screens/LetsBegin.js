@@ -62,7 +62,7 @@ class LetsBegin extends React.Component {
             "socketio": null,
             "last_id": false,
             "last_ids_list": {
-                "asalamoalaikom": { "is_question": true, "text": "السلام علیکم" },
+                "asalamoalaikom": { "unique_id": "asalamoalaikom", "is_question": true, "text": "السلام علیکم" },
             },
             "chat_list": {
                 // "asfdasfa": {
@@ -104,7 +104,7 @@ class LetsBegin extends React.Component {
 
     connectSocket = async () => {
         const { playState } = this.state
-        if (this.Sound ) await this.Sound.stop()
+        if (this.Sound) await this.Sound.stop()
         // this.setState({ "last_played_voice":{}, "playState":false })
         const socket = io(this.get_resource('asr'), SOCKET_CONFIG(this.get_resource('cid')));
         socket.on('connect', ((e) => {
@@ -125,7 +125,7 @@ class LetsBegin extends React.Component {
             "speakPressed": true,
             "socketio": socket,
             "playState": false,
-            "last_played_voice":{}
+            "last_played_voice": {}
         });
     }
 
@@ -259,7 +259,7 @@ class LetsBegin extends React.Component {
         const _renderMessagePanel = (obj, text, index) => {
             const { last_played_voice, playState } = this.state;
             let isPlay = false
-            let sliderValue = obj['audio_files'][index]['duration']
+            let sliderValue = obj['audio_files'] ? parseFloat(obj['audio_files'][index]['duration']) : 0
             let lastPlayVoice = {}
             if (obj['unique_id'] == last_played_voice['unique_id'] && last_played_voice['index'] == index) {
                 isPlay = playState
@@ -269,6 +269,7 @@ class LetsBegin extends React.Component {
                     "duration": this.Sound ? this.Sound._duration : 0.0,
                 }
             }
+
             return (
                 <View style={styles.chatRow(obj.is_question)} key={uid()}>
                     {!obj.is_question ? <View style={styles.chatViewIcon(obj.is_question)} /> : <></>}
@@ -325,7 +326,9 @@ class LetsBegin extends React.Component {
                                                 return _renderMessagePanel(obj, obj['text'], index1)
                                             }
                                             return <>{obj.text.map((text, index2) => {
-                                                return _renderMessagePanel(obj, text, index2)
+                                                return <View key={uid()}>
+                                                    {_renderMessagePanel(obj, text, index2)}
+                                                </View>
                                             })}</>
                                         })
                                     }
