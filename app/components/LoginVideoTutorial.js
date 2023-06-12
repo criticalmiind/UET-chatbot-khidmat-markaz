@@ -30,7 +30,7 @@ class LoginVideoTutorial extends React.Component {
                     style={{ flex:1 }}
                     containerStyle={{ borderWidth:1 }}
                     allowsFullscreenVideo={true}
-                    source={{ "uri":"https://bot.cle.org.pk/static/videos/PITB.mp4" }}/>
+                    source={{ "uri":"https://bot.cle.org.pk/static/videos/PITB.webm" }}/>
             </View>
         </>);
     }
