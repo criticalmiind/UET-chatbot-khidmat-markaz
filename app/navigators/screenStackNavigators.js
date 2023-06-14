@@ -13,6 +13,7 @@ import Help from "../screens/Help";
 import CommonQuestions from "../screens/CommonQuestions";
 import Rating from "../screens/Rating";
 import Settings from "../screens/Settings";
+import ContactUs from "../screens/ContactUs";
 
 export const MainNav = createStackNavigator({
   Start: { screen: Start, navigationOptions: { headerShown: false } },
@@ -24,6 +25,8 @@ export const MainNav = createStackNavigator({
   Rating: { screen: Rating, navigationOptions: { headerShown: false } },
   Settings: { screen: Settings, navigationOptions: { headerShown: false } },
   ForgotPassword: { screen: ForgotPassword, navigationOptions: { headerShown: false } },
+  ContactUs: { screen: ContactUs, navigationOptions: { headerShown: false } },
+
 });
 
 export const AuthNav = createStackNavigator({

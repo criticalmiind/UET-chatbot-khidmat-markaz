@@ -23,14 +23,13 @@ class LoginVideoTutorial extends React.Component {
             <View style={{
                 height: hp('21'),
                 width: wp('76'),
-                alignSelf: 'center',
-                backgroundColor: '#333'
+                alignSelf: 'center'
             }}>
                 <WebView
-                    style={{ flex:1 }}
-                    containerStyle={{ borderWidth:1 }}
+                    style={{ flex: 1 }}
+                    containerStyle={{ borderWidth: 1, backgroundColor: '#fff' }}
                     allowsFullscreenVideo={true}
-                    source={{ "uri":"https://bot.cle.org.pk/static/videos/PITB.webm" }}/>
+                    source={{ "uri": "https://bot.cle.org.pk/static/videos/PITB.webm" }} />
             </View>
         </>);
     }

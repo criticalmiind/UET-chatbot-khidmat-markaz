@@ -13,7 +13,7 @@ import { Logo } from '../constants/images';
 import Header from '../components/Header';
 
 
-class Help extends React.Component {
+class ContactUs extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -43,55 +43,35 @@ class Help extends React.Component {
 
                 <ScrollView>
                     <View style={styles.mainView}>
-                        <View style={{ height: hp("1") }} />
+                        <View style={{ height: hp("4") }} />
 
-                        <Text style={{ ...styles.title, lineHeight: 60, fontSize: 40 }}>{translate('Help')}</Text>
+                        <Text style={{ ...styles.title, lineHeight: 60, fontSize: 40 }}>{translate('Contact Us')}</Text>
 
-                        <View style={{ justifyContent: 'center' }}>
+                        {/* <View style={{ justifyContent: 'center' }}>
                             <Image source={Logo} style={styles.logo_bg} />
                             <Image source={Logo} style={styles.logo} />
                         </View>
-                        <Text style={styles.title}>{translate('e-service')}</Text>
+                        <Text style={styles.title}>{translate('e-service')}</Text> */}
+
+                        <View style={{ height: hp("8") }} />
+
+                        <Text style={styles.txt01}>{translate('Contact No')}</Text>
+                        <View style={styles.v01}>
+                            <Text style={styles.txt02}>{translate("+92-42-99000000")}</Text>
+                        </View>
 
                         <View style={{ height: hp("4") }} />
 
-                        <TouchableOpacity
-                            style={styles.btn}
-                            onPress={()=>{
-                                this.props.navigation.navigate("CommonQuestions")
-                            }}>
-                            <Text style={styles.btnTxt}>{translate("Common Questions")}</Text>
-                        </TouchableOpacity>
-                        <View style={{ height: hp("2") }} />
+                        <Text style={styles.txt01}>{translate('Email Address')}</Text>
+                        <View style={styles.v01}>
+                            <Text style={styles.txt02}>{translate("info@pitb.gov.pk")}</Text>
+                        </View>
+                        <View style={{ height: hp("6") }} />
 
-                        {/* <TouchableOpacity
-                            style={styles.btn}
-                            onPress={()=>{
-                                this.props.navigation.navigate("Rating")
-                            }}>
-                            <Text style={styles.btnTxt}>{translate("Complaints")}</Text>
-                        </TouchableOpacity>
-                        <View style={{ height: hp("2") }} /> */}
-
-                        <TouchableOpacity
-                            style={styles.btn}
-                            onPress={()=>{
-                                this.props.navigation.navigate("Rating")
-                            }}>
-                            <Text style={styles.btnTxt}>{translate("Suggestions")}</Text>
-                        </TouchableOpacity>
-                        <View style={{ height: hp("2") }} />
-
-                        <TouchableOpacity
-                            style={styles.btn}
-                            onPress={()=>{
-                                this.props.navigation.navigate("ContactUs")
-                            }}>
-                            <Text style={styles.btnTxt}>{translate("Contact Us (Email)")}</Text>
-                        </TouchableOpacity>
+                        <Text style={styles.txt01}>{translate('11th Floor, Arfa Software Technology Park, 346-B, Ferozpur Road, Lahore.')}</Text>
 
                     </View>
-                    <View style={{ height: hp("16") }} />
+                    <View style={{ height: hp("10") }} />
                     <PoweredBy />
                     <View style={{ height: hp("3") }} />
                 </ScrollView>
@@ -100,7 +80,7 @@ class Help extends React.Component {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Help);
+export default connect(mapStateToProps, mapDispatchToProps)(ContactUs);
 
 const styles = StyleSheet.create({
     safeArea: {
@@ -132,20 +112,27 @@ const styles = StyleSheet.create({
         fontSize: 22,
         color: theme.designColor
     },
-    btn:{
+    v01:{
         alignSelf:'center',
         height:hp('6'),
         width:wp('90'),
         borderWidth:1,
+        borderRadius:20,
         borderColor:"#000000",
         backgroundColor:"#E8E8E8",
         justifyContent:'center',
         paddingHorizontal:wp('2')
     },
-    btnTxt:{
+    txt01:{
         fontFamily:theme.font01,
-        fontSize:20,
+        fontSize:22,
         color:theme.designColor,
-        lineHeight:25
-    }
+        textAlign:'center'
+    },
+    txt02:{
+        fontFamily:theme.font01,
+        fontSize:18,
+        color:theme.designColor,
+        textAlign:'center'
+    },
 });
