@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, Image, ScrollView, StatusBar, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, StatusBar, SafeAreaView } from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
@@ -8,8 +8,6 @@ import Loader from '../components/Loader';
 import { translate } from '../i18n';
 import Popup from '../components/Popup';
 import PoweredBy from '../components/PoweredBy';
-import HelpIcon from '../components/HelpIcon';
-import { Logo } from '../constants/images';
 import Header from '../components/Header';
 
 
@@ -46,12 +44,6 @@ class ContactUs extends React.Component {
                         <View style={{ height: hp("4") }} />
 
                         <Text style={{ ...styles.title, lineHeight: 60, fontSize: 40 }}>{translate('Contact Us')}</Text>
-
-                        {/* <View style={{ justifyContent: 'center' }}>
-                            <Image source={Logo} style={styles.logo_bg} />
-                            <Image source={Logo} style={styles.logo} />
-                        </View>
-                        <Text style={styles.title}>{translate('e-service')}</Text> */}
 
                         <View style={{ height: hp("8") }} />
 
