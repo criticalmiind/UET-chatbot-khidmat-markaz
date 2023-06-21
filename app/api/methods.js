@@ -104,13 +104,14 @@ export async function onPlayBack(obj, index) {
     this.Sound = null
 
     let i = 0
+    // Single Audio
     if (index > -1) {
         for (let j = 0; j < obj['audio_files'].length; j++) {
             const el = obj['audio_files'][j];
             if (i == index) {
                 this.setState({
                     "playState": 'paly',
-                    "sliderValue": 0.0,
+                    "sliderValue": 0,
                     "last_played_voice": {
                         "unique_id": obj['unique_id'],
                         "duration": el['duration'],
@@ -123,10 +124,13 @@ export async function onPlayBack(obj, index) {
         };
         return
     } else {
+        // Audios List
         for (let j = 0; j < obj['audio_files'].length; j++) {
             const el = obj['audio_files'][j];
+            await wait(500);
             this.setState({
                 "playState": 'paly',
+                "sliderValue": 0,
                 "last_played_voice": {
                     "unique_id": obj['unique_id'],
                     "duration": el['duration'],

@@ -219,7 +219,11 @@ class LetsBegin extends React.Component {
             this.voicePlayerDurationInterval = setInterval((s) => {
                 if (this.Sound) {
                     this.Sound.getCurrentTime(async (seconds, isPlaying) => {
-                        this.setState({ ...this, "sliderValue": seconds, "playState": isPlaying ? 'play' : false })
+                        this.setState({
+                            ...this.state,
+                            "sliderValue": seconds >= this.Sound._duration ? 0 : seconds,
+                            "playState": isPlaying ? 'play' : false
+                        })
                     })
                 } else {
                     if (this.voicePlayerDurationInterval) clearInterval(this.voicePlayerDurationInterval)
@@ -259,14 +263,14 @@ class LetsBegin extends React.Component {
         const _renderMessagePanel = (obj, text, index) => {
             const { last_played_voice, playState } = this.state;
             let isPlay = false
-            let sliderValue = obj['audio_files'] ? parseFloat(obj['audio_files'][index]['duration']) : 0
+            let sliderValue =  obj['audio_files'] ? parseFloat(obj['audio_files'][index]['duration']) : 0
             let lastPlayVoice = {}
             if (obj['unique_id'] == last_played_voice['unique_id'] && last_played_voice['index'] == index) {
                 isPlay = playState
                 sliderValue = this.state.sliderValue
                 lastPlayVoice = {
                     ...last_played_voice,
-                    "duration": this.Sound ? this.Sound._duration : 0.0,
+                    // "duration": this.Sound ? this.Sound._duration : 0.0,
                 }
             }
 
