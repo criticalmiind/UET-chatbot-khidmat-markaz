@@ -228,7 +228,7 @@ class LetsBegin extends React.Component {
                 } else {
                     if (this.voicePlayerDurationInterval) clearInterval(this.voicePlayerDurationInterval)
                 }
-            }, 1000)
+            }, 500)
         } else {
             if (this.voicePlayerDurationInterval) clearInterval(this.voicePlayerDurationInterval)
         }
