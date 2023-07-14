@@ -90,10 +90,14 @@ class LetsBegin extends React.Component {
         AudioRecord.on('data', this.onAudioStreaming.bind(this));
 
         BackHandler.addEventListener('hardwareBackPress', (async function () {
-            if (this.state.isLoaded) {
-                await this.closeSession()
+            if (this.props.navigation.isFocused()) {
+                if (this.state.isLoaded) {
+                    await this.closeSession()
+                }
+                return true;
+            }else{
+                return false;
             }
-            return true;
         }).bind(this));
         this.resetTimeout()
     }
@@ -170,6 +174,7 @@ class LetsBegin extends React.Component {
         const { chat_list, last_id, last_ids_list, temp_text, is_recording } = this.state;
         if (!is_recording) return;
         var json = e.response;
+        // console.log(json.result);
         if (json.result) {
             const { final, hypotheses = [] } = json.result;
             let res = hypotheses[0]
@@ -178,11 +183,11 @@ class LetsBegin extends React.Component {
             let final_text = final ? `${temp_text} ${res.transcript}` : isNullRetNull(temp_text, res.transcript)
 
             const unique_id = last_id ? last_id : uid();
-            chat_list[unique_id] = { "is_question": true, "text": final ? final_text : text }
+            chat_list[unique_id] = { "is_question": true, "text": final ? `${final_text}۔` : text }
             last_ids_list[unique_id] = chat_list[unique_id];
 
             this.setState({
-                "temp_text": final ? text : temp_text,
+                "temp_text": final ? `${text}۔` : temp_text,
                 "chat_list": chat_list,
                 "last_id": unique_id,
                 "last_ids_list": last_ids_list

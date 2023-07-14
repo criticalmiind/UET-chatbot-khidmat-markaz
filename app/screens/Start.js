@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, Image, Platform } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, View, Image, Platform, BackHandler } from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
@@ -22,7 +22,23 @@ class Start extends React.Component {
         }
     }
 
-    UNSAFE_componentWillMount() { }
+    UNSAFE_componentWillMount() {
+        BackHandler.addEventListener('hardwareBackPress', (function () {
+            if (this.props.navigation.isFocused()) {
+                BackHandler.exitApp();
+                return true;
+              } else {
+                return false;
+              }
+        }).bind(this));
+    }
+
+    async componentWillUnmount() {
+        BackHandler.addEventListener('hardwareBackPress', (function () {
+            BackHandler.exitApp()
+        }))
+    }
+
 
     async get_resources(session) {
         // this.props.navigation.navigate("LetsBegin")
@@ -38,6 +54,9 @@ class Start extends React.Component {
             }, 300)
         } else {
             this.setState({ loader: false, popup: { "show": true, "type": "wrong", "message": translate(res.message) } })
+            setTimeout(() => {
+                this.props.updateRedux({ "userData": {}, "resources": {} })
+            }, 2000);
         }
     }
 
