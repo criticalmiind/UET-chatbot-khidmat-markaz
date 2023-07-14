@@ -38,7 +38,6 @@ import Header from '../components/Header';
 import AudioPlayer from '../components/AudioPlayer';
 import { AUDIO } from '../assets/audio';
 import PlayerView1 from '../components/PlayerView1';
-import { FlatList } from 'react-native';
 
 class LetsBegin extends React.Component {
     constructor(props) {
@@ -96,7 +95,7 @@ class LetsBegin extends React.Component {
                     await this.closeSession()
                 }
                 return true;
-            } else {
+            }else{
                 return false;
             }
         }).bind(this));
@@ -174,28 +173,25 @@ class LetsBegin extends React.Component {
     onMessage(e) {
         const { chat_list, last_id, last_ids_list, temp_text, is_recording } = this.state;
         if (!is_recording) return;
-        const json = e.response;
+        var json = e.response;
+        // console.log(json.result);
+        if (json.result) {
+            const { final, hypotheses = [] } = json.result;
+            let res = hypotheses[0]
 
-        if (json.result && json.result.hypotheses && json.result.hypotheses.length > 0) {
-            const { final, hypotheses } = json.result;
-            const transcript = hypotheses[0].transcript;
+            let text = `${temp_text} ${res.transcript}`
+            let final_text = final ? `${temp_text} ${res.transcript}` : isNullRetNull(temp_text, res.transcript)
 
-            const unique_id = last_id || uid();
-            const updatedChatList = {
-                ...chat_list,
-                [unique_id]: { is_question: true, text: final ? `${temp_text} ${transcript}۔` : `${temp_text} ${transcript}` },
-            };
-            const updatedLastIdsList = {
-                ...last_ids_list,
-                [unique_id]: updatedChatList[unique_id],
-            };
+            const unique_id = last_id ? last_id : uid();
+            chat_list[unique_id] = { "is_question": true, "text": final ? `${final_text}۔` : text }
+            last_ids_list[unique_id] = chat_list[unique_id];
 
-            this.setState((prevState) => ({
-                "temp_text": final ? `${temp_text} ${transcript}۔` : temp_text,
-                "chat_list": updatedChatList,
+            this.setState({
+                "temp_text": final ? `${text}۔` : temp_text,
+                "chat_list": chat_list,
                 "last_id": unique_id,
-                "last_ids_list": updatedLastIdsList,
-            }));
+                "last_ids_list": last_ids_list
+            })
         }
     }
 
@@ -230,16 +226,10 @@ class LetsBegin extends React.Component {
                     this.Sound.getCurrentTime(async (seconds, isPlaying) => {
                         this.setState({
                             ...this.state,
-                            "sliderValue": seconds >= this.Sound?._duration ? 0 : seconds,
+                            "sliderValue": seconds >= this.Sound._duration ? 0 : seconds,
                             "playState": isPlaying ? 'play' : false
                         })
                     })
-                    if(!this.props.navigation.isFocused()){
-                        this.Sound.stop()
-                        this.Sound = null
-                        if (this.voicePlayerDurationInterval) clearInterval(this.voicePlayerDurationInterval)
-                        this.setState({ "playState": false })
-                    }
                 } else {
                     if (this.voicePlayerDurationInterval) clearInterval(this.voicePlayerDurationInterval)
                 }
@@ -278,7 +268,7 @@ class LetsBegin extends React.Component {
         const _renderMessagePanel = (obj, text, index) => {
             const { last_played_voice, playState } = this.state;
             let isPlay = false
-            let sliderValue = obj['audio_files'] ? parseFloat(obj['audio_files'][index]['duration']) : 0
+            let sliderValue =  obj['audio_files'] ? parseFloat(obj['audio_files'][index]['duration']) : 0
             let lastPlayVoice = {}
             if (obj['unique_id'] == last_played_voice['unique_id'] && last_played_voice['index'] == index) {
                 isPlay = playState
@@ -311,21 +301,6 @@ class LetsBegin extends React.Component {
             )
         }
 
-        const renderItem = ({ item, index }) => {
-            if (typeof item.text === 'string') {
-                return _renderMessagePanel(item, item.text, index);
-            }
-            return (
-                <View key={uid()}>
-                    {item.text.map((text, innerIndex) => (
-                        <View key={uid()}>
-                            {_renderMessagePanel(item, text, innerIndex)}
-                        </View>
-                    ))}
-                </View>
-            );
-        };
-
         return (
             <TouchableWithoutFeedback onPress={() => this.resetTimeout()}>
                 <>
@@ -344,24 +319,31 @@ class LetsBegin extends React.Component {
 
                         <View style={styles.mainView}>
                             <View style={styles.v01}>
-                                <FlatList
+                                <ScrollView
                                     contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', flexDirection: 'column' }}
                                     style={{ width: wp('100') }}
-                                    ref={(ref) => { this.scrollViewRef = ref; }}
+                                    ref={(ref) => { this.scrollViewRef = ref }}
                                     onContentSizeChange={() => {
-                                        if (this.scrollViewRef) this.scrollViewRef.scrollToEnd({ animated: false });
-                                    }}
-                                    initialNumToRender={8}
-                                    data={Object.values(chat_list)}
-                                    renderItem={renderItem}
-                                    keyExtractor={(item, index) => index.toString()}
-                                    ListHeaderComponent={
-                                        <View style={{ flex:1, bottom:hp('24') }}>
-                                            {renderInfoMessage()}
-                                        </View>
+                                        if (this.scrollViewRef) this.scrollViewRef.scrollToEnd({ animated: false })
+                                    }}>
+                                    {renderInfoMessage()}
+                                    <View style={{ height: hp('8') }} />
+                                    {
+                                        Object.entries(chat_list).map((arr, index1) => {
+                                            const obj = arr[1];
+                                            if (typeof (obj.text) == 'string') {
+                                                return _renderMessagePanel(obj, obj['text'], index1)
+                                            }
+                                            return <>{obj.text.map((text, index2) => {
+                                                return <View key={uid()}>
+                                                    {_renderMessagePanel(obj, text, index2)}
+                                                </View>
+                                            })}</>
+                                        })
                                     }
-                                    ListFooterComponent={loader && <ActivityIndicator size="large" color="blue" />}
-                                />
+                                    {loader && <ActivityIndicator size="large" color={"blue"} />}
+                                    {/* {(is_recording && !loader) && <Text style={{ textAlign: 'center' }}>Speak Now</Text>} */}
+                                </ScrollView>
                             </View>
 
                             <View style={styles.speakBtnView}>
