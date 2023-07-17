@@ -32,7 +32,7 @@ export async function onSpeakPress(socket) {
 }
 
 export async function onSpeakRelease() {
-    await this.wait(500)
+    await this.wait(1500)
     const { socketio, socket_status } = this.state;
     if (this.playTimer) clearInterval(this.playTimer);
     if (socketio && socket_status) {

@@ -171,9 +171,10 @@ class LetsBegin extends React.Component {
         }
     }
 
-    onMessage(e) {
-        const { chat_list, last_id, last_ids_list, temp_text, is_recording } = this.state;
-        if (!is_recording) return;
+    async onMessage(e) {
+        const { chat_list, last_id, last_ids_list, temp_text, is_recording, playState } = this.state;
+        if (this.Sound && playState == 'play') await this.Sound.stop()
+        // if (!is_recording) return;
         const json = e.response;
 
         if (json.result && json.result.hypotheses && json.result.hypotheses.length > 0) {
@@ -195,6 +196,7 @@ class LetsBegin extends React.Component {
                 "chat_list": updatedChatList,
                 "last_id": unique_id,
                 "last_ids_list": updatedLastIdsList,
+                "playState": false
             }));
         }
     }
@@ -278,7 +280,7 @@ class LetsBegin extends React.Component {
         const _renderMessagePanel = (obj, text, index) => {
             const { last_played_voice, playState } = this.state;
             let isPlay = false
-            let sliderValue = obj['audio_files'] ? parseFloat(obj['audio_files'][index]['duration']) : 0
+            let sliderValue = obj['audio_files'] && obj['audio_files'].length >= index ? parseFloat(obj['audio_files'][index]['duration']) : 0
             let lastPlayVoice = {}
             if (obj['unique_id'] == last_played_voice['unique_id'] && last_played_voice['index'] == index) {
                 isPlay = playState
@@ -327,7 +329,7 @@ class LetsBegin extends React.Component {
         };
 
         return (
-            <TouchableWithoutFeedback onPress={() => this.resetTimeout()}>
+            // <TouchableWithoutFeedback onPress={() => this.resetTimeout()}>
                 <>
                     <Loader isShow={screen_loader} mesasge={loader_message} />
                     <Popup {...this.state.popup} onClick={() => { this.setState({ popup: {} }) }} />
@@ -356,7 +358,7 @@ class LetsBegin extends React.Component {
                                     renderItem={renderItem}
                                     keyExtractor={(item, index) => index.toString()}
                                     ListHeaderComponent={
-                                        <View style={{ flex:1, bottom:hp('24') }}>
+                                        <View style={{ flex:1, height:hp('40') }}>
                                             {renderInfoMessage()}
                                         </View>
                                     }
@@ -366,22 +368,27 @@ class LetsBegin extends React.Component {
 
                             <View style={styles.speakBtnView}>
                                 <TouchableOpacity
-                                    style={styles.speakBtn(is_recording)}
-                                    // disabled={playState}
-                                    onPressIn={async () => {
+                                    disabled={this.state.playState == 'play'}
+                                    style={styles.speakBtn(is_recording, this.state.playState == 'play')}
+                                    onLongPress={async () => {
                                         this.connectSocket()
                                         this.resetTimeout()
                                     }}
+                                    // disabled={playState}
+                                    // onPressIn={async () => {
+                                    //     this.connectSocket()
+                                    //     this.resetTimeout()
+                                    // }}
                                     onPressOut={async () => {
                                         await this.onSpeakRelease()
                                     }}>
-                                    <Image source={MicIcon} style={styles.speakBtnTxt(is_recording)} />
+                                    <Image source={MicIcon} style={styles.speakBtnImg(is_recording)} />
                                 </TouchableOpacity>
                             </View>
                         </View>
                     </SafeAreaView>
                 </>
-            </TouchableWithoutFeedback>
+            // </TouchableWithoutFeedback>
         );
     }
 }
@@ -403,7 +410,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: hp('1', '1')
     },
-    speakBtn: (is) => ({
+    speakBtn: (is, isPlay) => ({
         height: is ? hp('14') : hp('10'),
         width: is ? hp('14') : hp('10'),
         alignSelf: 'center',
@@ -412,9 +419,9 @@ const styles = StyleSheet.create({
         backgroundColor: is ? 'red' : theme.designColor,
         alignItems: 'center',
         justifyContent: 'center',
-        // opacity: is ? 0.5 : 1
+        opacity: isPlay ? 0.5 : 1
     }),
-    speakBtnTxt: is => ({
+    speakBtnImg: is => ({
         width: wp('10'),
         height: wp('10'),
         resizeMode: 'contain',
