@@ -4,18 +4,16 @@ import {
     StyleSheet,
     Text,
     View,
-    ScrollView,
     ActivityIndicator,
     Image,
     BackHandler,
     StatusBar,
     Alert,
-    TouchableWithoutFeedback
 } from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from './../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from './../constants/theme';
-import { get_resource, hp, isNullRetNull, uid, wp } from './../utils';
+import { get_resource, hp, uid, wp } from './../utils';
 import AudioRecord from 'react-native-audio-recording-stream';
 import {
     check_microphone,
@@ -30,17 +28,14 @@ import { MicIcon } from '../constants/images';
 import { dialogue_manager, SOCKET_CONFIG, tts_manager } from '../api';
 import Loader from '../components/Loader';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import PlayerView from '../components/PlayerView';
 import Popup from '../components/Popup';
 import io from 'socket.io-client';
 import { translate } from '../i18n';
 import Header from '../components/Header';
-import AudioPlayer from '../components/AudioPlayer';
-import { AUDIO } from '../assets/audio';
 import PlayerView1 from '../components/PlayerView1';
-import { FlatList } from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
 
-class LetsBegin extends React.Component {
+class LetsBegin extends React.PureComponent {
     constructor(props) {
         super(props)
         this.get_resource = get_resource.bind(this);
@@ -95,9 +90,11 @@ class LetsBegin extends React.Component {
                 if (this.state.isLoaded) {
                     await this.closeSession()
                 }
-                return true;
+                // BackHandler.exitApp()
+                return true
             } else {
-                return false;
+                BackHandler.exitApp()
+                return true;
             }
         }).bind(this));
         this.resetTimeout()
@@ -141,8 +138,9 @@ class LetsBegin extends React.Component {
         if (this.Sound) await this.Sound.stop()
         this.Sound = null;
         await AudioRecord.stop()
-        BackHandler.addEventListener('hardwareBackPress', (async function () {
+        BackHandler.addEventListener('hardwareBackPress', (function () {
             BackHandler.exitApp()
+            return true
         }))
     }
 
@@ -152,17 +150,17 @@ class LetsBegin extends React.Component {
         });
     }
 
-    async closeSession() {
+    closeSession = async () => {
         if (this.timeoutId) clearTimeout(this.timeoutId);
         this.setState({ "screen_loader": true, "loader_message": "Closing Connection" })
         const res = await this.close_connection()
-        this.setState({ "popup": { "show": true, "type": res.resultFlag ? 'success' : "wrong", "message": translate(res.message) } })
+        this.setState({ "popup": { "show": true, "action": "session_closed", "type": res.resultFlag ? 'success' : "wrong", "message": translate(res.message) } })
         await this.wait(500)
         this.props.updateRedux({ resources: {} })
-        this.props.navigation.goBack(null)
+        // this.props.navigation.goBack(null)
     }
 
-    async onAudioStreaming(data) {
+    onAudioStreaming = async (data) => {
         const { socketio } = this.state
         try {
             socketio?.emit('audio_bytes', data.replace("data:audio/wav;base64,", ""))
@@ -171,8 +169,15 @@ class LetsBegin extends React.Component {
         }
     }
 
-    async onMessage(e) {
-        const { chat_list, last_id, last_ids_list, temp_text, is_recording, playState } = this.state;
+    onMessage = async (e) => {
+        const {
+            chat_list,
+            last_id,
+            last_ids_list,
+            temp_text,
+            is_recording,
+            playState
+        } = this.state;
         if (this.Sound && playState == 'play') await this.Sound.stop()
         // if (!is_recording) return;
         const json = e.response;
@@ -205,7 +210,7 @@ class LetsBegin extends React.Component {
         if (this.playTimer) clearInterval(this.playTimer);
     }
 
-    onSoundPlay(error) {
+    onSoundPlay = (error) => {
         if (error) {
             Alert.alert('Notice', '(Error code : 1) audio file error.\naudio file not reachable!');
         } else {
@@ -225,18 +230,17 @@ class LetsBegin extends React.Component {
         if (this.timeoutId) clearTimeout(this.timeoutId);
     };
 
-    voicePlayerDurationService(state = 'on') {
+    voicePlayerDurationService = (state = 'on') => {
         if (state == 'on') {
             this.voicePlayerDurationInterval = setInterval((s) => {
                 if (this.Sound) {
                     this.Sound.getCurrentTime(async (seconds, isPlaying) => {
                         this.setState({
-                            ...this.state,
                             "sliderValue": seconds >= this.Sound?._duration ? 0 : seconds,
                             "playState": isPlaying ? 'play' : false
                         })
                     })
-                    if(!this.props.navigation.isFocused()){
+                    if (!this.props.navigation.isFocused()) {
                         this.Sound.stop()
                         this.Sound = null
                         if (this.voicePlayerDurationInterval) clearInterval(this.voicePlayerDurationInterval)
@@ -251,144 +255,155 @@ class LetsBegin extends React.Component {
         }
     }
 
-    render() {
-        const { is_recording, chat_list, screen_loader = false, loader_message = false, loader } = this.state;
-
-        const renderInfoMessage = () => {
-            return (<>
-                <View style={styles.v05}>
-                    <View style={styles.v02}>
-                        <View style={styles.v04}>
-                            {
-                                translate('services_list_01').split(',').map((t, i) => {
-                                    return <Text style={styles.txt02} key={i}>{t}</Text>
-                                })
-                            }
-                        </View>
-                        <View style={styles.v04}>
-                            {
-                                translate('services_list_02').split(',').map((t, i) => {
-                                    return <Text style={styles.txt02} key={i}>{t}</Text>
-                                })
-                            }
-                        </View>
-                    </View>
-                </View>
-            </>)
+    renderChatItem = ({ item, index }) => {
+        if (typeof item.text === 'string') {
+            return this._renderMessagePanel(item, item.text, index);
         }
-
-        const _renderMessagePanel = (obj, text, index) => {
-            const { last_played_voice, playState } = this.state;
-            let isPlay = false
-            let sliderValue = obj['audio_files'] && obj['audio_files'].length >= index ? parseFloat(obj['audio_files'][index]['duration']) : 0
-            let lastPlayVoice = {}
-            if (obj['unique_id'] == last_played_voice['unique_id'] && last_played_voice['index'] == index) {
-                isPlay = playState
-                sliderValue = this.state.sliderValue
-                lastPlayVoice = {
-                    ...last_played_voice,
-                    // "duration": this.Sound ? this.Sound._duration : 0.0,
-                }
-            }
-
-            return (
-                <View style={styles.chatRow(obj.is_question)} key={uid()}>
-                    {!obj.is_question ? <View style={styles.chatViewIcon(obj.is_question)} /> : <></>}
-                    <View style={styles.chatTextView(obj.is_question)}>
-                        {!obj.is_question &&
-                            <PlayerView1
-                                index={index}
-                                playState={isPlay}
-                                lastPlayVoice={lastPlayVoice}
-                                sliderValue={sliderValue}
-                                sound={this.Sound}
-                                onTogglePlay={() => {
-                                    this.onPlayBack(obj, index)
-                                }} />
-                        }
-                        <Text style={styles.chatTxt(obj.is_question)}>{text ? text.replace("#", "") : ''}</Text>
+        return (
+            <View>
+                {item.text.map((text, innerIndex) => (
+                    <View key={`${index}-${innerIndex}`}>
+                        {this._renderMessagePanel(item, text, innerIndex)}
                     </View>
-                    {obj.is_question ? <View style={styles.chatViewIcon(obj.is_question)} /> : <></>}
-                </View>
-            )
-        }
+                ))}
+            </View>
+        );
+    };
 
-        const renderItem = ({ item, index }) => {
-            if (typeof item.text === 'string') {
-                return _renderMessagePanel(item, item.text, index);
+    _renderMessagePanel = (obj, text, index) => {
+        const { last_played_voice, playState } = this.state;
+        let isPlay = false
+        let sliderValue = obj['audio_files'] && obj['audio_files'].length >= index ? parseFloat(obj['audio_files'][index]['duration']) : 0
+        let lastPlayVoice = {}
+        if (obj['unique_id'] == last_played_voice['unique_id'] && last_played_voice['index'] == index) {
+            isPlay = playState
+            sliderValue = this.state.sliderValue
+            lastPlayVoice = {
+                ...last_played_voice,
+                // "duration": this.Sound ? this.Sound._duration : 0.0,
             }
-            return (
-                <View key={uid()}>
-                    {item.text.map((text, innerIndex) => (
-                        <View key={uid()}>
-                            {_renderMessagePanel(item, text, innerIndex)}
-                        </View>
-                    ))}
-                </View>
-            );
-        };
+        }
 
         return (
-            // <TouchableWithoutFeedback onPress={() => this.resetTimeout()}>
-                <>
-                    <Loader isShow={screen_loader} mesasge={loader_message} />
-                    <Popup {...this.state.popup} onClick={() => { this.setState({ popup: {} }) }} />
-
-                    <SafeAreaView style={styles.safeArea} forceInset={{ top: 'always' }}>
-                        <StatusBar barStyle="light-content" backgroundColor={theme.designColor} />
-                        <Header
-                            onClickHelp={() => {
-                                this.setState({ popup: { "show": true, "title": "Instractions", "audio": "SpeakScreen", "btnTitle": "Back", "type": "help", "message": translate("speak screen help") } })
-                            }}
-                            onClickBack={() => {
-                                this.closeSession()
+            <View style={styles.chatRow(obj.is_question)}>
+                {!obj.is_question ? <View style={styles.chatViewIcon(obj.is_question)} /> : <></>}
+                <View style={styles.chatTextView(obj.is_question)}>
+                    {!obj.is_question &&
+                        <PlayerView1
+                            index={index}
+                            playState={isPlay}
+                            lastPlayVoice={lastPlayVoice}
+                            sliderValue={sliderValue}
+                            sound={this.Sound}
+                            onTogglePlay={() => {
+                                this.onPlayBack(obj, index)
                             }} />
+                    }
+                    <Text style={styles.chatTxt(obj.is_question)}>{text ? text.replace("#", "") : ''}</Text>
+                </View>
+                {obj.is_question ? <View style={styles.chatViewIcon(obj.is_question)} /> : <></>}
+            </View>
+        )
+    }
 
-                        <View style={styles.mainView}>
-                            <View style={styles.v01}>
-                                <FlatList
-                                    contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', flexDirection: 'column' }}
-                                    style={{ width: wp('100') }}
-                                    ref={(ref) => { this.scrollViewRef = ref; }}
-                                    onContentSizeChange={() => {
-                                        if (this.scrollViewRef) this.scrollViewRef.scrollToEnd({ animated: false });
-                                    }}
-                                    initialNumToRender={8}
-                                    data={Object.values(chat_list)}
-                                    renderItem={renderItem}
-                                    keyExtractor={(item, index) => index.toString()}
-                                    ListHeaderComponent={
-                                        <View style={{ flex:1, height:hp('40') }}>
-                                            {renderInfoMessage()}
-                                        </View>
-                                    }
-                                    ListFooterComponent={loader && <ActivityIndicator size="large" color="blue" />}
-                                />
-                            </View>
+    renderInfoMessage = () => {
+        return (<>
+            <View style={styles.v05}>
+                <View style={styles.v02}>
+                    <View style={styles.v04}>
+                        {
+                            translate('services_list_01').split(',').map((t, i) => {
+                                return <Text style={styles.txt02} key={i}>{t}</Text>
+                            })
+                        }
+                    </View>
+                    <View style={styles.v04}>
+                        {
+                            translate('services_list_02').split(',').map((t, i) => {
+                                return <Text style={styles.txt02} key={i}>{t}</Text>
+                            })
+                        }
+                    </View>
+                </View>
+            </View>
+        </>)
+    }
 
-                            <View style={styles.speakBtnView}>
-                                <TouchableOpacity
-                                    disabled={this.state.playState == 'play'}
-                                    style={styles.speakBtn(is_recording, this.state.playState == 'play')}
-                                    onLongPress={async () => {
-                                        this.connectSocket()
-                                        this.resetTimeout()
-                                    }}
-                                    // disabled={playState}
-                                    // onPressIn={async () => {
-                                    //     this.connectSocket()
-                                    //     this.resetTimeout()
-                                    // }}
-                                    onPressOut={async () => {
-                                        await this.onSpeakRelease()
-                                    }}>
-                                    <Image source={MicIcon} style={styles.speakBtnImg(is_recording)} />
-                                </TouchableOpacity>
-                            </View>
+    render() {
+        const {
+            is_recording,
+            chat_list,
+            screen_loader = false,
+            loader_message = false,
+            loader
+        } = this.state;
+
+        return (
+            <>
+                <Loader isShow={screen_loader} mesasge={loader_message} />
+                <Popup
+                    {...this.state.popup}
+                    onClick={() => {
+                        if (this.state.popup.action == 'session_closed') {
+                            this.props.navigation.goBack(null)
+                        }
+                        this.setState({ popup: {} })
+                    }} />
+
+                <SafeAreaView style={styles.safeArea} forceInset={{ top: 'always' }}>
+                    <StatusBar barStyle="light-content" backgroundColor={theme.designColor} />
+                    <Header
+                        onClickHelp={() => {
+                            this.setState({ popup: { "show": true, "title": "Instractions", "audio": "SpeakScreen", "btnTitle": "Back", "type": "help", "message": translate("speak screen help") } })
+                        }}
+                        onClickBack={() => {
+                            this.closeSession()
+                        }} />
+
+                    <View style={styles.mainView}>
+                        <View style={styles.v01}>
+                            <FlatList
+                                contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', flexDirection: 'column' }}
+                                style={{ width: wp('100') }}
+                                ref={(ref) => { this.scrollViewRef = ref; }}
+                                onContentSizeChange={() => {
+                                    if (this.scrollViewRef) this.scrollViewRef.scrollToEnd({ animated: false });
+                                }}
+                                initialNumToRender={4}
+                                data={Object.values(chat_list)}
+                                renderItem={this.renderChatItem}
+                                keyExtractor={(item, index) => index.toString()}
+                                ListHeaderComponent={
+                                    <View style={{ flex: 1, height: hp('40') }}>
+                                        {this.renderInfoMessage()}
+                                    </View>
+                                }
+                                ListFooterComponent={loader && <ActivityIndicator size="large" color="blue" />}
+                            />
                         </View>
-                    </SafeAreaView>
-                </>
-            // </TouchableWithoutFeedback>
+
+                        <View style={styles.speakBtnView}>
+                            <TouchableOpacity
+                                disabled={this.state.playState == 'play'}
+                                style={styles.speakBtn(is_recording, this.state.playState == 'play')}
+                                onLongPress={async () => {
+                                    this.connectSocket()
+                                    this.resetTimeout()
+                                }}
+                                // disabled={playState}
+                                // onPressIn={async () => {
+                                //     this.connectSocket()
+                                //     this.resetTimeout()
+                                // }}
+                                onPressOut={async () => {
+                                    await this.onSpeakRelease()
+                                }}>
+                                <Image source={MicIcon} style={styles.speakBtnImg(is_recording)} />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </SafeAreaView>
+            </>
         );
     }
 }
