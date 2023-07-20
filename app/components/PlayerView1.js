@@ -1,12 +1,10 @@
 import React from 'react';
 import { Slider, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
-import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
-import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
 import { formatTime, hp, platform, wp } from '../utils';
 import { SvgPauseIcon, SvgPlayIcon } from '../constants/images';
 
-const PlayerView1 = ({
+const PlayerView1 = React.memo(({
     onTogglePlay,
     lastPlayVoice = { "duration": 0, "index": 0, "unique_id": false },
     playState = false,
@@ -46,9 +44,9 @@ const PlayerView1 = ({
             </View>
         </View>
     );
-}
+})
 
-export default connect(mapStateToProps, mapDispatchToProps)(PlayerView1);
+export default PlayerView1;
 
 const styles = StyleSheet.create({
     v01: {

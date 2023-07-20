@@ -206,8 +206,15 @@ class LetsBegin extends React.PureComponent {
         }
     }
 
-    playComplete = (success) => {
+    playComplete = async (success) => {
+        const { last_played_voice, chat_list } = this.state
         if (this.playTimer) clearInterval(this.playTimer);
+        const text = chat_list[last_played_voice['unique_id']]['text'];
+        if(text.toString().includes('شکریہ خدا حافظ')){
+            setTimeout(() => {
+                this.closeSession()
+            }, 1000);
+        }
     }
 
     onSoundPlay = (error) => {

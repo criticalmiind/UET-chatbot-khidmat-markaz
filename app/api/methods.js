@@ -24,7 +24,7 @@ export async function onSpeakPress(socket) {
     if (audioPermission) {
         await this.wait(200)
         AudioRecord.start();
-        await this.wait(300)
+        await this.wait(200)
         this.setState({ "socket_status": true, "socketio": socket, "playState": false, "is_recording": true, "last_id": uid() })
     } else {
         Alert.alert("Please Allow audio permission and try again!")
@@ -32,8 +32,9 @@ export async function onSpeakPress(socket) {
 }
 
 export async function onSpeakRelease() {
-    await this.wait(1500)
+    await this.wait(800)
     const { socketio, socket_status } = this.state;
+    let audioFile = await AudioRecord.stop();
     if (this.playTimer) clearInterval(this.playTimer);
     if (socketio && socket_status) {
         socketio?.emit('audio_bytes', 'EOS')
@@ -41,7 +42,6 @@ export async function onSpeakRelease() {
     }
     if (socketio) socketio?.disconnect();
     this.setState({ "speakPressed": false, "socketio": null, "playState": false, "is_recording": false, "last_id": false, "temp_text": "" })
-    let audioFile = await AudioRecord.stop();
     await this.wait(200)
     this.get_query_answers()
 }
@@ -78,7 +78,6 @@ export async function get_query_answers() {
         })
     });
 }
-
 
 export async function onPlayBack(obj, index) {
     const { playState, last_played_voice } = this.state;
