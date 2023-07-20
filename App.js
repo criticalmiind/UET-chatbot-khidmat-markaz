@@ -32,6 +32,7 @@ class App extends Component {
         updateDialog: true,
         installMode: CodePush.InstallMode.IMMEDIATE
       });
+      console.log(a);
       if (a === 1) {
         CodePush.restartApp();
       }
