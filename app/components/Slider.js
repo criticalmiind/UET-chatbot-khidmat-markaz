@@ -83,7 +83,7 @@ class Slider extends React.Component {
                     <View style={styles.versionView}>
                         <Text style={styles.versionTxt}>GitHub: 1.0.4</Text>
                         <Text style={styles.versionTxt}>App Version: {version.appVersion}</Text>
-                        <Text style={styles.versionTxt}>Codepush Version: {version.label}</Text>
+                        <Text style={styles.versionTxt}>Update Version: {version.label}</Text>
                     </View>
                 }
             </View>

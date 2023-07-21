@@ -8,6 +8,7 @@
     "start": "react-native start",
     "publish:android": "npx appcenter codepush release-react -a kamaljankamal4-gmail.com/E-Khidmat-Markaz -d Production",
     "publish:ios": "npx appcenter codepush release-react -a kamaljankamal4-gmail.com/E-Khidmat-Markaz-1 -d Production",
+    "codepush:publish:android": "npx code-push release-react kamaljankamal4-gmail.com/E-Khidmat-Markaz android -d Production",
     "test": "jest",
     "lint": "eslint ."
   },

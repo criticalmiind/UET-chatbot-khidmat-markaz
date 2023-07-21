@@ -5,7 +5,7 @@ import configureStore from "./app/redux/store/index";
 const { persistor, store } = configureStore();
 import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 import EntryPoint from "./app/EntryPoint";
-import { LogBox, Text, View } from "react-native";
+import { Alert, LogBox, Text, View } from "react-native";
 import CodePush from "react-native-code-push";
 
 class App extends Component {
@@ -28,13 +28,21 @@ class App extends Component {
   async checkForUpdate() {
     this.setState({ loader: true })
     try {
-      const a = await CodePush.sync({
+      const status = await CodePush.sync({
         updateDialog: true,
         installMode: CodePush.InstallMode.IMMEDIATE
       });
-      console.log(a);
-      if (a === 1) {
-        CodePush.restartApp();
+      switch (status) {
+        case CodePush.SyncStatus.UPDATE_INSTALLED:
+          Alert.alert('Success', 'Update installed.');
+          CodePush.restartApp();
+          break;
+        case CodePush.SyncStatus.ERROR:
+          Alert.alert('Error', 'Error while updating.');
+          this.setState({ loader: false })
+          break;
+        default:
+          console.log(`Update Sync status: ${status}`);
       }
     } catch (error) {
       console.log(error);
