@@ -54,6 +54,7 @@ class LetsBegin extends React.PureComponent {
             "loader": false,
             "is_recording": false,
             "speakPressed": false,
+            "speakBlur": true,
             "socket_status": false,
             "socketio": null,
             "last_id": false,
@@ -210,7 +211,7 @@ class LetsBegin extends React.PureComponent {
         const { last_played_voice, chat_list } = this.state
         if (this.playTimer) clearInterval(this.playTimer);
         const text = chat_list[last_played_voice['unique_id']]['text'];
-        if(text.toString().includes('شکریہ خدا حافظ')){
+        if(text.toString().includes('خدا حافظ')){
             setTimeout(() => {
                 this.closeSession()
             }, 1000);
@@ -391,8 +392,8 @@ class LetsBegin extends React.PureComponent {
 
                         <View style={styles.speakBtnView}>
                             <TouchableOpacity
-                                disabled={this.state.playState == 'play'}
-                                style={styles.speakBtn(is_recording, this.state.playState == 'play')}
+                                disabled={(this.state.playState == 'play' || this.state.speakBlur)}
+                                style={styles.speakBtn(is_recording, (this.state.playState == 'play' || this.state.speakBlur))}
                                 onLongPress={async () => {
                                     this.connectSocket()
                                     this.resetTimeout()

@@ -32,23 +32,30 @@ export async function onSpeakPress(socket) {
 }
 
 export async function onSpeakRelease() {
-    await this.wait(800)
+    await this.wait(200)
     const { socketio, socket_status } = this.state;
     let audioFile = await AudioRecord.stop();
     if (this.playTimer) clearInterval(this.playTimer);
+    this.setState({ "speakBlur": true, "speakPressed": false, "playState": false, "is_recording": false })
+    await this.wait(1500)
     if (socketio && socket_status) {
         socketio?.emit('audio_bytes', 'EOS')
         socketio?.emit('audio_end')
     }
     if (socketio) socketio?.disconnect();
-    this.setState({ "speakPressed": false, "socketio": null, "playState": false, "is_recording": false, "last_id": false, "temp_text": "" })
-    await this.wait(200)
-    this.get_query_answers()
+    // this.setState({ "speakBlur": true, "speakPressed": false, "socketio": null, "playState": false, "is_recording": false, "last_id": false, "temp_text": "" })
+    this.setState({ "socketio": null, "last_id": false, "temp_text": "" })
+    await this.wait(100)
+    await this.get_query_answers()
+    // await this.wait(1000)
 }
 
 export async function get_query_answers() {
     const { chat_list, last_ids_list } = this.state;
     const ids_list = Object.entries(last_ids_list).map(e => ({ "id": e[0], ...e[1] }))
+    if(ids_list.length < 1){
+        this.setState({ "speakBlur": false })
+    }
 
     ids_list.forEach(async (el) => {
         const qs = await this.dialogue_manager({ "textMessage": el.text })
@@ -67,7 +74,7 @@ export async function get_query_answers() {
             this.setState({ "chat_list": chat_list })
 
             await wait(500)
-            if (resultFlag)  this.onPlayBack(chat_list[unique_id], -1)
+            if (resultFlag) this.onPlayBack(chat_list[unique_id], -1)
             else Alert.alert("Error", message)
         }
         await this.wait(500)
@@ -86,7 +93,7 @@ export async function onPlayBack(obj, index) {
     if (obj['unique_id'] == last_played_voice['unique_id'] && last_played_voice['index'] == index) {
         if (playState == 'play') {
             if (this.Sound) this.Sound.pause()
-            this.setState({ "playState": 'pause' })
+            this.setState({ "playState": 'pause', "speakBlur": false })
             await wait(200)
             this.voicePlayerDurationService('off')
         }
@@ -121,7 +128,6 @@ export async function onPlayBack(obj, index) {
             }
             i++
         };
-        return
     } else {
         // Audios List
         for (let j = 0; j < obj['audio_files'].length; j++) {
@@ -140,6 +146,8 @@ export async function onPlayBack(obj, index) {
             i++
         }
     }
+
+    this.setState({ "speakBlur": false })
 }
 
 export async function play_message_handler(url, is_path = false) {
