@@ -34,7 +34,6 @@ import { translate } from '../i18n';
 import Header from '../components/Header';
 import PlayerView1 from '../components/PlayerView1';
 import { FlatList } from 'react-native-gesture-handler';
-import { OptimizedFlatList } from '../components/OptimizeFlatList';
 
 class LetsBegin extends React.PureComponent {
     constructor(props) {
@@ -280,6 +279,8 @@ class LetsBegin extends React.PureComponent {
         );
     };
 
+    // VirtualizedList: You have a large list that is slow to update - make sure your renderItem function renders components that follow React performance best practices like PureComponent, shouldComponentUpdate, etc. {"contentLength": 2987, "dt": 6768, "prevDt": 15323}
+
     _renderMessagePanel = (obj, text, index) => {
         const { last_played_voice, playState } = this.state;
         let isPlay = false
@@ -372,18 +373,23 @@ class LetsBegin extends React.PureComponent {
 
                     <View style={styles.mainView}>
                         <View style={styles.v01}>
-                            <OptimizedFlatList
+                            <FlatList
                                 contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', flexDirection: 'column' }}
                                 style={{ width: wp('100') }}
+                                ref={(ref) => { this.scrollViewRef = ref; }}
+                                onContentSizeChange={() => {
+                                    if (this.scrollViewRef) this.scrollViewRef.scrollToEnd({ animated: false });
+                                }}
+                                initialNumToRender={4}
                                 data={Object.values(chat_list)}
                                 renderItem={this.renderChatItem}
-                                initialNumToRender={4}
                                 keyExtractor={(item, index) => index.toString()}
                                 ListHeaderComponent={
                                     <View style={{ flex: 1, height: hp('40') }}>
                                         {this.renderInfoMessage()}
                                     </View>
                                 }
+                                ListFooterComponent={loader && <ActivityIndicator size="large" color="blue" />}
                             />
                         </View>
 
@@ -395,6 +401,11 @@ class LetsBegin extends React.PureComponent {
                                     this.connectSocket()
                                     this.resetTimeout()
                                 }}
+                                // disabled={playState}
+                                // onPressIn={async () => {
+                                //     this.connectSocket()
+                                //     this.resetTimeout()
+                                // }}
                                 onPressOut={async () => {
                                     await this.onSpeakRelease()
                                 }}>

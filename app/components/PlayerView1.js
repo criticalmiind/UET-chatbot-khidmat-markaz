@@ -1,50 +1,51 @@
-import React from 'react';
-import { Slider, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
+import React, { useCallback } from 'react';
+import { Slider, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { theme } from '../constants/theme';
 import { formatTime, hp, platform, wp } from '../utils';
 import { SvgPauseIcon, SvgPlayIcon } from '../constants/images';
 
-const PlayerView1 = React.memo(({
-    onTogglePlay,
-    lastPlayVoice = { "duration": 0, "index": 0, "unique_id": false },
-    playState = false,
-    sliderValue,
-    sound
+const PlayerView1 = ({
+  onTogglePlay,
+  lastPlayVoice = { duration: 0, index: 0, unique_id: false },
+  playState = false,
+  sliderValue,
+  sound,
 }) => {
-    const _renderPlayPause = () => {
-        if (playState == 'play') {
-            return <SvgPauseIcon />
-        }
-        return <SvgPlayIcon />
+  const _renderPlayPause = useCallback(() => {
+    if (playState === 'play') {
+      return <SvgPauseIcon />;
     }
+    return <SvgPlayIcon />;
+  }, [playState]);
 
-    const handleSliderChange = (value) => {
-        if (sound) sound.setCurrentTime(value);
-    };
+  const handleSliderChange = useCallback(
+    (value) => {
+      if (sound) sound.setCurrentTime(value);
+    },
+    [sound]
+  );
 
-    return (
-        <View style={styles.v01}>
-            <View style={styles.playView}>
-                <TouchableOpacity
-                    onPress={() => {
-                        if (onTogglePlay) onTogglePlay()
-                    }}>
-                    {_renderPlayPause()}
-                </TouchableOpacity>
-                <Slider
-                    style={{ flex: 1 }}
-                    minimumValue={0}
-                    maximumValue={parseFloat(lastPlayVoice['duration']) || 0}
-                    value={sliderValue}
-                    onValueChange={handleSliderChange}
-                    thumbTintColor="#000000"
-                    minimumTrackTintColor="#000000"
-                    maximumTrackTintColor="#000000" />
-                <Text style={styles.counterTxt}>{formatTime(sliderValue)}</Text>
-            </View>
-        </View>
-    );
-})
+  return (
+    <View style={styles.v01}>
+      <View style={styles.playView}>
+        <TouchableOpacity onPress={onTogglePlay}>
+          {_renderPlayPause()}
+        </TouchableOpacity>
+        <Slider
+          style={{ flex: 1 }}
+          minimumValue={0}
+          maximumValue={parseFloat(lastPlayVoice['duration']) || 0}
+          value={sliderValue}
+          onValueChange={handleSliderChange}
+          thumbTintColor="#000000"
+          minimumTrackTintColor="#000000"
+          maximumTrackTintColor="#000000"
+        />
+        <Text style={styles.counterTxt}>{formatTime(sliderValue)}</Text>
+      </View>
+    </View>
+  );
+};
 
 export default PlayerView1;
 
