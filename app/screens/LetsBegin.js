@@ -25,7 +25,7 @@ import {
     onPlayBack
 } from '../api/methods';
 import { MicIcon } from '../constants/images';
-import { dialogue_manager, SOCKET_CONFIG, tts_manager } from '../api';
+import { call_api, dialogue_manager, SOCKET_CONFIG, tts_manager } from '../api';
 import Loader from '../components/Loader';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Popup from '../components/Popup';
@@ -233,6 +233,9 @@ class LetsBegin extends React.PureComponent {
         this.timeoutId = setTimeout(() => {
             this.closeSession()
         }, TIMEOUT_SECONDS * 1000);
+
+        // update session time 
+        call_api(this.get_resource('asrm'), { "function":"asrInput", "connectionId": this.get_resource('cid') })
     };
 
     clearAllTimeouts = () => {

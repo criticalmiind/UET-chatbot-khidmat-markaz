@@ -56,6 +56,20 @@ export async function call_asr_manager(payload) {
     }
 }
 
+export async function call_api(api, payload) {
+    try {
+        const rawResponse = await fetch(`${api}`, {
+            method: 'POST',
+            headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const content = await rawResponse.json();
+        return content;
+    } catch (error) {
+        return { "resultFlag": false, "message": error.message }
+    }
+}
+
 export async function tts_manager(obj) {
     try {
         const rawResponse = await fetch(`${this.get_resource('tts')}`, {

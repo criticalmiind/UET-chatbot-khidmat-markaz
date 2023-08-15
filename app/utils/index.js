@@ -5,12 +5,13 @@ export function getAsrLink(asrModel, connectionId) {
   return `${asrModel}content-type=audio/x-raw,+layout=(string)interleaved,+rate=(int)16000,+format=(string)S16LE,+channels=(int)1,+token=${connectionId}`
 }
 export function get_resource(key) {
-  const { asrModel, connectionId, dialogueManager, ttsManager } = this.props.resources;
+  const { asrModel, connectionId, dialogueManager, ttsManager, asrManager } = this.props.resources;
   // if (key == 'asr') return asrModel ? `${asrModel}?content-type=audio/x-raw,+layout=(string)interleaved,+rate=(int)16000,+format=(string)S16LE,+channels=(int)1,+token=${connectionId}` : ''
   // if (key == 'asr') return asrModel ? `${asrModel}?content-type=audio/x-raw,+layout=(string)interleaved,+rate=(int)16000,+format=(string)S16LE,+channels=(int)1` : ''
   if (key == 'asr') return asrModel ? `${asrModel}` : ''
   if (key == 'dm') return filter_url(dialogueManager)
   if (key == 'tts') return filter_url(ttsManager)
+  if (key == 'asrm') return filter_url(asrManager)
   if (key == 'cid') return connectionId
 }
 

@@ -22,10 +22,16 @@ export async function onSpeakPress(socket) {
     if (this.playTimer) clearInterval(this.playTimer);
     let audioPermission = await check_microphone();
     if (audioPermission) {
-        await this.wait(200)
+        await this.wait(100)
         AudioRecord.start();
-        await this.wait(200)
-        this.setState({ "socket_status": true, "socketio": socket, "playState": false, "is_recording": true, "last_id": uid() })
+        await this.wait(500)
+        this.setState({
+            "socket_status": true,
+            "socketio": socket,
+            "playState": false,
+            "is_recording": true,
+            "last_id": uid()
+        })
     } else {
         Alert.alert("Please Allow audio permission and try again!")
     }
@@ -53,7 +59,7 @@ export async function onSpeakRelease() {
 export async function get_query_answers() {
     const { chat_list, last_ids_list } = this.state;
     const ids_list = Object.entries(last_ids_list).map(e => ({ "id": e[0], ...e[1] }))
-    if(ids_list.length < 1){
+    if (ids_list.length < 1) {
         this.setState({ "speakBlur": false })
     }
 
@@ -69,7 +75,7 @@ export async function get_query_answers() {
                 "unique_id": unique_id,
                 "is_question": false,
                 "text": textArr,
-                "audio_files": resultFlag?audioResponse:[]
+                "audio_files": resultFlag ? audioResponse : []
             }
             this.setState({ "chat_list": chat_list })
 

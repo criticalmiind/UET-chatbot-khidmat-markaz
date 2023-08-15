@@ -1,6 +1,6 @@
 import { uid } from "../../utils";
 
-export const initialState = {
+export const initialState = { 
     userData:{},
     resources:{},
     audioRecordingOptions:{

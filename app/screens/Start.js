@@ -32,6 +32,7 @@ class Start extends React.Component {
         this.setState({ loader: true })
         let obj = { 'function': method['startService'], 'sessionId': session }
         let res = await call_application_manager(obj)
+        console.log(res);
         if (res.resultFlag) {
             this.props.updateRedux({ "resources": res })
             setTimeout(() => {
