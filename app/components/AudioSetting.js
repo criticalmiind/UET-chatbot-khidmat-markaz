@@ -83,7 +83,7 @@ class AudioSetting extends React.Component {
                                         "sampleRate": 16000,
                                         "channels": 1,
                                         "bitsPerSample": 16,
-                                        "chunkSize": 1024,
+                                        "chunkSize": 8192,
                                         "wavFile": `audio-${uid()}.wav`,
                                     }
                                 })

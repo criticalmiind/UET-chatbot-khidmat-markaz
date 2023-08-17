@@ -29,7 +29,7 @@ class Slider extends React.Component {
 
     render() {
         const { version } = this.state;
-        const { onClose } = this.props;
+        const { onClose, onAction } = this.props;
 
         return (<>
             <TouchableOpacity
@@ -70,6 +70,13 @@ class Slider extends React.Component {
                         this.props.navigation.navigate("Help")
                     }}>
                     <Text style={styles.btnTxt}>{translate('Help')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.btn01}
+                    onPress={async () => {
+                        if(onAction) onAction('setting')
+                    }}>
+                    <Text style={styles.btnTxt}>{translate('Audio Settings')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.btn01}

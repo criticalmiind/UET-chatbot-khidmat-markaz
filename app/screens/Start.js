@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AudioSetting from '../components/AudioSetting';
 import Slider from '../components/Slider';
 import Button1 from '../components/Button1';
+// import ZoomableAreaView from '../components/ZoomableArea';
 
 class Start extends React.Component {
     constructor(props) {
@@ -22,9 +23,9 @@ class Start extends React.Component {
         }
     }
 
-    UNSAFE_componentWillMount() {}
+    UNSAFE_componentWillMount() { }
 
-    async componentWillUnmount() {}
+    async componentWillUnmount() { }
 
     async get_resources(session) {
         // this.props.navigation.navigate("LetsBegin")
@@ -53,6 +54,7 @@ class Start extends React.Component {
 
         const renderPanel = (isPopup) => {
             return (<>
+                {/* <ZoomableAreaView> */}
                 <Text style={styles.title01}>{translate('Dear Citizen Welcome!')}</Text>
                 <View style={styles.v01}>
                     <View style={styles.v03}>
@@ -96,6 +98,7 @@ class Start extends React.Component {
                     </>
                     }
                 </View>
+                {/* </ZoomableAreaView> */}
             </>)
         }
 
@@ -104,7 +107,12 @@ class Start extends React.Component {
             <Popup {...this.state.popup} onClick={() => { this.setState({ popup: {} }) }} >{renderPanel(true)}</Popup>
             {audioSettingPopup && <AudioSetting onClick={(is) => { this.setState({ "audioSettingPopup": is }) }} />}
             <SafeAreaView style={styles.safeArea} forceInset={{ top: 'always' }}>
-                {isSlider && <Slider onClose={() => { this.setState({ isSlider: false }) }} navigation={this.props.navigation} />}
+                {isSlider && <Slider
+                    onClose={() => { this.setState({ isSlider: false }) }} navigation={this.props.navigation}
+                    onAction={(state)=>{
+                        if(state == 'setting') this.setState({ "audioSettingPopup": true })
+                    }}/>
+                }
                 <View style={styles.safeArea}>
                     <View style={styles.header}>
                         <TouchableOpacity onPress={() => { this.setState({ isSlider: true }) }}>

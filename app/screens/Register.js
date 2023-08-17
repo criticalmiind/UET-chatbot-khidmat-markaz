@@ -19,9 +19,9 @@ import HelpIcon from '../components/HelpIcon';
 import Button1 from '../components/Button1';
 
 const GENDER_LIST = [
-    { name: translate("Male") },
-    { name: translate("Female") },
-    { name: translate("Other") }
+    { "name": translate("Male"), "value": "Male" },
+    { "name": translate("Female"), "value": "Female" },
+    { "name": translate("Other"), "value": "Other" },
 ]
 
 class Register extends React.Component {
@@ -29,12 +29,22 @@ class Register extends React.Component {
         super(props)
         this.state = {
             "loader": false,
-            'name': '',
-            'userName': '',
-            'password': '',
+            // 'name': '',
+            // 'userName': '',
+            // 'password': '',
+            // 'city': '',
+            // 'district': '',
+            // 'gender': translate("Male"),
+            // 'dateOfBirth': false,
+
+
+            'name': 'Test',
+            'userName': 'Test',
+            'password': 'Test',
+            'confirm_password': 'Test',
             'city': '',
             'district': '',
-            'gender': translate("Male"),
+            'gender': "Male",
             'dateOfBirth': false,
         }
     }
@@ -63,9 +73,12 @@ class Register extends React.Component {
             'city': city,
             // 'district':district,
             'tehsil': district,
-            'gender': gender,
+            'gender': translate(gender),
             'dataOfBirth': dateOfBirth
         }
+        this.setStateObj({ loader: false })
+        console.log(obj);
+        return
         let res = await call_application_manager(obj)
         this.setStateObj({ loader: false })
         if (res.resultFlag) {
@@ -230,9 +243,9 @@ class Register extends React.Component {
                             buttonTextStyle={styles.txt01}
                             defaultButtonText={translate('Gender')}
                             search={true}
-                            defaultValue={gender}
+                            defaultValue={translate(gender)}
                             onSelect={(i) => {
-                                this.setStateObj({ gender: i.name })
+                                this.setStateObj({ "gender": i.value })
                             }}
                             buttonTextAfterSelection={(i) => i.name}
                             rowTextForSelection={(item) => item.name}
