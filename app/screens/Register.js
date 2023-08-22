@@ -29,23 +29,23 @@ class Register extends React.Component {
         super(props)
         this.state = {
             "loader": false,
-            // 'name': '',
-            // 'userName': '',
-            // 'password': '',
-            // 'city': '',
-            // 'district': '',
-            // 'gender': translate("Male"),
-            // 'dateOfBirth': false,
-
-
-            'name': 'Test',
-            'userName': 'Test',
-            'password': 'Test',
-            'confirm_password': 'Test',
+            'name': '',
+            'userName': '',
+            'password': '',
             'city': '',
             'district': '',
-            'gender': "Male",
+            'gender': translate("Male"),
             'dateOfBirth': false,
+
+
+            // 'name': 'Test',
+            // 'userName': 'Test',
+            // 'password': 'Test',
+            // 'confirm_password': 'Test',
+            // 'city': '',
+            // 'district': '',
+            // 'gender': "Male",
+            // 'dateOfBirth': false,
         }
     }
 
@@ -222,6 +222,7 @@ class Register extends React.Component {
                             testID="dateTimePicker"
                             value={dateOfBirth ? dateOfBirth : new Date()}
                             mode={"date"}
+                            display="spinner"
                             is24Hour={true}
                             onChange={(e) => {
                                 this.setState({ "dateOfBirth": e.nativeEvent.timestamp, "showDatePicker": false })
