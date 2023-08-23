@@ -71,13 +71,13 @@ class Slider extends React.Component {
                     }}>
                     <Text style={styles.btnTxt}>{translate('Help')}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
+                {/* <TouchableOpacity
                     style={styles.btn01}
                     onPress={async () => {
                         if(onAction) onAction('setting')
                     }}>
                     <Text style={styles.btnTxt}>{translate('Audio Settings')}</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
                 <TouchableOpacity
                     style={styles.btn01}
                     onPress={async () => {

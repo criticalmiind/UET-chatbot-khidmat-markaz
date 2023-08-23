@@ -1,96 +1,110 @@
 import React, { useState } from 'react';
-import { Text } from 'react-native';
-import { View } from 'react-native';
-import { PinchGestureHandler, State } from 'react-native-gesture-handler';
+import { View, Text, StyleSheet, Animated, TouchableOpacity } from 'react-native';
+import { hp, wp } from '../utils';
+// import { TouchableOpacity } from 'react-native-gesture-handler';
 
-const ZoomableAreaView = ({ children }) => {
-  const [scale, setScale] = useState(1);
+const ZoomableArea = () => {
+  const [isTouching, setIsTouching] = useState(false);
+  const [touchX, setTouchX] = useState(0);
+  const [touchY, setTouchY] = useState(0);
 
-  const onZoomEvent = event => {
-    setScale(event.nativeEvent.scale);
+  const animatedSize = new Animated.Value(0);
+
+  const handleTouchStart = (event) => {
+    const { locationX, locationY } = event.nativeEvent;
+    setIsTouching(true);
+    setTouchX(locationX);
+    setTouchY(locationY);
+    Animated.spring(animatedSize, {
+      toValue: 1,
+      useNativeDriver: false,
+    }).start();
   };
 
-  const onZoomStateChange = event => {
-    if (event.nativeEvent.oldState === State.ACTIVE) {
-      // Do something when the pinch gesture ends
-    }
+  const handleTouchEnd = () => {
+    setIsTouching(false);
+    Animated.spring(animatedSize, {
+      toValue: 0,
+      useNativeDriver: false,
+    }).start();
   };
+
+  const handleTouchCancel = () => {
+    handleTouchEnd();
+  };
+
+  const animatedCircleSize = animatedSize.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 200], // Change this to control the circle size
+  });
+  console.log(animatedCircleSize, touchX, touchY);
+
 
   return (
-    <View style={{ flex: 1 }}>
-      <PinchGestureHandler onGestureEvent={onZoomEvent} onHandlerStateChange={onZoomStateChange}>
-        <View style={{ flex: 1 }}>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-              transform: [{ scale }],
-            }}
-          >
-            {children}
-          </View>
+    <View style={styles.container}>
+      <TouchableOpacity
+        onPress={() => {
+          console.log("Ok");
+        }}>
+        <Text>Abc</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => {
+          console.log("Ok");
+        }}
+        style={styles.touchArea}
+        onPressIn={handleTouchStart}
+        onPressOut={handleTouchEnd}
+        onResponderTerminate={handleTouchCancel}
+      >
+        <View style={styles.innerTouchArea}>
+          {isTouching && animatedCircleSize != 0 && (<>
+            <Text>JHGJHGKJHG</Text>
+            <Animated.View
+              style={[
+                styles.circle,
+                {
+                  width: animatedCircleSize,
+                  height: animatedCircleSize,
+                  borderRadius: animatedCircleSize,
+
+                  left: 100,
+                  top: 100,
+                  // left: touchX - animatedCircleSize / 2,
+                  // top: touchY - animatedCircleSize / 2,
+                },
+              ]}
+            />
+          </>)}
         </View>
-      </PinchGestureHandler>
+      </TouchableOpacity>
     </View>
   );
 };
 
-export default ZoomableAreaView;
+const styles = StyleSheet.create({
+  container: {
+    // height: hp('50%'),
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  touchArea: {
+    width: wp('100%'),
+    height: hp('50%'),
+    backgroundColor: 'pink',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  innerTouchArea: {
+    position: 'relative',
+  },
+  circle: {
+    position: 'absolute',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderWidth: 1
+  },
+});
 
-
-// import React, { useState } from 'react';
-// import { View, Text } from 'react-native';
-// import Svg, { G, Rect, Text as SVGText } from 'react-native-svg';
-// import { TapGestureHandler, PinchGestureHandler, State } from 'react-native-gesture-handler';
-
-// const ZoomInScreenPart = ({ children }) => {
-//     const [scale, setScale] = useState(1);
-//     const [baseScale, setBaseScale] = useState(1);
-//     const [translateX, setTranslateX] = useState(0);
-//     const [translateY, setTranslateY] = useState(0);
-
-//     const onZoomEvent = event => {
-//         setScale(event.nativeEvent.scale);
-//     };
-
-//     const onZoomStateChange = event => {
-//         console.log(event.nativeEvent.oldState, State.ACTIVE);
-//         if (event.nativeEvent.oldState === State.ACTIVE) {
-//             setBaseScale(scale);
-//         }
-//     };
-
-//     const onDoubleTap = event => {
-//         const x = event.nativeEvent.x;
-//         const y = event.nativeEvent.y;
-
-//         setTranslateX(-x * (scale - baseScale));
-//         setTranslateY(-y * (scale - baseScale));
-//     };
-
-//     return (
-//         <TapGestureHandler onActivated={onDoubleTap}>
-//             <PinchGestureHandler onGestureEvent={onZoomEvent} onHandlerStateChange={onZoomStateChange}>
-//                 <View style={{ flex: 1 }}>
-//                     <Svg width="100%" height="100%">
-//                         <G transform={{ translateX, translateY, scale }}>
-//                             {/* Your content here */}
-//                             <Text>asdhakjsdhaskdhkajsdh</Text>
-//                             <Text>asdhakjsdhaskdhkajsdh</Text>
-//                             <Text>asdhakjsdhaskdhkajsdh</Text>
-//                             <Text>asdhakjsdhaskdhkajsdh</Text>
-//                             <Text>asdhakjsdhaskdhkajsdh</Text>
-//                             <Text>asdhakjsdhaskdhkajsdh</Text>
-//                             <Text>asdhakjsdhaskdhkajsdh</Text>
-//                             <Text>asdhakjsdhaskdhkajsdh</Text>
-//                             {children}
-//                         </G>
-//                     </Svg>
-//                 </View>
-//             </PinchGestureHandler>
-//         </TapGestureHandler>
-//     );
-// };
-
-// export default ZoomInScreenPart
+export default ZoomableArea;

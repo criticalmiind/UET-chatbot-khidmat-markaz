@@ -62,7 +62,7 @@ class Settings extends React.Component {
                             <Button1
                                 title="Update Password"
                                 onPress={() => {
-                                    this.props.navigation.navigate("ForgotPassword")
+                                    this.props.navigation.navigate("ForgotPassword", { "screen":"Settings" })
                                 }}/>
                             <View style={{ height: hp("4") }} />
 

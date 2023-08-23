@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AudioSetting from '../components/AudioSetting';
 import Slider from '../components/Slider';
 import Button1 from '../components/Button1';
-// import ZoomableAreaView from '../components/ZoomableArea';
+// import ZoomableArea from '../components/ZoomableArea';
 
 class Start extends React.Component {
     constructor(props) {
@@ -53,7 +53,6 @@ class Start extends React.Component {
 
         const renderPanel = (isPopup) => {
             return (<>
-                {/* <ZoomableAreaView> */}
                 <Text style={styles.title01}>{translate('Dear Citizen Welcome!')}</Text>
                 <View style={styles.v01}>
                     <View style={styles.v03}>
@@ -100,6 +99,7 @@ class Start extends React.Component {
                 {/* </ZoomableAreaView> */}
             </>)
         }
+        // return <ZoomableArea/>
 
         return (<>
             <Loader isShow={loader} />
@@ -114,7 +114,9 @@ class Start extends React.Component {
                 }
                 <View style={styles.safeArea}>
                     <View style={styles.header}>
-                        <TouchableOpacity onPress={() => { this.setState({ isSlider: true }) }}>
+                        <TouchableOpacity
+                            style={styles.headHelpBtn}
+                            onPress={() => { this.setState({ isSlider: true }) }}>
                             <SvgDrawerIcon />
                         </TouchableOpacity>
 

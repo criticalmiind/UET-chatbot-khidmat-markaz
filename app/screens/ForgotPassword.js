@@ -35,6 +35,7 @@ class ForgotPassword extends React.Component {
     render() {
         const { loader, userName, password, confirm_password } = this.state;
         let disabled_login = (isNullRetNull(userName, 1) == 1 || isNullRetNull(password, 1) == 1 || password != confirm_password)
+        const cameFrom = this.props.navigation.getParam('screen')
 
         return (<>
             <Loader isShow={loader} />
@@ -57,7 +58,7 @@ class ForgotPassword extends React.Component {
                         alignSelf: 'center',
                         borderRadius: 10
                     }}>
-                        <Text style={styles.title}>{translate('Forgot Password')}</Text>
+                        <Text style={styles.title}>{cameFrom == 'Login' && translate('Forgot Password') || cameFrom == 'Settings' && translate('Change Password')}</Text>
                         <View style={{ height: hp("1.5") }} />
                         <Input
                             viewStyle={{ width: wp('84') }}

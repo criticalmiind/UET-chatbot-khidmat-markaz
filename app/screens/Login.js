@@ -23,8 +23,8 @@ class Login extends React.Component {
             'password': "",
             // 'userName': "cleUser",
             // 'password': "cle@Password",
-            'userName': '03049758182',
-            'password': "12345678",
+            // 'userName': '03049758182',
+            // 'password': "12345678",
         }
     }
 
@@ -88,7 +88,7 @@ class Login extends React.Component {
                             <TouchableOpacity
                                 style={styles.forgot_pwd_btn}
                                 onPress={() => {
-                                    this.props.navigation.navigate("ForgotPassword")
+                                    this.props.navigation.navigate("ForgotPassword", { "screen":"Login" })
                                 }}>
                                 <Text style={styles.forgot_pwd_txt}>{translate("I forgot my password?")}</Text>
                             </TouchableOpacity>
