@@ -14,27 +14,23 @@ import { mapDispatchToProps, mapStateToProps } from './../redux/actions/userActi
 import { connect } from 'react-redux';
 import { theme } from './../constants/theme';
 import { get_resource, hp, uid, wp } from './../utils';
-import AudioRecord from 'react-native-audio-recording-stream';
 import {
     check_microphone,
     get_query_answers,
     play_message_handler,
-    onSpeakPress,
-    onSpeakRelease,
     close_connection,
     onPlayBack
 } from '../api/methods';
 import { MicIcon } from '../constants/images';
-import { call_api, dialogue_manager, SOCKET_CONFIG, tts_manager } from '../api';
+import { call_api, dialogue_manager, tts_manager } from '../api';
 import Loader from '../components/Loader';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Popup from '../components/Popup';
-import io from 'socket.io-client';
 import { translate } from '../i18n';
 import Header from '../components/Header';
 import PlayerView1 from '../components/PlayerView1';
-import { FlatList } from 'react-native-gesture-handler';
 import { OptimizedFlatList } from '../components/OptimizeFlatList';
+import SpeechToText from '../components/SpeechToText';
 
 class LetsBegin extends React.PureComponent {
     constructor(props) {
@@ -47,33 +43,17 @@ class LetsBegin extends React.PureComponent {
 
         this.Sound = null;
         this.get_query_answers = get_query_answers.bind(this);
-        this.onSpeakPress = onSpeakPress.bind(this);
-        this.onSpeakRelease = onSpeakRelease.bind(this);
         this.play_message_handler = play_message_handler.bind(this);
         this.state = {
             "isLoaded": false,
             "loader": false,
             "is_recording": false,
-            "speakPressed": false,
             "speakBlur": true,
-            "socket_status": false,
-            "socketio": null,
             "last_id": false,
             "last_ids_list": {
                 "asalamoalaikom": { "unique_id": "asalamoalaikom", "is_question": true, "text": "السلام علیکم" },
             },
-            "chat_list": {
-                // "asfdasfa": {
-                //     "unique_id": "asfdasfa",
-                //     "is_question": false,
-                //     "text": ["آپ حبیب بینک میں فیس جمع کروانے کے بعد درکار دستاویزات لے کر# ای خدمت مرکز تشریف لے جائیں۔", "آپ کا لائسنس 15 دن میں رینیو ہو جائے گا۔ کیا آپ کو مزید کچھ معلوم کرنا ہے؟"],
-                //     "audio_files": [
-                //         // AUDIO['ChangePasswordScreen'], AUDIO['ContactUsScreen']
-                //         { "audio": AUDIO['ChangePasswordScreen'], "duration": 10.00 },
-                //         { "audio": AUDIO['ContactUsScreen'], "duration": 15.00 }
-                //     ]
-                // },
-            },
+            "chat_list": {},
             "last_played_voice": {},
             "temp_text": ""
         }
@@ -83,9 +63,6 @@ class LetsBegin extends React.PureComponent {
         this.setState({ "isLoaded": true })
 
         let audioPermission = await check_microphone();
-
-        AudioRecord.init(this.props.audioRecordingOptions);
-        AudioRecord.on('data', this.onAudioStreaming.bind(this));
 
         BackHandler.addEventListener('hardwareBackPress', (async function () {
             if (this.props.navigation.isFocused()) {
@@ -106,40 +83,12 @@ class LetsBegin extends React.PureComponent {
         this.get_query_answers()
     }
 
-    connectSocket = async () => {
-        const { playState } = this.state
-        if (this.Sound) await this.Sound.stop()
-        // this.setState({ "last_played_voice":{}, "playState":false })
-        const socket = io(this.get_resource('asr'), SOCKET_CONFIG(this.get_resource('cid')));
-        socket.on('connect', ((e) => {
-            console.log("socket connected: ")
-            const { speakPressed } = this.state
-            this.onSpeakPress(socket)
-            if (!speakPressed) {
-                this.onSpeakRelease()
-            }
-        }).bind(this));
-        socket.on('disconnect', (async (e) => {
-            console.log('Disconnected from server', e);
-        }).bind(this));
-
-        socket.on('response', this.onMessage.bind(this));
-
-        this.setState({
-            "speakPressed": true,
-            "socketio": socket,
-            "playState": false,
-            "last_played_voice": {}
-        });
-    }
-
     async componentWillUnmount() {
         const { playState } = this.state
         this.setState({ "isLoaded": false })
         if (this.playTimer) clearInterval(this.playTimer);
         if (this.Sound) await this.Sound.stop()
         this.Sound = null;
-        await AudioRecord.stop()
         BackHandler.addEventListener('hardwareBackPress', (function () {
             BackHandler.exitApp()
             return true
@@ -162,36 +111,21 @@ class LetsBegin extends React.PureComponent {
         // this.props.navigation.goBack(null)
     }
 
-    onAudioStreaming = async (data) => {
-        const { socketio } = this.state
-        try {
-            socketio?.emit('audio_bytes', data.replace("data:audio/wav;base64,", ""))
-        } catch (error) {
-            console.log("onAudioStreaming", error)
-        }
-    }
-
-    onMessage = async (e) => {
+    onMessage = async (e, final) => {
         const {
             chat_list,
             last_id,
             last_ids_list,
             temp_text,
-            is_recording,
             playState
         } = this.state;
         if (this.Sound && playState == 'play') await this.Sound.stop()
-        // if (!is_recording) return;
-        const json = e.response;
 
-        if (json.result && json.result.hypotheses && json.result.hypotheses.length > 0) {
-            const { final, hypotheses } = json.result;
-            const transcript = hypotheses[0].transcript;
-
+        if (e) {
             const unique_id = last_id || uid();
             const updatedChatList = {
                 ...chat_list,
-                [unique_id]: { is_question: true, text: final ? `${temp_text} ${transcript}۔` : `${temp_text} ${transcript}` },
+                [unique_id]: { is_question: true, text: final ? `${temp_text} ${e}۔` : `${temp_text} ${e}` },
             };
             const updatedLastIdsList = {
                 ...last_ids_list,
@@ -199,12 +133,20 @@ class LetsBegin extends React.PureComponent {
             };
 
             this.setState((prevState) => ({
-                "temp_text": final ? `${temp_text} ${transcript}۔` : temp_text,
+                "temp_text": final ? `${temp_text} ${e}۔` : temp_text,
                 "chat_list": updatedChatList,
                 "last_id": unique_id,
                 "last_ids_list": updatedLastIdsList,
-                "playState": false
+                "playState": false,
+                ...final ? {
+                    "speakBlur": true,
+                    "is_recording": false,
+                    "last_id": false,
+                    "temp_text": ""
+                } : {}
             }));
+
+            if (final) await this.get_query_answers()
         }
     }
 
@@ -212,7 +154,7 @@ class LetsBegin extends React.PureComponent {
         const { last_played_voice, chat_list } = this.state
         if (this.playTimer) clearInterval(this.playTimer);
         const text = chat_list[last_played_voice['unique_id']]['text'];
-        if(text.toString().includes('خدا حافظ')){
+        if (text.toString().includes('خدا حافظ')) {
             setTimeout(() => {
                 this.closeSession()
             }, 1000);
@@ -235,7 +177,7 @@ class LetsBegin extends React.PureComponent {
         }, TIMEOUT_SECONDS * 1000);
 
         // update session time 
-        call_api(this.get_resource('asrm'), { "function":"asrInput", "connectionId": this.get_resource('cid') })
+        // call_api(this.get_resource('asrm'), { "function": "asrInput", "connectionId": this.get_resource('cid') })
     };
 
     clearAllTimeouts = () => {
@@ -269,7 +211,7 @@ class LetsBegin extends React.PureComponent {
 
     renderChatItem = ({ item, index }) => {
         // if (typeof item.text === 'string') {
-        if(!Array.isArray(item.text)){
+        if (!Array.isArray(item.text)) {
             return this._renderMessagePanel(item, item.text, index);
         }
         return (
@@ -391,18 +333,29 @@ class LetsBegin extends React.PureComponent {
                         </View>
 
                         <View style={styles.speakBtnView}>
-                            <TouchableOpacity
-                                disabled={(this.state.playState == 'play' || this.state.speakBlur)}
-                                style={styles.speakBtn(is_recording, (this.state.playState == 'play' || this.state.speakBlur))}
-                                onLongPress={async () => {
-                                    this.connectSocket()
+                            <SpeechToText
+                                btnDisabled={(this.state.playState == 'play' || this.state.speakBlur)}
+                                btnStyle={styles.speakBtn(is_recording, (this.state.playState == 'play' || this.state.speakBlur))}
+                                btnContent={<Image source={MicIcon} style={styles.speakBtnImg(is_recording)} />}
+                                onSpeechStart={() => {
                                     this.resetTimeout()
+                                    this.setState({
+                                        "is_recording": true,
+                                        "playState": false,
+                                        "last_played_voice": {}
+                                    });
                                 }}
-                                onPressOut={async () => {
-                                    await this.onSpeakRelease()
-                                }}>
-                                <Image source={MicIcon} style={styles.speakBtnImg(is_recording)} />
-                            </TouchableOpacity>
+                                onSpeechStop={(text) => {
+                                    // this.onMessage(text, true)
+                                }}
+                                onSpeakResults={(text) => {
+                                    console.log(text);
+                                    this.onMessage(text)
+                                }}
+                                onSpeechFinalResults={(text)=>{
+                                    this.onMessage(text, true)
+                                }}
+                            />
                         </View>
                     </View>
                 </SafeAreaView>

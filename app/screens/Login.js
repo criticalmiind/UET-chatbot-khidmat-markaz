@@ -13,6 +13,7 @@ import Popup from '../components/Popup';
 import PoweredBy from '../components/PoweredBy';
 import HelpIcon from '../components/HelpIcon';
 import LoginVideoTutorial from '../components/LoginVideoTutorial';
+import SpeechToText from '../components/SpeechToText';
 
 class Login extends React.Component {
     constructor(props) {
@@ -23,8 +24,8 @@ class Login extends React.Component {
             'password': "",
             // 'userName': "cleUser",
             // 'password': "cle@Password",
-            // 'userName': '03049758182',
-            // 'password': "12345678",
+            'userName': '03049758182',
+            'password': "12345678",
         }
     }
 
@@ -64,6 +65,9 @@ class Login extends React.Component {
                         <Text style={styles.title}>{translate('e-service')}</Text>
                         <LoginVideoTutorial />
                         <View style={{ height: hp("4") }} />
+
+                        {/* <SpeechToText/> */}
+                        
                         <Input
                             Icon={SvgPhone}
                             placeholder={translate('phone-placeholder')}

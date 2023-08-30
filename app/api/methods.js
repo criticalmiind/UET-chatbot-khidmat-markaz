@@ -1,5 +1,4 @@
 import { PermissionsAndroid, Alert, Platform } from 'react-native';
-import AudioRecord from "react-native-audio-recording-stream";
 import { uid, wait } from "../utils";
 import Sound from "react-native-sound";
 import { call_application_manager, method } from '.';
@@ -18,43 +17,6 @@ export const check_microphone = async () => {
     }
 };
 
-export async function onSpeakPress(socket) {
-    if (this.playTimer) clearInterval(this.playTimer);
-    let audioPermission = await check_microphone();
-    if (audioPermission) {
-        await this.wait(100)
-        AudioRecord.start();
-        await this.wait(500)
-        this.setState({
-            "socket_status": true,
-            "socketio": socket,
-            "playState": false,
-            "is_recording": true,
-            "last_id": uid()
-        })
-    } else {
-        Alert.alert("Please Allow audio permission and try again!")
-    }
-}
-
-export async function onSpeakRelease() {
-    await this.wait(200)
-    const { socketio, socket_status } = this.state;
-    let audioFile = await AudioRecord.stop();
-    if (this.playTimer) clearInterval(this.playTimer);
-    this.setState({ "speakBlur": true, "speakPressed": false, "playState": false, "is_recording": false })
-    await this.wait(1500)
-    if (socketio && socket_status) {
-        socketio?.emit('audio_bytes', 'EOS')
-        socketio?.emit('audio_end')
-    }
-    if (socketio) socketio?.disconnect();
-    // this.setState({ "speakBlur": true, "speakPressed": false, "socketio": null, "playState": false, "is_recording": false, "last_id": false, "temp_text": "" })
-    this.setState({ "socketio": null, "last_id": false, "temp_text": "" })
-    await this.wait(100)
-    await this.get_query_answers()
-    // await this.wait(1000)
-}
 
 export async function get_query_answers() {
     const { chat_list, last_ids_list } = this.state;
