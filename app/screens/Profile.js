@@ -3,20 +3,18 @@ import { TouchableOpacity, StyleSheet, Text, View, Image, ScrollView, StatusBar,
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
-import { hp, isNullRetNull, wp } from '../utils';
+import { getItemByName, hp, wp } from '../utils';
 import Loader from '../components/Loader';
 import { translate } from '../i18n';
 import Input from '../components/Input';
 import Popup from '../components/Popup';
 import PoweredBy from '../components/PoweredBy';
-import HelpIcon from '../components/HelpIcon';
 import SelectDropdown from 'react-native-select-dropdown'
-import { Logo, SvgCPwd, SvgCalenderIcon, SvgCity, SvgGender, SvgMap, SvgPhone, SvgPwd, SvgReg, SvgUser } from '../constants/images';
-import cities from './../constants/cities.json';
-import tehseel from './../constants/tehseel.json';
+import { Logo, SvgCalenderIcon, SvgCity, SvgGender, SvgMap, SvgPhone, SvgReg, SvgUser } from '../constants/images';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Header from '../components/Header';
 import Button1 from '../components/Button1';
+import { call_application_manager, method } from '../api';
 
 const GENDER_LIST = [
     { name: translate("Male") },
@@ -24,24 +22,57 @@ const GENDER_LIST = [
     { name: translate("Other") },
 ]
 
-
 class Profile extends React.Component {
     constructor(props) {
         super(props)
+        const { userData, districtList, tehsilList, cityList } = this.props
         this.state = {
             "loader": false,
-            'name': '',
-            'cnic': '',
-            'userName': '',
-            'password': '',
-            'city': '',
-            'district': '',
-            'gender': translate('Male'),
-            'dateOfBirth': false,
+            ...userData,
+            "district": getItemByName(districtList, userData.district),
+            "tehsil": getItemByName(tehsilList, userData.tehsil),
+            "city": getItemByName(cityList, userData.city),
+            "dateOfBirth": new Date(userData.dateOfBirth)
+        }
+    }
+
+    UNSAFE_componentWillMount() {
+        this.get_profile()
+    }
+
+    async get_profile() {
+        const { userData } = this.props
+        this.setStateObj({ "loader": true })
+        let res = await call_application_manager({ 'function': method['getUserProfile'], 'sessionId': userData.sessionId })
+        if (res.resultFlag) {
+            this.setStateObj({ "loader": false })
+            this.props.updateRedux({ "userData": { ...userData, ...res } })
+        } else {
+            this.setStateObj({ "loader": false, "popup": { "show": true, "type": "wrong", "message": translate(res.message ? res.message : res.error) } })
         }
     }
 
     async update() {
+        const state = this.state
+        this.setStateObj({ "loader": true })
+        let res = await call_application_manager({
+            'function': method['updateUserProfile'],
+            "cnic": state.cnic,
+            "dateOfBirth": state.dateOfBirth,
+            "district": state.district.name,
+            "tehsil": state.tehsil.name,
+            "city": state.city.name,
+            "gender": state.gender,
+            "name": state.name,
+            "sessionId": state.sessionId,
+            "userName": state.userName,
+        })
+        if (res.resultFlag) {
+            this.setStateObj({ "popup": { "show": true, "type": "success", "message": "Profile updated!" } })
+            this.get_profile()
+        } else {
+            this.setStateObj({ "loader": false, "popup": { "show": true, "type": "wrong", "message": translate(res.message ? res.message : res.error) } })
+        }
     }
 
     setStateObj(data) {
@@ -55,13 +86,14 @@ class Profile extends React.Component {
             name,
             cnic,
             userName,
-            password,
-            confirm_password,
-            city,
             district,
+            tehsil,
+            city,
             gender,
             dateOfBirth,
         } = this.state;
+
+        const { districtList, tehsilList, cityList } = this.props;
 
         return (<>
             <Loader isShow={loader} />
@@ -116,54 +148,50 @@ class Profile extends React.Component {
                                 this.setState({ "userName": str })
                             }} />
 
-                        {/* <View style={{ height: hp("2") }} />
-                        <Input
-                            Icon={SvgPwd}
-                            placeholder={translate("Password")}
-                            value={password}
-                            secureTextEntry
-                            onChangeText={(str) => {
-                                this.setState({ "password": str })
-                            }} />
-
-                        <View style={{ height: hp("2") }} />
-                        <Input
-                            Icon={SvgCPwd}
-                            placeholder={translate("Confirm Password")}
-                            value={confirm_password}
-                            secureTextEntry
-                            onChangeText={(str) => {
-                                this.setState({ "confirm_password": str })
-                            }} /> */}
-
                         <View style={{ height: hp("2") }} />
                         <View style={{ flexDirection: 'row-reverse', alignSelf: 'center', justifyContent: 'space-between', width: wp('90') }}>
                             <SelectDropdown
-                                renderSearchInputLeftIcon={() => <SvgCity />}
-                                renderDropdownIcon={() => <SvgCity />}
-                                data={tehseel}
-                                buttonStyle={{ width: wp('44.5'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
-                                buttonTextStyle={styles.txt01}
-                                defaultButtonText={translate('City')}
-                                search={true}
-                                defaultValue={city}
-                                onSelect={(selectedItem) => {
-                                    this.setStateObj({ 'city': selectedItem.name })
-                                }}
-                                buttonTextAfterSelection={(selectedItem) => selectedItem.name}
-                                rowTextForSelection={(item) => item.name}
-                            />
-                            <SelectDropdown
                                 renderSearchInputLeftIcon={() => <SvgMap />}
                                 renderDropdownIcon={() => <SvgMap />}
-                                data={cities}
-                                buttonStyle={{ width: wp('44.5'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
+                                data={districtList}
+                                buttonStyle={{ width: wp('29'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
                                 buttonTextStyle={styles.txt01}
                                 defaultButtonText={translate('District')}
                                 search={true}
                                 defaultValue={district}
                                 onSelect={(selectedItem) => {
-                                    this.setStateObj({ 'district': selectedItem.name })
+                                    this.setStateObj({ 'district': selectedItem })
+                                }}
+                                buttonTextAfterSelection={(selectedItem) => selectedItem.name}
+                                rowTextForSelection={(item) => item.name}
+                            />
+
+                            <SelectDropdown
+                                renderSearchInputLeftIcon={() => <SvgMap />}
+                                renderDropdownIcon={() => <SvgMap />}
+                                data={tehsilList.filter((t)=> t.districtId == district.id)}
+                                buttonStyle={{ width: wp('29'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
+                                buttonTextStyle={styles.txt01}
+                                defaultButtonText={translate('Tehsil')}
+                                search={true}
+                                defaultValue={tehsil}
+                                onSelect={(selectedItem) => {
+                                    this.setStateObj({ 'tehsil': selectedItem })
+                                }}
+                                buttonTextAfterSelection={(selectedItem) => selectedItem.name}
+                                rowTextForSelection={(item) => item.name}
+                            />
+                            <SelectDropdown
+                                renderSearchInputLeftIcon={() => <SvgCity />}
+                                renderDropdownIcon={() => <SvgCity />}
+                                data={cityList.filter((c)=> c.tehsilId == tehsil.id )}
+                                buttonStyle={{ width: wp('29'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
+                                buttonTextStyle={styles.txt01}
+                                defaultButtonText={translate('City')}
+                                search={true}
+                                defaultValue={city}
+                                onSelect={(selectedItem) => {
+                                    this.setStateObj({ 'city': selectedItem })
                                 }}
                                 buttonTextAfterSelection={(selectedItem) => selectedItem.name}
                                 rowTextForSelection={(item) => item.name}
@@ -180,6 +208,7 @@ class Profile extends React.Component {
                         </TouchableOpacity>
                         {showDatePicker && <DateTimePicker
                             testID="dateTimePicker"
+                            display="spinner"
                             value={dateOfBirth ? dateOfBirth : new Date()}
                             mode={"date"}
                             is24Hour={true}
@@ -198,7 +227,7 @@ class Profile extends React.Component {
                             buttonTextStyle={styles.txt01}
                             defaultButtonText={translate('Gender')}
                             search={true}
-                            defaultValue={gender}
+                            defaultValue={{ "name": gender }}
                             onSelect={(i) => {
                                 this.setStateObj({ gender: i.name })
                             }}
@@ -218,16 +247,6 @@ class Profile extends React.Component {
                     <PoweredBy />
                     <View style={{ height: hp("3") }} />
                 </ScrollView>
-
-                {showDatePicker && <DateTimePicker
-                    testID="dateTimePicker"
-                    value={dateOfBirth ? dateOfBirth : new Date()}
-                    mode={"date"}
-                    is24Hour={true}
-                    onChange={(e) => {
-                        this.setState({ "dateOfBirth": e.nativeEvent.timestamp, "showDatePicker": false })
-                    }} />
-                }
             </SafeAreaView>
         </>);
     }

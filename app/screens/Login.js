@@ -21,10 +21,8 @@ class Login extends React.Component {
             "loader": false,
             'userName': "",
             'password': "",
-            // 'userName': "cleUser",
-            // 'password': "cle@Password",
-            // 'userName': '03049758182',
-            // 'password': "12345678",
+            'userName': '03049758182',
+            'password': "12345678",
         }
     }
 
@@ -34,11 +32,11 @@ class Login extends React.Component {
         let obj = { 'function': method['loginUser'], 'userName': userName, 'password': password }
         let res = await call_application_manager(obj)
         if (res.resultFlag) {
-            this.setState({ popup: { "show": true, "type": "success", "message": "Login Successfully!" } })
-            this.props.updateRedux({ "userData": res })
+            this.setState({ "loader": false, "popup": { "show": true, "type": "success", "message": "Login Successfully!" } })
+            let data = await call_application_manager({ 'function': method['getUserProfile'], 'sessionId': res.sessionId })
+            this.props.updateRedux({ "userData": { ...res, ...data.resultFlag ? data : {} } })
         } else {
-            this.setStateObj({ loader: false })
-            this.setState({ popup: { "show": true, "type": "wrong", "message": translate(res.message ? res.message : res.error) } })
+            this.setState({ "loader": false, "popup": { "show": true, "type": "wrong", "message": translate(res.message ? res.message : res.error) } })
         }
     }
 

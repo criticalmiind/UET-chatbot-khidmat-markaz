@@ -147,3 +147,13 @@ export function formatTime(secondsElapsed) {
   seconds = seconds < 10 ? '0' + seconds : seconds;
   return `${minutes || '00'}:${seconds || '00'}`;
 }
+
+export function getItemByName(list = [], name = '', returnIfNull={}) {
+  for (let i = 0; i < list.length; i++) {
+    const el = list[i];
+    if (el.name == name) {
+      return el
+    }
+  }
+  return returnIfNull
+}

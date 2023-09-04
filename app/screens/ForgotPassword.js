@@ -12,20 +12,54 @@ import Popup from '../components/Popup';
 import PoweredBy from '../components/PoweredBy';
 import Header from '../components/Header';
 import Button1 from '../components/Button1';
+import { call_application_manager, method } from '../api';
 
 class ForgotPassword extends React.Component {
     constructor(props) {
         super(props)
+        const { userData } = this.props
         this.state = {
             "loader": false,
             'userName': "",
             'password': "",
             'confirm_password': "",
+            ...userData,
         }
     }
 
     async update_passowrd() {
-        this.setState({ popup: { "show": true, "type": "wrong", "message": translate("This Feature is under construction") } })
+        const { userName, password, confirm_password, sessionId } = this.state;
+        const cameFrom = this.props.navigation.getParam('screen')
+
+        let error = false
+        if (password != confirm_password) error = 'Password doesn\'t matached'
+        if (isNullRetNull(password, '').length < 6) error = 'Password length should be greater then 5'
+        if(error){
+            this.setStateObj({ "popup": { "show": true, "type": "wrong", "message": translate(error) } })
+            return
+        }
+
+        this.setStateObj({ loader: true })
+
+        if (cameFrom == 'Settings') {
+            let obj = { 'function': method['updateUserPassword'], 'newPassword': password, 'sessionId': sessionId }
+            let res = await call_application_manager(obj)
+            if (res.resultFlag) {
+                this.setState({ "loader": false, "popup": { "show": true, "type": "success", "message": "Password update successfully!" } })
+            } else {
+                this.setStateObj({ "loader": false, "popup": { "show": true, "type": "wrong", "message": translate(res.message ? res.message : res.error) } })
+            }
+        }
+
+        if (cameFrom == 'Login') {
+            let obj = { 'function': method['forgotPassword'], 'userName': userName, 'newPassword': password }
+            let res = await call_application_manager(obj)
+            if (res.resultFlag) {
+                this.setState({ "loader": false, "popup": { "show": true, "type": "success", "message": "Password reset successfully!" } })
+            } else {
+                this.setStateObj({ "loader": false, "popup": { "show": true, "type": "wrong", "message": translate(res.message ? res.message : res.error) } })
+            }
+        }
     }
 
     setStateObj(data) {
@@ -34,7 +68,6 @@ class ForgotPassword extends React.Component {
 
     render() {
         const { loader, userName, password, confirm_password } = this.state;
-        let disabled_login = (isNullRetNull(userName, 1) == 1 || isNullRetNull(password, 1) == 1 || password != confirm_password)
         const cameFrom = this.props.navigation.getParam('screen')
 
         return (<>
@@ -65,6 +98,7 @@ class ForgotPassword extends React.Component {
                             Icon={SvgPhone}
                             placeholder={translate('phone-placeholder')}
                             value={userName}
+                            disabled={cameFrom == 'Settings'}
                             onChangeText={(str) => {
                                 this.setState({ "userName": str })
                             }} />
@@ -85,7 +119,7 @@ class ForgotPassword extends React.Component {
                         <Input
                             viewStyle={{ width: wp('84') }}
                             Icon={SvgPwd}
-                            placeholder={translate("Password")}
+                            placeholder={translate("Confirm Password")}
                             value={confirm_password}
                             secureTextEntry
                             onChangeText={(str) => {

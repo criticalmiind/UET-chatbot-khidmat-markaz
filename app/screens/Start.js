@@ -47,6 +47,21 @@ class Start extends React.Component {
         }
     }
 
+    async logout(){
+        const { sessionId } = this.props.userData
+        this.setState({ "loader": true })
+        let obj = { 'function': method['userLogout'], 'sessionId': sessionId }
+        let res = await call_application_manager(obj)
+        if (res.resultFlag) {
+            this.setState({ "popup": { "show": true, "type": "success", "message": translate("Logout successfully!") } })
+        } else {
+            this.setState({ "popup": { "show": true, "type": "wrong", "message": translate(res.message) } })
+        }
+        setTimeout(() => {
+            this.props.updateRedux({ "userData": {}, "resources": {} })
+        }, 2000);
+    }
+
     render() {
         const { loader, isSlider, audioSettingPopup } = this.state;
         const { sessionId } = this.props.userData;
@@ -110,6 +125,7 @@ class Start extends React.Component {
                     onClose={() => { this.setState({ isSlider: false }) }} navigation={this.props.navigation}
                     onAction={(state)=>{
                         if(state == 'setting') this.setState({ "audioSettingPopup": true })
+                        if(state == 'logout') this.logout()
                     }}/>
                 }
                 <View style={styles.safeArea}>

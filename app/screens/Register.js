@@ -4,13 +4,11 @@ import SelectDropdown from 'react-native-select-dropdown'
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
-import { hp, isNullRetNull, notify, wp } from '../utils';
-import { Logo, Logo01, SvgCPwd, SvgCalenderIcon, SvgCity, SvgGender, SvgHelp, SvgMap, SvgPhone, SvgPwd, SvgReg, SvgUser } from '../constants/images';
+import { hp, wp } from '../utils';
+import { Logo, SvgCPwd, SvgCalenderIcon, SvgCity, SvgGender, SvgMap, SvgPhone, SvgPwd, SvgReg, SvgUser } from '../constants/images';
 import { call_application_manager, method } from '../api';
 import Loader from '../components/Loader';
 import { translate } from '../i18n';
-import cities from './../constants/cities.json';
-import tehseel from './../constants/tehseel.json';
 import Input from '../components/Input';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Popup from '../components/Popup';
@@ -32,20 +30,11 @@ class Register extends React.Component {
             'name': '',
             'userName': '',
             'password': '',
-            'city': '',
-            'district': '',
+            'district': {},
+            'tehsil': {},
+            'city': {},
             'gender': translate("Male"),
             'dateOfBirth': false,
-
-
-            // 'name': 'Test',
-            // 'userName': 'Test',
-            // 'password': 'Test',
-            // 'confirm_password': 'Test',
-            // 'city': '',
-            // 'district': '',
-            // 'gender': "Male",
-            // 'dateOfBirth': false,
         }
     }
 
@@ -55,8 +44,9 @@ class Register extends React.Component {
             userName,
             password,
             confirm_password,
-            city,
             district,
+            tehsil,
+            city,
             gender,
             dateOfBirth
         } = this.state;
@@ -67,18 +57,16 @@ class Register extends React.Component {
         this.setStateObj({ loader: true })
         let obj = {
             'function': method['signUpUser'],
-            // 'name': name,
+            'name': name,
             'userName': userName,
             'password': password,
-            'city': city,
-            // 'district':district,
-            'tehsil': district,
+            'district': district.name,
+            'tehsil': tehsil.name,
+            'city': city.name,
             'gender': translate(gender),
             'dataOfBirth': dateOfBirth
         }
         this.setStateObj({ loader: false })
-        console.log(obj);
-        return
         let res = await call_application_manager(obj)
         this.setStateObj({ loader: false })
         if (res.resultFlag) {
@@ -105,11 +93,18 @@ class Register extends React.Component {
             userName,
             password,
             confirm_password,
-            city,
             district,
+            tehsil,
+            city,
             gender,
             dateOfBirth,
         } = this.state;
+
+        const {
+            districtList,
+            cityList,
+            tehsilList
+        } = this.props;
 
         let disabled_reg = () => {
             // if (isNullRetNull(name, 1) == 1) return true
@@ -169,21 +164,21 @@ class Register extends React.Component {
                         <View style={{ height: hp("2") }} />
                         <View style={{ flexDirection: 'row-reverse', alignSelf: 'center', justifyContent: 'space-between', width: wp('90') }}>
                             <SelectDropdown
-                                renderSearchInputLeftIcon={() => <SvgCity />}
-                                renderDropdownIcon={() => <SvgCity />}
-                                data={tehseel}
-                                buttonStyle={{ width: wp('44.5'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
-                                searchInputStyle={{ flexDirection:'row-reverse' }}
-                                searchInputTxtStyle={{ textAlign: "right", fontFamily:theme.font01 }}
-                                rowTextStyle={{ fontFamily:theme.font01 }}
-                                selectedRowStyle={{ backgroundColor:theme.designColor }}
-                                selectedRowTextStyle={{ color:"#fff" }}
+                                renderSearchInputLeftIcon={() => <SvgMap />}
+                                renderDropdownIcon={() => <SvgMap />}
+                                data={districtList}
+                                buttonStyle={{ width: wp('29'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
+                                searchInputStyle={{ flexDirection: 'row-reverse' }}
+                                searchInputTxtStyle={{ textAlign: "right", fontFamily: theme.font01 }}
+                                rowTextStyle={{ fontFamily: theme.font01 }}
+                                selectedRowStyle={{ backgroundColor: theme.designColor }}
+                                selectedRowTextStyle={{ color: "#fff" }}
                                 buttonTextStyle={styles.txt01}
-                                defaultButtonText={translate('City')}
+                                defaultButtonText={translate('District')}
                                 search={true}
-                                defaultValue={city}
+                                defaultValue={district}
                                 onSelect={(selectedItem) => {
-                                    this.setStateObj({ 'city': selectedItem.name })
+                                    this.setStateObj({ 'district': selectedItem })
                                 }}
                                 buttonTextAfterSelection={(selectedItem) => selectedItem.name}
                                 rowTextForSelection={(item) => item.name}
@@ -191,19 +186,39 @@ class Register extends React.Component {
                             <SelectDropdown
                                 renderSearchInputLeftIcon={() => <SvgMap />}
                                 renderDropdownIcon={() => <SvgMap />}
-                                data={cities}
-                                buttonStyle={{ width: wp('44.5'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
-                                searchInputStyle={{ flexDirection:'row-reverse' }}
-                                searchInputTxtStyle={{ textAlign: "right", fontFamily:theme.font01 }}
-                                rowTextStyle={{ fontFamily:theme.font01 }}
-                                selectedRowStyle={{ backgroundColor:theme.designColor }}
-                                selectedRowTextStyle={{ color:"#fff" }}
+                                data={tehsilList.filter((t)=> t.districtId == district.id )}
+                                buttonStyle={{ width: wp('29'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
+                                searchInputStyle={{ flexDirection: 'row-reverse' }}
+                                searchInputTxtStyle={{ textAlign: "right", fontFamily: theme.font01 }}
+                                rowTextStyle={{ fontFamily: theme.font01 }}
+                                selectedRowStyle={{ backgroundColor: theme.designColor }}
+                                selectedRowTextStyle={{ color: "#fff" }}
                                 buttonTextStyle={styles.txt01}
-                                defaultButtonText={translate('District')}
+                                defaultButtonText={translate('Tehsil')}
                                 search={true}
-                                defaultValue={district}
+                                defaultValue={tehsil}
                                 onSelect={(selectedItem) => {
-                                    this.setStateObj({ 'district': selectedItem.name })
+                                    this.setStateObj({ 'tehsil': selectedItem })
+                                }}
+                                buttonTextAfterSelection={(selectedItem) => selectedItem.name}
+                                rowTextForSelection={(item) => item.name}
+                            />
+                            <SelectDropdown
+                                renderSearchInputLeftIcon={() => <SvgCity />}
+                                renderDropdownIcon={() => <SvgCity />}
+                                data={cityList.filter((c)=> c.tehsilId == tehsil.id )}
+                                buttonStyle={{ width: wp('29'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
+                                searchInputStyle={{ flexDirection: 'row-reverse' }}
+                                searchInputTxtStyle={{ textAlign: "right", fontFamily: theme.font01 }}
+                                rowTextStyle={{ fontFamily: theme.font01 }}
+                                selectedRowStyle={{ backgroundColor: theme.designColor }}
+                                selectedRowTextStyle={{ color: "#fff" }}
+                                buttonTextStyle={styles.txt01}
+                                defaultButtonText={translate('City')}
+                                search={true}
+                                defaultValue={city}
+                                onSelect={(selectedItem) => {
+                                    this.setStateObj({ 'city': selectedItem })
                                 }}
                                 buttonTextAfterSelection={(selectedItem) => selectedItem.name}
                                 rowTextForSelection={(item) => item.name}
@@ -236,11 +251,11 @@ class Register extends React.Component {
                             renderSearchInputLeftIcon={() => <SvgGender />}
                             data={GENDER_LIST}
                             buttonStyle={{ width: wp('90'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
-                            searchInputStyle={{ flexDirection:'row-reverse' }}
-                            searchInputTxtStyle={{ textAlign: "right", fontFamily:theme.font01 }}
-                            rowTextStyle={{ fontFamily:theme.font01 }}
-                            selectedRowStyle={{ backgroundColor:theme.designColor }}
-                            selectedRowTextStyle={{ color:"#fff" }}
+                            searchInputStyle={{ flexDirection: 'row-reverse' }}
+                            searchInputTxtStyle={{ textAlign: "right", fontFamily: theme.font01 }}
+                            rowTextStyle={{ fontFamily: theme.font01 }}
+                            selectedRowStyle={{ backgroundColor: theme.designColor }}
+                            selectedRowTextStyle={{ color: "#fff" }}
                             buttonTextStyle={styles.txt01}
                             defaultButtonText={translate('Gender')}
                             search={true}

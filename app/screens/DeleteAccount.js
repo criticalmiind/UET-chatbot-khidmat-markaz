@@ -12,6 +12,7 @@ import Popup from '../components/Popup';
 import PoweredBy from '../components/PoweredBy';
 import Header from '../components/Header';
 import Button1 from '../components/Button1';
+import { call_application_manager, method } from '../api';
 
 class DeleteAccount extends React.Component {
     constructor(props) {
@@ -23,8 +24,19 @@ class DeleteAccount extends React.Component {
         }
     }
 
-    async update_passowrd() {
-        this.setState({ popup: { "show": true, "type": "wrong", "message": translate("This Feature is under construction") } })
+    async delete_account() {
+        const { sessionId } = this.props.userData;
+        const { userName, password } = this.state;
+        this.setStateObj({ loader: true })
+        let obj = { 'function': method['deleteUserAccount'], 'userName': userName, 'password': password, 'sessionId': sessionId }
+        let res = await call_application_manager(obj)
+        if (res.resultFlag) {
+            this.setState({ popup: { "show": true, "type": "success", "message": "Account deleted successfully!" } })
+            this.props.updateRedux({ "userData": {} })
+        } else {
+            this.setStateObj({ "loader": false, "popup": { "show": true, "type": "wrong", "message": translate(res.message ? res.message : res.error) } })
+        }
+        // this.setState({ popup: { "show": true, "type": "wrong", "message": translate("This Feature is under construction") } })
     }
 
     setStateObj(data) {
@@ -85,7 +97,7 @@ class DeleteAccount extends React.Component {
                             style={styles.btn}
                             btnTxt={styles.btnTxt}
                             onPress={() => {
-                                this.update_passowrd()
+                                this.delete_account()
                             }}>
                             <SvgDelete />
                         </Button1>

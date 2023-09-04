@@ -13,13 +13,16 @@ import { Logo } from '../constants/images';
 import Header from '../components/Header';
 import RatingStars from '../components/RatingStars';
 import Button1 from '../components/Button1';
+import { call_application_manager, method } from '../api';
 
 
 class Rating extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            "loader": false
+            "loader": false,
+            "rateStar": false,
+            "feedback": "",
         }
     }
 
@@ -27,8 +30,21 @@ class Rating extends React.Component {
         this.setState({ ...this, ...data })
     }
 
+    async rate_app(){
+        const { sessionId } = this.props.userData;
+        const { rateStar, feedback } = this.state;
+        this.setStateObj({ loader: true })
+        let obj = { 'function': method['userFeedback'], 'sessionId': sessionId, 'rateStar':rateStar, 'feedback':feedback }
+        let res = await call_application_manager(obj)
+        if (res.resultFlag) {
+            this.setState({ popup: { "show": true, "type": "success", "message": "Thank you for feedback!" } })
+        } else {
+            this.setStateObj({ "loader": false, "popup": { "show": true, "type": "wrong", "message": translate(res.message ? res.message : res.error) } })
+        }
+    }
+
     render() {
-        const { loader } = this.state;
+        const { loader, rateStar, feedback } = this.state;
 
         return (<>
             <Loader isShow={loader} />
@@ -52,9 +68,9 @@ class Rating extends React.Component {
                         <View style={{ height: hp("1") }} />
                         <View style={styles.view01}>
                             <RatingStars
-                                // defualtValue={rateValue}
+                                defualtValue={rateStar}
                                 getRatevalue={(val) => {
-                                    // this.setState({ rateValue: val })
+                                    this.setState({ rateStar: val })
                                 }} />
                         </View>
                         <Text style={styles.title}>{translate('Rate This App')}</Text>
@@ -64,7 +80,7 @@ class Rating extends React.Component {
                             multiline
                             placeholder={translate('Record your valuable suggestions')}
                             numberOfLines={8}
-                            // value='sakdjaskl'
+                            value={feedback}
                             textAlign={"right"}
                             style={{
                                 padding:hp('1.5'),
@@ -77,10 +93,13 @@ class Rating extends React.Component {
                                 lineHeight:10,
                                 textAlignVertical:'top'
                             }}
+                            onChangeText={(str)=>{
+                                this.setState({ feedback: str })
+                            }}
                         />
 
                         <View style={{ height: hp("8") }} />
-                        <Button1 title="Submit" onPress={() => { }} />
+                        <Button1 title="Submit" onPress={() => { this.rate_app() }} />
                         <View style={{ height: hp("9") }} />
                     </View>
                     <PoweredBy />

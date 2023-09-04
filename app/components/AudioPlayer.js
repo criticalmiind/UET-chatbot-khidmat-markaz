@@ -39,7 +39,7 @@ class AudioPlayer extends Component {
       return
     }
     if (this.state.isPlaying == false) {
-      let path = await base64IntoPath(this.isBase64 ? this.props.audio : AUDIO[this.props.audio])
+      let path = await base64IntoPath(this.props.isBase64 ? this.props.audio : AUDIO[this.props.audio])
       this.sound = new Sound(path, '', (error) => {
         this.onSoundPlay(error)
         this.sound.play((success) => {

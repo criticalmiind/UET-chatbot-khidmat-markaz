@@ -15,13 +15,14 @@ class Input extends React.Component {
     }
 
     render() {
-        const { Icon, iconStyle = {}, secureTextEntry, viewStyle = {}, textInputStyle = {} } = this.props;
+        const { Icon, iconStyle = {}, secureTextEntry, viewStyle = {}, textInputStyle = {}, disabled } = this.props;
         const { showPwd } = this.state;
 
         return (
             <View style={{ ...styles.view, ...viewStyle }}>
                 {Icon && <View style={{ ...styles.icon, ...iconStyle }}><Icon /></View>}
                 <TextInput
+                    editable={!disabled}
                     style={{ ...styles.textInput, ...textInputStyle }}
                     placeholderTextColor={"#939393"}
                     {...this.props}
@@ -59,7 +60,8 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 14,
         fontFamily: theme.font01,
-        color:"#333"
+        color:"#333",
+        lineHeight: 20
     },
     icon: {
         paddingLeft: wp('1'),

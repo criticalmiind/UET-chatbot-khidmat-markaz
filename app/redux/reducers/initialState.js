@@ -3,6 +3,10 @@ import { uid } from "../../utils";
 export const initialState = { 
     userData:{},
     resources:{},
+    cityList: [],
+    districtList: [],
+    tehsilList: [],
+
     audioRecordingOptions:{
         sampleRate: 16000,  // default 44100
         channels: 1,        // 1 - mono or 2 - stero, default 1

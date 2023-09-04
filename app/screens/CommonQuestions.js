@@ -10,6 +10,7 @@ import Popup from '../components/Popup';
 import PoweredBy from '../components/PoweredBy';
 import Header from '../components/Header';
 import AudioPlayer from '../components/AudioPlayer';
+import { call_application_manager, method } from '../api';
 
 class CommonQuestions extends React.Component {
     constructor(props) {
@@ -18,22 +19,47 @@ class CommonQuestions extends React.Component {
         this.state = {
             "loader": false,
             "expended": {},
-            "data_list": [
-                { "id": 1, "question": "help_q_01", "ans": "help_ans_01", "audio": "FAQSQUESTION1" },
-                { "id": 2, "question": "help_q_02", "ans": "help_ans_02", "audio": "FAQSQUESTION2" },
-                { "id": 3, "question": "help_q_03", "ans": "help_ans_03", "audio": "FAQSQUESTION3" },
-                { "id": 4, "question": "help_q_04", "ans": "help_ans_04", "audio": "FAQSQUESTION4" },
-                { "id": 5, "question": "help_q_05", "ans": "help_ans_05", "audio": "FAQSQUESTION5" },
-                { "id": 6, "question": "help_q_06", "ans": "help_ans_06", "audio": "FAQSQUESTION6" },
-                { "id": 7, "question": "help_q_07", "ans": "help_ans_07", "audio": "FAQSQUESTION7" },
-                { "id": 8, "question": "help_q_08", "ans": "help_ans_08", "audio": "FAQSQUESTION8" },
-                { "id": 9, "question": "help_q_09", "ans": "help_ans_09", "audio": "FAQSQUESTION9" },
-            ]
+            "data_list": []
         }
     }
 
     setStateObj(data) {
         this.setState({ ...this, ...data })
+    }
+
+    componentWillMount() {
+        this.get_faqs()
+    }
+
+    async get_faqs() {
+        this.setStateObj({ loader: true })
+        let obj = { 'function': method['getFaq'] }
+        let res = await call_application_manager(obj)
+        this.setStateObj({ loader: false })
+        if (res.resultFlag) {
+            let faqList = []
+            for (let i = 0; i < res.faqList.length; i++) {
+                const el = res.faqList[i];
+                faqList.push({ "id": i + 1, "question": el[0], "ans": el[1], "filename": el[2], "audio": false })
+            }
+            this.setState({ "data_list": faqList, "loader": false, })
+        } else {
+            this.setStateObj({ "loader": false, "popup": { "show": true, "type": "wrong", "message": translate(res.message ? res.message : res.error) } })
+        }
+    }
+
+    async get_faq_audio(item = {}) {
+        this.setStateObj({ "loader": true })
+        let obj = { 'function': method['getFaqAudio'], 'audioFileName': item['filename'] }
+        let res = await call_application_manager(obj)
+        if (res.resultFlag) {
+            this.setStateObj({
+                "expended": { ...item, "audio": res.faqAudioFile },
+                "loader": false
+            })
+        } else {
+            this.setStateObj({ "loader": false, "popup": { "show": true, "type": "wrong", "message": translate(res.message ? res.message : res.error) } })
+        }
     }
 
     render() {
@@ -68,7 +94,11 @@ class CommonQuestions extends React.Component {
                                             style={styles.btn01}
                                             onPress={async () => {
                                                 if (this.audioRef.current) await this.audioRef.current.stopAudio()
-                                                this.setStateObj({ "expended": item.id == expended.id ? {} : item })
+                                                if (item.id == expended.id) {
+                                                    this.setStateObj({ "expended": {} })
+                                                } else {
+                                                    await this.get_faq_audio(item)
+                                                }
                                             }}>
                                             <Text style={styles.txt03}>{translate(item.id)}</Text>
 
@@ -85,14 +115,15 @@ class CommonQuestions extends React.Component {
                                                     <Text style={styles.txt03}>{translate("Jeem")}</Text>
 
                                                     <View style={{ flexDirection: 'row-reverse', width: wp('84') }}>
-                                                        <Text style={styles.txt01}>{translate(item.ans)}</Text>
+                                                        <Text style={styles.txt01}>{translate(expended.ans)}</Text>
                                                     </View>
 
                                                 </View>
                                                 <View style={styles.v03}>
                                                     <AudioPlayer
                                                         ref={this.audioRef}
-                                                        audio={item.audio}
+                                                        audio={expended.audio}
+                                                        isBase64={true}
                                                         updateParent={(obj) => {
                                                             // this.setState(obj)
                                                         }} />

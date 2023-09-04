@@ -1,4 +1,4 @@
-const main_base_url = "https://bot.cle.org.pk/"
+const main_base_url = "https://cc.cle.org.pk/"
 export const SOCKET_CONFIG = (connection1) => ({ "transportOptions": { "polling": { "extraHeaders": { 'connectionid': connection1 } } } })
 
 export const uri = {
@@ -15,6 +15,16 @@ export const method = {
     "doSynthesis": "doSynthesis",
     "openAsrConnection": "openAsrConnection", // payload = {"function":"openAsrConnection","connectionId": connectionId}
     "connectionClose": "connectionClose", // payload = {"function":"connectionClose","connectionId": connectionId,"sessionId":sessionId}
+    "deleteUserAccount": "deleteUserAccount", // { 'function': 'deleteUserAccount', 'sessionId': sessionId, 'userName':'03345354727', 'password':'1234567' }
+    "updateUserPassword": "updateUserPassword", // { 'function': 'updateUserPassword', 'sessionId': sessionId, 'newPassword':"1234567" }
+    "forgotPassword": "forgotPassword", // { 'function': 'forgotPassword', 'userName':'033453523858527', 'newPassword':'12345678' }
+    "getUserProfile": "getUserProfile", // { 'function': 'getUserProfile', 'sessionId': sessionId }
+    "updateUserProfile": "updateUserProfile", // { 'function': 'updateUserProfile', 'sessionId': sessionId,'name': "Attaullah",'cnic': "49448488",'userName': '03345354727','district': "lahore",'tehsil': 'tangi','city': 'mandani','dateOfBirth': 'myDate','gender': 'gender' }
+    "userFeedback": "userFeedback", // { 'function': 'userFeedback', 'sessionId':sessionId, 'rateStar':'5', 'feedback':"Good" }
+    "userLogout": "userLogout", // { 'function': 'userLogout', 'sessionId': sessionId }
+    "getFaq": "getFaq", // { 'function': 'getFaq' }
+    "getFaqAudio": "getFaqAudio", // { 'function': 'getFaqAudio', 'audioFileName':'1.wav' }
+    "getLocation": "getLocation", // { 'function': 'getLocation' }
 }
 
 export async function run_scripts(string, signal) {

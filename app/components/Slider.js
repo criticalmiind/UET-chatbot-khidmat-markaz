@@ -81,7 +81,7 @@ class Slider extends React.Component {
                 <TouchableOpacity
                     style={styles.btn01}
                     onPress={async () => {
-                        this.props.updateRedux({ "userData": {}, "resources": {} })
+                        if(onAction) onAction('logout')
                     }}>
                     <Text style={styles.btnTxt}>{translate('Logout')}</Text>
                 </TouchableOpacity>
