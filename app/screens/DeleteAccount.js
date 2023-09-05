@@ -21,6 +21,7 @@ class DeleteAccount extends React.Component {
             "loader": false,
             'userName': "",
             'password': "",
+            ...this.props.userData
         }
     }
 
@@ -32,11 +33,12 @@ class DeleteAccount extends React.Component {
         let res = await call_application_manager(obj)
         if (res.resultFlag) {
             this.setState({ popup: { "show": true, "type": "success", "message": "Account deleted successfully!" } })
-            this.props.updateRedux({ "userData": {} })
+            setTimeout(() => {
+                this.props.updateRedux({ "userData": {} })
+            }, 2000)
         } else {
             this.setStateObj({ "loader": false, "popup": { "show": true, "type": "wrong", "message": translate(res.message ? res.message : res.error) } })
         }
-        // this.setState({ popup: { "show": true, "type": "wrong", "message": translate("This Feature is under construction") } })
     }
 
     setStateObj(data) {
@@ -73,9 +75,10 @@ class DeleteAccount extends React.Component {
                             viewStyle={{ width: wp('84') }}
                             Icon={SvgPhone}
                             placeholder={translate('phone-placeholder')}
+                            disabled={true}
                             value={userName}
                             onChangeText={(str) => {
-                                this.setState({ "userName": str })
+                                // this.setState({ "userName": str })
                             }} />
 
                         <View style={{ height: hp("1") }} />
