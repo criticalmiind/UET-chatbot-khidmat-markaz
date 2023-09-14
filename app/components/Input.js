@@ -15,13 +15,14 @@ class Input extends React.Component {
     }
 
     render() {
-        const { Icon, iconStyle = {}, secureTextEntry, viewStyle = {}, textInputStyle = {}, disabled } = this.props;
+        const { Icon, iconStyle = {}, secureTextEntry, viewStyle = {}, textInputStyle = {}, disabled, multiline=false } = this.props;
         const { showPwd } = this.state;
 
         return (
             <View style={{ ...styles.view, ...viewStyle }}>
                 {Icon && <View style={{ ...styles.icon, ...iconStyle }}><Icon /></View>}
                 <TextInput
+                    multiline={multiline}
                     editable={!disabled}
                     style={{ ...styles.textInput, ...textInputStyle }}
                     placeholderTextColor={"#939393"}

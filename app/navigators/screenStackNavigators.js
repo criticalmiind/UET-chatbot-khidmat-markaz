@@ -14,6 +14,7 @@ import CommonQuestions from "../screens/CommonQuestions";
 import Rating from "../screens/Rating";
 import Settings from "../screens/Settings";
 import ContactUs from "../screens/ContactUs";
+import Logs from "../screens/Logs";
 
 export const MainNav = createStackNavigator({
   Start: { screen: Start, navigationOptions: { headerShown: false } },
@@ -26,7 +27,7 @@ export const MainNav = createStackNavigator({
   Settings: { screen: Settings, navigationOptions: { headerShown: false } },
   ForgotPassword: { screen: ForgotPassword, navigationOptions: { headerShown: false } },
   ContactUs: { screen: ContactUs, navigationOptions: { headerShown: false } },
-
+  Logs: { screen: Logs, navigationOptions: { headerShown: false } },
 });
 
 export const AuthNav = createStackNavigator({

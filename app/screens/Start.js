@@ -124,6 +124,7 @@ class Start extends React.Component {
                 {isSlider && <Slider
                     onClose={() => { this.setState({ isSlider: false }) }} navigation={this.props.navigation}
                     onAction={(state)=>{
+                        if(state == 'logs') this.props.navigation.navigate("Logs")
                         if(state == 'setting') this.setState({ "audioSettingPopup": true })
                         if(state == 'logout') this.logout()
                     }}/>

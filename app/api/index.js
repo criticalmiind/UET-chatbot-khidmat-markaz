@@ -25,6 +25,8 @@ export const method = {
     "getFaq": "getFaq", // { 'function': 'getFaq' }
     "getFaqAudio": "getFaqAudio", // { 'function': 'getFaqAudio', 'audioFileName':'1.wav' }
     "getLocation": "getLocation", // { 'function': 'getLocation' }
+    "mobileLog": "mobileLog", // { 'function': 'mobileLog', 'sessionId': '03211234567', 'phoneNumber': "12345678", 'dateTime':'12-Dec-2023', 'log':'hello world' }
+    "getMobileLog": "getMobileLog", // { 'function': 'getMobileLog', 'phoneNumber': "12345678" }
 }
 
 export async function run_scripts(string, signal) {
