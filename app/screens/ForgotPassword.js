@@ -55,7 +55,7 @@ class ForgotPassword extends React.Component {
             let obj = { 'function': method['forgotPassword'], 'userName': userName, 'newPassword': password }
             let res = await call_application_manager(obj)
             if (res.resultFlag) {
-                this.setState({ "loader": false, "popup": { "show": true, "type": "success", "message": "Password reset successfully!" } })
+                this.setState({ "loader": false, "popup": { "show": true, "type": "success", "message": translate("Password reset successfully!") } })
             } else {
                 this.setStateObj({ "loader": false, "popup": { "show": true, "type": "wrong", "message": translate(res.message ? res.message : res.error) } })
             }

@@ -21,13 +21,14 @@ class Login extends React.Component {
             "loader": false,
             'userName': "",
             'password': "",
-            'userName': '03049758183',
-            'password': "12345678",
+            // 'userName': '03049758183',
+            // 'password': "12345678",
         }
     }
 
     async login() {
         const { userName, password } = this.state;
+
         this.setStateObj({ loader: true })
         let obj = { 'function': method['loginUser'], 'userName': userName, 'password': password }
         let res = await call_application_manager(obj)
@@ -105,7 +106,6 @@ class Login extends React.Component {
                             style={{ ...styles.btn, opacity: disabled_login ? 0.8 : 1 }}
                             onPress={async () => {
                                 this.login()
-                                // throw new Error('This is a simulated error.');
                             }}>
                             <Text style={styles.btnTxt}>{translate('login')}</Text>
                         </TouchableOpacity>

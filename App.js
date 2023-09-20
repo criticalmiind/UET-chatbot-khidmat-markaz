@@ -7,9 +7,8 @@ import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 import EntryPoint from "./app/EntryPoint";
 import { Alert, LogBox, Text, View } from "react-native";
 import CodePush from "react-native-code-push";
-import { call_application_manager, method } from "./app/api";
-
-// console.log(store.getState().userReducer);
+// import { call_application_manager, method } from "./app/api";
+import ErrorBoundary from "./app/components/ErrorBoundary";
 
 class App extends Component {
   _isMounted = false;
@@ -69,35 +68,37 @@ class App extends Component {
     return (<>
       <Provider store={store}>
         <PersistGate persistor={persistor}>
-          {loader ? <Update /> : <EntryPoint />}
+          <ErrorBoundary>
+            {loader ? <Update /> : <EntryPoint />}
+          </ErrorBoundary>
         </PersistGate>
       </Provider>
     </>);
   }
 }
 
-const logError = async (error) => {
-  const { userData } = store.getState().userReducer
-  // setTimeout(() => {
-  //   alert(`Error Saved: ${error}`)
-  // }, 2000)
-  console.log(`Error Saved: ${error}`);
+// const logError = async (error) => {
+//   const { userData } = store.getState().userReducer
+//   // setTimeout(() => {
+//   //   alert(`Error Saved: ${error}`)
+//   // }, 2000)
+//   console.log(`Error Saved: ${error}`);
 
-  let obj = {
-    'function': method['mobileLog'],
-    'sessionId': userData.sessionId,
-    'phoneNumber': userData.userName,
-    'dateTime': new Date(),
-    'log': `${error}`
-  }
-  let res = await call_application_manager(obj)
-  if (res.resultFlag) {
-    alert(`Error Saved: ${error}`)
-  } else {
-    alert(`Error Not Saved: ${error}`)
-  }
-};
+//   let obj = {
+//     'function': method['mobileLog'],
+//     'sessionId': userData.sessionId,
+//     'phoneNumber': userData.userName,
+//     'dateTime': new Date(),
+//     'log': `${error}`
+//   }
+//   let res = await call_application_manager(obj)
+//   if (res.resultFlag) {
+//     alert(`Error Saved: ${error}`)
+//   } else {
+//     alert(`Error Not Saved: ${error}`)
+//   }
+// };
 
-global.ErrorUtils.setGlobalHandler(logError);
+// global.ErrorUtils.setGlobalHandler(logError);
 
 export default gestureHandlerRootHOC(App)

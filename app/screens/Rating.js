@@ -37,7 +37,7 @@ class Rating extends React.Component {
         let obj = { 'function': method['userFeedback'], 'sessionId': sessionId, 'rateStar':rateStar, 'feedback':feedback }
         let res = await call_application_manager(obj)
         if (res.resultFlag) {
-            this.setState({ popup: { "show": true, "type": "success", "message": "Thank you for feedback!" } })
+            this.setState({ popup: { "show": true, "type": "success", "message": translate("Thank you for feedback!") } })
         } else {
             this.setStateObj({ "loader": false, "popup": { "show": true, "type": "wrong", "message": translate(res.message ? res.message : res.error) } })
         }

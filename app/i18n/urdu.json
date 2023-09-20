@@ -131,5 +131,17 @@
     "City can’t be left blank": "اندراج لازمی ہے",
     "Passwords don’t match": "پاس ورڈ مشابه نہیں ہیں",
     "Change Password": "پاس ورڈ تبدیل کریں",
-    "Log": "لاگ"
+    "Log": "لاگ",
+    "sessionError": "دوبارہ لاگ ان کریں",
+    "Password length should be greater then 5": "نئے پاس ورڈ کا اندراج درست نہیں",
+    "Password doesn't matached": "پاس ورڈ مشابه نہیں ہیں",
+    "Password reset successfully!": "پاس ورڈ اپ ڈیٹ ہو گیا ہے",
+    "userNotExist": "صارف رجسٹرڈ نہیں",
+    "Profile updated!": "پروفائل اپڈیٹ ہو گئی ہے",
+    "accountNotExist": "صارف رجسٹرڈ نہیں",
+    "account deleted successfully!": "اکاؤنٹ ڈیلیٹ ہو گیا ہے",
+    "alreadyRegistered": "اس نمبر پر پہلے ہی صارف رجسٹرڈ ہے",
+    "Registered Successfully! Now please login!": "صارف کی رجسٹریشن ہو چکی ہے۔ لاگ ان کریں",
+    "Thank you for feedback!": "اپنی قیمتی رائے دینے کا شکریہ",
+    "connectionClosed": "رابطہ ختم ہو گیا ہے"
 }

@@ -68,7 +68,7 @@ class Profile extends React.Component {
             "userName": state.userName,
         })
         if (res.resultFlag) {
-            this.setStateObj({ "popup": { "show": true, "type": "success", "message": "Profile updated!" } })
+            this.setStateObj({ "popup": { "show": true, "type": "success", "message": translate("Profile updated!") } })
             this.get_profile()
         } else {
             this.setStateObj({ "loader": false, "popup": { "show": true, "type": "wrong", "message": translate(res.message ? res.message : res.error) } })

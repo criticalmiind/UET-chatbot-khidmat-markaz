@@ -13,7 +13,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AudioSetting from '../components/AudioSetting';
 import Slider from '../components/Slider';
 import Button1 from '../components/Button1';
-// import ZoomableArea from '../components/ZoomableArea';
 
 class Start extends React.Component {
     constructor(props) {
@@ -28,8 +27,6 @@ class Start extends React.Component {
     async componentWillUnmount() { }
 
     async get_resources(session) {
-        // this.props.navigation.navigate("LetsBegin")
-        // return
         this.setState({ loader: true })
         let obj = { 'function': method['startService'], 'sessionId': session }
         let res = await call_application_manager(obj)
@@ -47,7 +44,7 @@ class Start extends React.Component {
         }
     }
 
-    async logout(){
+    async logout() {
         const { sessionId } = this.props.userData
         this.setState({ "loader": true })
         let obj = { 'function': method['userLogout'], 'sessionId': sessionId }
@@ -108,13 +105,12 @@ class Start extends React.Component {
                             <View style={{ width: wp('1') }} />
                         </Button1>
                         <View style={{ height: hp("2") }} />
+                        <Text>{this.state.test}</Text>
                     </>
                     }
                 </View>
-                {/* </ZoomableAreaView> */}
             </>)
         }
-        // return <ZoomableArea/>
 
         return (<>
             <Loader isShow={loader} />
@@ -123,11 +119,11 @@ class Start extends React.Component {
             <SafeAreaView style={styles.safeArea} forceInset={{ top: 'always' }}>
                 {isSlider && <Slider
                     onClose={() => { this.setState({ isSlider: false }) }} navigation={this.props.navigation}
-                    onAction={(state)=>{
-                        if(state == 'logs') this.props.navigation.navigate("Logs")
-                        if(state == 'setting') this.setState({ "audioSettingPopup": true })
-                        if(state == 'logout') this.logout()
-                    }}/>
+                    onAction={(state) => {
+                        if (state == 'logs') this.props.navigation.navigate("Logs")
+                        if (state == 'setting') this.setState({ "audioSettingPopup": true })
+                        if (state == 'logout') this.logout()
+                    }} />
                 }
                 <View style={styles.safeArea}>
                     <View style={styles.header}>

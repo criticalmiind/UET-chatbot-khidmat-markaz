@@ -70,7 +70,7 @@ class Register extends React.Component {
         let res = await call_application_manager(obj)
         this.setStateObj({ loader: false })
         if (res.resultFlag) {
-            this.setState({ popup: { "show": true, "type": "success", "message": "Registered Successfully! Now please login!" } })
+            this.setState({ popup: { "show": true, "type": "success", "message": translate("Registered Successfully! Now please login!") } })
             setTimeout(() => {
                 this.props.navigation.navigate("Login")
             }, 1500);
