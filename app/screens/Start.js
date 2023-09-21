@@ -40,7 +40,7 @@ class Start extends React.Component {
             this.setState({ loader: false, popup: { "show": true, "type": "wrong", "message": translate(res.message) } })
             setTimeout(() => {
                 this.props.updateRedux({ "userData": {}, "resources": {} })
-            }, 2000);
+            }, 3000);
         }
     }
 
@@ -56,7 +56,7 @@ class Start extends React.Component {
         }
         setTimeout(() => {
             this.props.updateRedux({ "userData": {}, "resources": {} })
-        }, 2000);
+        }, 3000);
     }
 
     render() {

@@ -4,7 +4,7 @@ import SelectDropdown from 'react-native-select-dropdown'
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
-import { hp, wp } from '../utils';
+import { hp, isNullRetNull, isObjEmpty, wp } from '../utils';
 import { Logo, SvgCPwd, SvgCalenderIcon, SvgCity, SvgGender, SvgMap, SvgPhone, SvgPwd, SvgReg, SvgUser } from '../constants/images';
 import { call_application_manager, method } from '../api';
 import Loader from '../components/Loader';
@@ -50,10 +50,23 @@ class Register extends React.Component {
             gender,
             dateOfBirth
         } = this.state;
-        if (password !== confirm_password) {
-            this.setState({ popup: { "show": true, "type": "wrong", "message": translate("Passwords don't match") } })
+
+        let error = ''
+        if (!isNullRetNull(userName, false)) error += translate("Phone number is required") + '.\n'
+        if (!isNullRetNull(password, false)) error += translate("Password is required") + '.\n'
+        if (isNullRetNull(password, false) && isNullRetNull(password, '').length <= 5) error += translate("Password length should be greater then 5") + '.\n'
+        if (isNullRetNull(password, false) && password !== confirm_password) error += translate("Passwords don't match") + '.\n'
+        if (isObjEmpty(district)) error += translate("District is required") + '.\n'
+        if (isObjEmpty(tehsil)) error += translate("Tehsil is required") + '.\n'
+        if (isObjEmpty(city)) error += translate("City is required") + '.\n'
+        if (!isNullRetNull(dateOfBirth, false)) error += translate("Date of Birth is required") + '.\n'
+        if (!isNullRetNull(gender, false)) error += translate("Gender is required") + '.\n'
+
+        if (!!isNullRetNull(error, false)) {
+            this.setState({ "popup": { "show": true, "type": "wrong", "message": error } })
             return
         }
+
         this.setStateObj({ loader: true })
         let obj = {
             'function': method['signUpUser'],
@@ -70,12 +83,12 @@ class Register extends React.Component {
         let res = await call_application_manager(obj)
         this.setStateObj({ loader: false })
         if (res.resultFlag) {
-            this.setState({ popup: { "show": true, "type": "success", "message": translate("Registered Successfully! Now please login!") } })
-            setTimeout(() => {
-                this.props.navigation.navigate("Login")
-            }, 1500);
+            this.setState({ "popup": { "show": true, "type": "success", "message": translate("Registered Successfully! Now please login!") } })
+            // setTimeout(() => {
+            //     this.props.navigation.navigate("Login")
+            // }, 1500);
         } else {
-            this.setState({ popup: { "show": true, "type": "wrong", "message": translate(res.message) } })
+            this.setState({ "popup": { "show": true, "type": "wrong", "message": translate(res.message) } })
 
         }
     }
@@ -186,7 +199,7 @@ class Register extends React.Component {
                             <SelectDropdown
                                 renderSearchInputLeftIcon={() => <SvgMap />}
                                 renderDropdownIcon={() => <SvgMap />}
-                                data={tehsilList.filter((t)=> t.districtId == district.id )}
+                                data={tehsilList.filter((t) => t.districtId == district.id)}
                                 buttonStyle={{ width: wp('29'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
                                 searchInputStyle={{ flexDirection: 'row-reverse' }}
                                 searchInputTxtStyle={{ textAlign: "right", fontFamily: theme.font01 }}
@@ -206,7 +219,7 @@ class Register extends React.Component {
                             <SelectDropdown
                                 renderSearchInputLeftIcon={() => <SvgCity />}
                                 renderDropdownIcon={() => <SvgCity />}
-                                data={cityList.filter((c)=> c.tehsilId == tehsil.id )}
+                                data={cityList.filter((c) => c.tehsilId == tehsil.id)}
                                 buttonStyle={{ width: wp('29'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
                                 searchInputStyle={{ flexDirection: 'row-reverse' }}
                                 searchInputTxtStyle={{ textAlign: "right", fontFamily: theme.font01 }}

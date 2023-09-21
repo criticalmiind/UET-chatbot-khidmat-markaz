@@ -32,7 +32,7 @@ class DeleteAccount extends React.Component {
         let obj = { 'function': method['deleteUserAccount'], 'userName': userName, 'password': password, 'sessionId': sessionId }
         let res = await call_application_manager(obj)
         if (res.resultFlag) {
-            this.setState({ popup: { "show": true, "type": "success", "message": "Account deleted successfully!" } })
+            this.setState({ popup: { "show": true, "type": "success", "message": translate("Account deleted successfully!") } })
             setTimeout(() => {
                 this.props.updateRedux({ "userData": {} })
             }, 2000)

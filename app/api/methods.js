@@ -3,6 +3,7 @@ import AudioRecord from "react-native-audio-recording-stream";
 import { uid, wait } from "../utils";
 import Sound from "react-native-sound";
 import { call_application_manager, method } from '.';
+import { translate } from '../i18n';
 var RNFS = require('react-native-fs');
 
 export const check_microphone = async () => {
@@ -75,7 +76,7 @@ export async function get_query_answers() {
                 "unique_id": unique_id,
                 "is_question": false,
                 "text": textArr,
-                "audio_files": resultFlag ? audioResponse : []
+                "audio_files": resultFlag ? audioResponse : textArr.map((a) => false)
             }
             this.setState({ "chat_list": chat_list })
 
@@ -120,6 +121,10 @@ export async function onPlayBack(obj, index) {
     if (index > -1) {
         for (let j = 0; j < obj['audio_files'].length; j++) {
             const el = obj['audio_files'][j];
+            if (!el) {
+                Alert.alert(translate("Audio Issue!"), translate("There is an issue in loading audio from server!"))
+                return
+            }
             if (i == index) {
                 this.setState({
                     "playState": 'paly',
@@ -138,6 +143,10 @@ export async function onPlayBack(obj, index) {
         // Audios List
         for (let j = 0; j < obj['audio_files'].length; j++) {
             const el = obj['audio_files'][j];
+            if (!el) {
+                Alert.alert(translate("Audio Issue!"), translate("There is an issue in loading audio from server!"))
+                return
+            }
             await wait(500);
             this.setState({
                 "playState": 'paly',
@@ -157,6 +166,11 @@ export async function onPlayBack(obj, index) {
 }
 
 export async function play_message_handler(url, is_path = false) {
+    if (!url) {
+        Alert.alert(translate("Audio Issue!"), translate("There is an issue in loading audio from server!"))
+        return
+    }
+
     let new_url = url
     if (this.Sound) await this.Sound.stop()
     this.Sound = null

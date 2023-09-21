@@ -21,6 +21,7 @@ class Login extends React.Component {
             "loader": false,
             'userName': "",
             'password': "",
+            "loginData": {},
             // 'userName': '03049758183',
             // 'password': "12345678",
         }
@@ -33,9 +34,9 @@ class Login extends React.Component {
         let obj = { 'function': method['loginUser'], 'userName': userName, 'password': password }
         let res = await call_application_manager(obj)
         if (res.resultFlag) {
-            this.setState({ "loader": false, "popup": { "show": true, "type": "success", "message": "Login Successfully!" } })
+            this.setState({ "loader": false, "popup": { "show": true, "type": "success", "message": translate("Login Successfully!") } })
             let data = await call_application_manager({ 'function': method['getUserProfile'], 'sessionId': res.sessionId })
-            this.props.updateRedux({ "userData": { ...res, ...data.resultFlag ? data : {} } })
+            this.setStateObj({ "loginData": { ...res, ...data.resultFlag ? data : {} } })
         } else {
             this.setState({ "loader": false, "popup": { "show": true, "type": "wrong", "message": translate(res.message ? res.message : res.error) } })
         }
@@ -46,12 +47,16 @@ class Login extends React.Component {
     }
 
     render() {
-        const { loader, userName, password } = this.state;
+        const { loader, userName, password, loginData } = this.state;
         let disabled_login = (isNullRetNull(userName, 1) == 1 || isNullRetNull(password, 1) == 1)
 
         return (<>
             <Loader isShow={loader} />
-            <Popup {...this.state.popup} onClick={() => { this.setState({ popup: {} }) }} />
+            <Popup
+                {...this.state.popup}
+                onClick={() => {
+                    this.props.updateRedux({ "userData": loginData, "popup": {} })
+                }} />
             <View style={styles.safeArea}>
                 <ScrollView>
                     <View style={styles.mainView}>
@@ -87,7 +92,7 @@ class Login extends React.Component {
                             <TouchableOpacity
                                 style={styles.forgot_pwd_btn}
                                 onPress={() => {
-                                    this.props.navigation.navigate("ForgotPassword", { "screen":"Login" })
+                                    this.props.navigation.navigate("ForgotPassword", { "screen": "Login" })
                                 }}>
                                 <Text style={styles.forgot_pwd_txt}>{translate("I forgot my password?")}</Text>
                             </TouchableOpacity>
