@@ -32,8 +32,8 @@ class ForgotPassword extends React.Component {
         const cameFrom = this.props.navigation.getParam('screen')
 
         let error = false
-        if (password != confirm_password) error = 'Password doesn\'t matached'
-        if (isNullRetNull(password, '').length < 6) error = 'Password length should be greater then 5'
+        if (password != confirm_password) error = translate("Passwords doesn't matched")
+        if (isNullRetNull(password, '').length < 6) error = translate('Password length should be greater then 5')
         if(error){
             this.setStateObj({ "popup": { "show": true, "type": "wrong", "message": translate(error) } })
             return
@@ -45,7 +45,7 @@ class ForgotPassword extends React.Component {
             let obj = { 'function': method['updateUserPassword'], 'newPassword': password, 'sessionId': sessionId }
             let res = await call_application_manager(obj)
             if (res.resultFlag) {
-                this.setState({ "loader": false, "popup": { "show": true, "type": "success", "message": "Password update successfully!" } })
+                this.setState({ "loader": false, "popup": { "show": true, "type": "success", "message": translate("Password update successfully!") } })
             } else {
                 this.setStateObj({ "loader": false, "popup": { "show": true, "type": "wrong", "message": translate(res.message ? res.message : res.error) } })
             }
@@ -89,7 +89,8 @@ class ForgotPassword extends React.Component {
                         width: wp('90'),
                         backgroundColor: theme.designColor,
                         alignSelf: 'center',
-                        borderRadius: 10
+                        borderRadius: 10,
+                        zIndex:10
                     }}>
                         <Text style={styles.title}>{cameFrom == 'Login' && translate('Forgot Password') || cameFrom == 'Settings' && translate('Change Password')}</Text>
                         <View style={{ height: hp("1.5") }} />
@@ -162,6 +163,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.tertiary,
         flex: 1,
         justifyContent: 'center',
+        position:'relative'
     },
     btn: {
         backgroundColor: "#ffffff"

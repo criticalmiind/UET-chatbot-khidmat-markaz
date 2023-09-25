@@ -56,7 +56,7 @@ class Register extends React.Component {
         if (isNullRetNull(userName, false) && isNullRetNull(userName, '').length <= 10) error += translate("Phone Number length should be greater then 10") + '.\n'
         if (!isNullRetNull(password, false)) error += translate("Password is required") + '.\n'
         if (isNullRetNull(password, false) && isNullRetNull(password, '').length <= 5) error += translate("Password length should be greater then 5") + '.\n'
-        if (isNullRetNull(password, false) && password !== confirm_password) error += translate("Passwords don't match") + '.\n'
+        if (isNullRetNull(password, false) && password !== confirm_password) error += translate("Passwords doesn't matched") + '.\n'
         if (isObjEmpty(district)) error += translate("District is required") + '.\n'
         if (isObjEmpty(tehsil)) error += translate("Tehsil is required") + '.\n'
         if (isObjEmpty(city)) error += translate("City is required") + '.\n'
