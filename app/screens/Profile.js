@@ -16,19 +16,22 @@ import Header from '../components/Header';
 import Button1 from '../components/Button1';
 import { call_application_manager, method } from '../api';
 
+
 const GENDER_LIST = [
-    { name: translate("Male") },
-    { name: translate("Female") },
-    { name: translate("Other") },
+    { "name": translate("Male"), "value": "Male" },
+    { "name": translate("Female"), "value": "Female" },
+    { "name": translate("Other"), "value": "Other" },
 ]
 
 class Profile extends React.Component {
     constructor(props) {
         super(props)
         const { userData, districtList, tehsilList, cityList } = this.props
+        console.log(getItemByName(GENDER_LIST, userData.gender));
         this.state = {
             "loader": false,
             ...userData,
+            "gender": getItemByName(GENDER_LIST, userData.gender),
             "district": getItemByName(districtList, userData.district),
             "tehsil": getItemByName(tehsilList, userData.tehsil),
             "city": getItemByName(cityList, userData.city),
@@ -62,7 +65,7 @@ class Profile extends React.Component {
             "district": state.district.name,
             "tehsil": state.tehsil.name,
             "city": state.city.name,
-            "gender": state.gender,
+            "gender": state.gender.value,
             "name": state.name,
             "sessionId": state.sessionId,
             "userName": state.userName,
@@ -156,6 +159,11 @@ class Profile extends React.Component {
                                 data={districtList}
                                 buttonStyle={{ width: wp('29'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
                                 buttonTextStyle={styles.txt01}
+                                searchInputStyle={{ flexDirection: 'row-reverse' }}
+                                searchInputTxtStyle={{ textAlign: "right", fontFamily: theme.font01 }}
+                                rowTextStyle={{ fontFamily: theme.font01 }}
+                                selectedRowStyle={{ backgroundColor: theme.designColor }}
+                                selectedRowTextStyle={{ color: "#fff" }}
                                 defaultButtonText={translate('District')}
                                 search={true}
                                 defaultValue={district}
@@ -172,6 +180,11 @@ class Profile extends React.Component {
                                 data={tehsilList.filter((t)=> t.districtId == district.id)}
                                 buttonStyle={{ width: wp('29'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
                                 buttonTextStyle={styles.txt01}
+                                searchInputStyle={{ flexDirection: 'row-reverse' }}
+                                searchInputTxtStyle={{ textAlign: "right", fontFamily: theme.font01 }}
+                                rowTextStyle={{ fontFamily: theme.font01 }}
+                                selectedRowStyle={{ backgroundColor: theme.designColor }}
+                                selectedRowTextStyle={{ color: "#fff" }}
                                 defaultButtonText={translate('Tehsil')}
                                 search={true}
                                 defaultValue={tehsil}
@@ -187,6 +200,11 @@ class Profile extends React.Component {
                                 data={cityList.filter((c)=> c.tehsilId == tehsil.id )}
                                 buttonStyle={{ width: wp('29'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
                                 buttonTextStyle={styles.txt01}
+                                searchInputStyle={{ flexDirection: 'row-reverse' }}
+                                searchInputTxtStyle={{ textAlign: "right", fontFamily: theme.font01 }}
+                                rowTextStyle={{ fontFamily: theme.font01 }}
+                                selectedRowStyle={{ backgroundColor: theme.designColor }}
+                                selectedRowTextStyle={{ color: "#fff" }}
                                 defaultButtonText={translate('City')}
                                 search={true}
                                 defaultValue={city}
@@ -220,16 +238,20 @@ class Profile extends React.Component {
 
                         <SelectDropdown
                             searchPlaceHolder={translate('Gender')}
-                            searchInputTxtStyle={{ textAlign: "right" }}
                             renderDropdownIcon={() => <SvgGender />}
                             data={GENDER_LIST}
-                            buttonStyle={{ width: wp('90'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
                             buttonTextStyle={styles.txt01}
+                            buttonStyle={{ width: wp('90'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
+                            searchInputStyle={{ flexDirection: 'row-reverse' }}
+                            searchInputTxtStyle={{ textAlign: "right", fontFamily: theme.font01 }}
+                            rowTextStyle={{ fontFamily: theme.font01 }}
+                            selectedRowStyle={{ backgroundColor: theme.designColor }}
+                            selectedRowTextStyle={{ color: "#fff" }}
                             defaultButtonText={translate('Gender')}
-                            search={true}
-                            defaultValue={{ "name": gender }}
+                            // search={true}
+                            defaultValue={gender}
                             onSelect={(i) => {
-                                this.setStateObj({ gender: i.name })
+                                this.setStateObj({ gender: i })
                             }}
                             buttonTextAfterSelection={(i) => i.name}
                             rowTextForSelection={(item) => item.name}

@@ -5,7 +5,7 @@ import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userAction
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
 import { hp, isNullRetNull, isObjEmpty, wp } from '../utils';
-import { Logo, SvgCPwd, SvgCalenderIcon, SvgCity, SvgGender, SvgMap, SvgPhone, SvgPwd, SvgReg, SvgUser } from '../constants/images';
+import { Logo, SvgCPwd, SvgCalenderIcon, SvgCity, SvgGender, SvgMap, SvgPhone, SvgPwd, SvgReg } from '../constants/images';
 import { call_application_manager, method } from '../api';
 import Loader from '../components/Loader';
 import { translate } from '../i18n';
@@ -77,7 +77,7 @@ class Register extends React.Component {
             'district': district.name,
             'tehsil': tehsil.name,
             'city': city.name,
-            'gender': translate(gender),
+            'gender': gender.value,
             'dataOfBirth': dateOfBirth
         }
         this.setStateObj({ loader: false })

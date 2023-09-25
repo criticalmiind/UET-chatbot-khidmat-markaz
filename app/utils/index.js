@@ -151,7 +151,7 @@ export function formatTime(secondsElapsed) {
 export function getItemByName(list = [], name = '', returnIfNull={}) {
   for (let i = 0; i < list.length; i++) {
     const el = list[i];
-    if (el.name == name) {
+    if (el.name == name || el.value == name) {
       return el
     }
   }
