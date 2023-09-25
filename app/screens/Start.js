@@ -54,9 +54,7 @@ class Start extends React.Component {
         } else {
             this.setState({ "popup": { "show": true, "type": "wrong", "message": translate(res.message) } })
         }
-        setTimeout(() => {
-            this.props.updateRedux({ "userData": {}, "resources": {} })
-        }, 3000);
+        this.props.updateRedux({ "userData": {}, "resources": {} })
     }
 
     render() {

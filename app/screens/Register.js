@@ -33,7 +33,7 @@ class Register extends React.Component {
             'district': {},
             'tehsil': {},
             'city': {},
-            'gender': translate("Male"),
+            'gender': {},
             'dateOfBirth': false,
         }
     }
@@ -53,6 +53,7 @@ class Register extends React.Component {
 
         let error = ''
         if (!isNullRetNull(userName, false)) error += translate("Phone number is required") + '.\n'
+        if (isNullRetNull(userName, false) && isNullRetNull(userName, '').length <= 10) error += translate("Phone Number length should be greater then 10") + '.\n'
         if (!isNullRetNull(password, false)) error += translate("Password is required") + '.\n'
         if (isNullRetNull(password, false) && isNullRetNull(password, '').length <= 5) error += translate("Password length should be greater then 5") + '.\n'
         if (isNullRetNull(password, false) && password !== confirm_password) error += translate("Passwords don't match") + '.\n'
@@ -60,7 +61,7 @@ class Register extends React.Component {
         if (isObjEmpty(tehsil)) error += translate("Tehsil is required") + '.\n'
         if (isObjEmpty(city)) error += translate("City is required") + '.\n'
         if (!isNullRetNull(dateOfBirth, false)) error += translate("Date of Birth is required") + '.\n'
-        if (!isNullRetNull(gender, false)) error += translate("Gender is required") + '.\n'
+        if (isObjEmpty(gender)) error += translate("Gender is required") + '.\n'
 
         if (!!isNullRetNull(error, false)) {
             this.setState({ "popup": { "show": true, "type": "wrong", "message": error } })
@@ -133,7 +134,7 @@ class Register extends React.Component {
 
         return (<>
             <Loader isShow={loader} />
-            <Popup {...this.state.popup} onClick={() => { this.setState({ popup: {} }) }} />
+            <Popup {...this.state.popup} onClick={() => { this.setState({ "popup": {} }) }} />
             <View style={styles.safeArea}>
                 <ScrollView>
                     <View style={styles.mainView}>
@@ -147,6 +148,7 @@ class Register extends React.Component {
 
                         <View style={{ height: hp("2") }} />
                         <Input
+                            keyboardType={'decimal-pad'}
                             Icon={SvgPhone}
                             placeholder={translate('phone-placeholder')}
                             value={userName}
@@ -271,10 +273,10 @@ class Register extends React.Component {
                             selectedRowTextStyle={{ color: "#fff" }}
                             buttonTextStyle={styles.txt01}
                             defaultButtonText={translate('Gender')}
-                            search={true}
-                            defaultValue={translate(gender)}
-                            onSelect={(i) => {
-                                this.setStateObj({ "gender": i.value })
+                            // search={true}
+                            defaultValue={gender}
+                            onSelect={(g) => {
+                                this.setStateObj({ "gender": g })
                             }}
                             buttonTextAfterSelection={(i) => i.name}
                             rowTextForSelection={(item) => item.name}

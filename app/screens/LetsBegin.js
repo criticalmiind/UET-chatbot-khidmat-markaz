@@ -154,7 +154,7 @@ class LetsBegin extends React.PureComponent {
 
     closeSession = async () => {
         if (this.timeoutId) clearTimeout(this.timeoutId);
-        this.setState({ "screen_loader": true, "loader_message": "Closing Connection" })
+        this.setState({ "screen_loader": true })
         const res = await this.close_connection()
         this.setState({ "popup": { "show": true, "action": "session_closed", "type": res.resultFlag ? 'success' : "wrong", "message": translate(res.message) } })
         await this.wait(500)

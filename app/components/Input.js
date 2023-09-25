@@ -15,7 +15,7 @@ class Input extends React.Component {
     }
 
     render() {
-        const { Icon, iconStyle = {}, secureTextEntry, viewStyle = {}, textInputStyle = {}, disabled, multiline=false } = this.props;
+        const { Icon, iconStyle = {}, secureTextEntry, viewStyle = {}, textInputStyle = {}, disabled, multiline=false, keyboardType } = this.props;
         const { showPwd } = this.state;
 
         return (
@@ -24,6 +24,7 @@ class Input extends React.Component {
                 <TextInput
                     multiline={multiline}
                     editable={!disabled}
+                    keyboardType={keyboardType}
                     style={{ ...styles.textInput, ...textInputStyle }}
                     placeholderTextColor={"#939393"}
                     {...this.props}

@@ -34,9 +34,10 @@ class Login extends React.Component {
         let obj = { 'function': method['loginUser'], 'userName': userName, 'password': password }
         let res = await call_application_manager(obj)
         if (res.resultFlag) {
-            this.setState({ "loader": false, "popup": { "show": true, "type": "success", "message": translate("Login Successfully!") } })
+            // this.setState({ "loader": false, "popup": { "show": true, "type": "success", "message": translate("Login Successfully!") } })
             let data = await call_application_manager({ 'function': method['getUserProfile'], 'sessionId': res.sessionId })
-            this.setStateObj({ "loginData": { ...res, ...data.resultFlag ? data : {} } })
+            // this.setStateObj({ "loginData": { ...res, ...data.resultFlag ? data : {} } })
+            this.props.updateRedux({ "userData": { ...res, ...data.resultFlag ? data : {} } })
         } else {
             this.setState({ "loader": false, "popup": { "show": true, "type": "wrong", "message": translate(res.message ? res.message : res.error) } })
         }
@@ -55,7 +56,8 @@ class Login extends React.Component {
             <Popup
                 {...this.state.popup}
                 onClick={() => {
-                    this.props.updateRedux({ "userData": loginData, "popup": {} })
+                    this.setStateObj({ "popup": {} })
+                    // this.props.updateRedux({ "userData": loginData })
                 }} />
             <View style={styles.safeArea}>
                 <ScrollView>
@@ -70,6 +72,7 @@ class Login extends React.Component {
                         <View style={{ height: hp("4") }} />
                         <Input
                             Icon={SvgPhone}
+                            keyboardType={'decimal-pad'}
                             placeholder={translate('phone-placeholder')}
                             value={userName}
                             onChangeText={(str) => {
