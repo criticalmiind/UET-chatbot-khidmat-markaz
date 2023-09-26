@@ -34,7 +34,7 @@ class Register extends React.Component {
             'tehsil': {},
             'city': {},
             'gender': {},
-            'dateOfBirth': false,
+            'dateOfBirth': false
         }
     }
 
@@ -74,12 +74,13 @@ class Register extends React.Component {
             'name': name,
             'userName': userName,
             'password': password,
-            'district': district.name,
-            'tehsil': tehsil.name,
             'city': city.name,
+            'tehsil': tehsil.name,
+            'district': district.name,
+            'dateOfBirth': dateOfBirth.toLocaleDateString(),
             'gender': gender.value,
-            'dataOfBirth': dateOfBirth
         }
+        
         this.setStateObj({ loader: false })
         let res = await call_application_manager(obj)
         this.setStateObj({ loader: false })
