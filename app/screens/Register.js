@@ -207,6 +207,7 @@ class Register extends React.Component {
                             <SelectDropdown
                                 renderSearchInputLeftIcon={() => <SvgMap />}
                                 renderDropdownIcon={() => <SvgMap />}
+                                disabled={isObjEmpty(district)}
                                 data={tehsilList.filter((t) => t.districtId == district.id)}
                                 buttonStyle={{ width: wp('29'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
                                 searchInputStyle={{ flexDirection: 'row-reverse' }}
@@ -227,6 +228,7 @@ class Register extends React.Component {
                             <SelectDropdown
                                 renderSearchInputLeftIcon={() => <SvgCity />}
                                 renderDropdownIcon={() => <SvgCity />}
+                                disabled={isObjEmpty(district) || isObjEmpty(tehsil)}
                                 data={cityList.filter((c) => c.tehsilId == tehsil.id)}
                                 buttonStyle={{ width: wp('29'), alignSelf: 'center', height: hp('6'), borderBottomWidth: 2, borderColor: "#7A7A7A" }}
                                 searchInputStyle={{ flexDirection: 'row-reverse' }}
