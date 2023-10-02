@@ -80,12 +80,12 @@ class Register extends React.Component {
             'dateOfBirth': dateOfBirth.toLocaleDateString(),
             'gender': gender.value,
         }
-        
-        this.setStateObj({ loader: false })
+
+        this.setStateObj({ "loader": false })
         let res = await call_application_manager(obj)
-        this.setStateObj({ loader: false })
+        this.setStateObj({ "loader": false })
         if (res.resultFlag) {
-            this.setState({ "popup": { "show": true, "type": "success", "message": translate("Registered Successfully! Now please login!") } })
+            this.setState({ "reg_success":true, "popup": { "show": true, "type": "success", "message": translate("Registered Successfully! Now please login!") } })
             // setTimeout(() => {
             //     this.props.navigation.navigate("Login")
             // }, 1500);
@@ -135,7 +135,12 @@ class Register extends React.Component {
 
         return (<>
             <Loader isShow={loader} />
-            <Popup {...this.state.popup} onClick={() => { this.setState({ "popup": {} }) }} />
+            <Popup
+                {...this.state.popup}
+                onClick={() => {
+                    this.setState({ "popup": {} })
+                    if(this.state.reg_success) this.props.navigation.navigate("Login")
+                }} />
             <View style={styles.safeArea}>
                 <ScrollView>
                     <View style={styles.mainView}>

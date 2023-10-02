@@ -30,14 +30,14 @@ class Rating extends React.Component {
         this.setState({ ...this, ...data })
     }
 
-    async rate_app(){
+    async rate_app() {
         const { sessionId } = this.props.userData;
         const { rateStar, feedback } = this.state;
         this.setStateObj({ loader: true })
-        let obj = { 'function': method['userFeedback'], 'sessionId': sessionId, 'rateStar':rateStar, 'feedback':feedback }
+        let obj = { 'function': method['userFeedback'], 'sessionId': sessionId, 'rateStar': rateStar, 'feedback': feedback }
         let res = await call_application_manager(obj)
         if (res.resultFlag) {
-            this.setState({ popup: { "show": true, "type": "success", "message": translate("Thank you for feedback!") } })
+            this.setState({ "rateStar": false, "feedback": "", "loader": false, "popup": { "show": true, "type": "success", "message": translate("Thank you for feedback!") } })
         } else {
             this.setStateObj({ "loader": false, "popup": { "show": true, "type": "wrong", "message": translate(res.message ? res.message : res.error) } })
         }
@@ -48,7 +48,7 @@ class Rating extends React.Component {
 
         return (<>
             <Loader isShow={loader} />
-            <Popup {...this.state.popup} onClick={() => { this.setState({ popup: {} }) }} />
+            <Popup {...this.state.popup} onClick={() => { this.setState({ "popup": {} }) }} />
             <SafeAreaView style={styles.safeArea} forceInset={{ top: 'always' }}>
                 <StatusBar barStyle="light-content" backgroundColor={theme.designColor} />
                 <Header
@@ -61,7 +61,7 @@ class Rating extends React.Component {
 
                 <ScrollView>
                     <View style={styles.mainView}>
-                    <View style={{ height: hp("8") }} />
+                        <View style={{ height: hp("8") }} />
 
                         <Text style={styles.title}>{translate('Give us rating')}</Text>
 
@@ -82,18 +82,8 @@ class Rating extends React.Component {
                             numberOfLines={8}
                             value={feedback}
                             textAlign={"right"}
-                            style={{
-                                padding:hp('1.5'),
-                                width:wp('80'),
-                                borderWidth:1,
-                                borderColor:theme.designColor,
-                                borderRadius:10,
-                                backgroundColor:"#E8E8E8",
-                                fontFamily:theme.font01,
-                                lineHeight:10,
-                                textAlignVertical:'top'
-                            }}
-                            onChangeText={(str)=>{
+                            style={styles.textInput}
+                            onChangeText={(str) => {
                                 this.setState({ feedback: str })
                             }}
                         />
@@ -132,5 +122,16 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: theme.designColor
     },
-    view01: { flexDirection: 'row', height: hp('6'), width: '100%', alignItems: 'center', justifyContent: 'center' }
+    view01: { flexDirection: 'row', height: hp('6'), width: '100%', alignItems: 'center', justifyContent: 'center' },
+    textInput: {
+        padding: hp('1.5'),
+        width: wp('80'),
+        borderWidth: 1,
+        borderColor: theme.designColor,
+        borderRadius: 10,
+        backgroundColor: "#E8E8E8",
+        fontFamily: theme.font01,
+        lineHeight: 10,
+        textAlignVertical: 'top'
+    }
 });

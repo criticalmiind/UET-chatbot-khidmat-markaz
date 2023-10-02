@@ -32,8 +32,8 @@ class ForgotPassword extends React.Component {
         const cameFrom = this.props.navigation.getParam('screen')
 
         let error = false
-        if (password != confirm_password) error = translate("Passwords doesn't matched")
-        if (isNullRetNull(password, '').length < 6) error = translate('Password length should be greater then 5')
+        if (password != confirm_password) error = translate("New password does not match")
+        if (isNullRetNull(password, '').length < 6) error = translate("New password does not meet the requirements.")
         if(error){
             this.setStateObj({ "popup": { "show": true, "type": "wrong", "message": translate(error) } })
             return

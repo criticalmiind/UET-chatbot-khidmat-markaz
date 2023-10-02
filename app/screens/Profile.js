@@ -10,7 +10,7 @@ import Input from '../components/Input';
 import Popup from '../components/Popup';
 import PoweredBy from '../components/PoweredBy';
 import SelectDropdown from 'react-native-select-dropdown'
-import { Logo, SvgCalenderIcon, SvgCity, SvgGender, SvgMap, SvgPhone, SvgReg, SvgUser } from '../constants/images';
+import { Logo, SvgCNIC, SvgCalenderIcon, SvgCity, SvgGender, SvgMap, SvgPhone, SvgUser } from '../constants/images';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Header from '../components/Header';
 import Button1 from '../components/Button1';
@@ -27,7 +27,6 @@ class Profile extends React.Component {
     constructor(props) {
         super(props)
         const { userData, districtList, tehsilList, cityList } = this.props
-        console.log(getItemByName(GENDER_LIST, userData.gender));
         this.state = {
             "loader": false,
             ...userData,
@@ -135,7 +134,8 @@ class Profile extends React.Component {
                         <View style={{ height: hp("2") }} />
 
                         <Input
-                            Icon={SvgReg}
+                            Icon={SvgCNIC}
+                            iconStyle={{ tintColor: "#21347E" }}
                             placeholder={translate('CNIC')}
                             value={cnic}
                             onChangeText={(str) => {

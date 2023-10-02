@@ -61,7 +61,8 @@ const ThumbImg = () => <Image source={thumb} style={{ width: 3, height: 40, resi
 const SvgGender = () => <Image source={gender} style={{ width: 18, height: 40 }} /> //<SvgXml xml={popup_help}/>
 const SvgUpdate = () => <Image source={update} style={{ width: 28, height: 28, resizeMode: 'contain' }} /> //<SvgXml xml={popup_help}/>
 const SvgDelete = () => <Image source={delte} style={{ width: 28, height: 28, resizeMode: 'contain' }} /> //<SvgXml xml={popup_help}/>
-const SvgReg = () => <Image source={register} style={{ width: 20, height: 32, tintColor:'#333' }} /> //<SvgXml xml={popup_help}/>
+const SvgReg = (style) => <Image source={register} style={{ width: 20, height: 32, tintColor:'#fff', ...style }} /> //<SvgXml xml={popup_help}/>
+const SvgCNIC = (style) => <Image source={register} style={{ width: 20, height: 32, tintColor:'#21347E', ...style }} /> //<SvgXml xml={popup_help}/>
 const SvgClose = () => <Image source={close} style={{ width: 18, height: 18 }} /> //<SvgXml xml={popup_help}/>
 const VideoBg = ({style}) => <Image source={video} style={{ width: 18, height: 18, ...style }} /> //<SvgXml xml={popup_help}/>
 const PlayIcon1 = ({style}) => <Image source={play1} style={{ width: 18, height: 18, ...style }} /> //<SvgXml xml={popup_help}/>
@@ -95,6 +96,7 @@ export {
     SvgCPwd,
     SvgUpdate,
     SvgReg,
+    SvgCNIC,
     SvgHelp1,
     SvgDelete,
     SvgClose,
