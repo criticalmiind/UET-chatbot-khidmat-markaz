@@ -33,7 +33,7 @@ class ContactUs extends React.Component {
                 <StatusBar barStyle="light-content" backgroundColor={theme.designColor} />
                 <Header
                     onClickHelp={() => {
-                        this.setState({ popup: { "show": true, "title": "Instractions", "audio": "HelpScreen", "btnTitle": "Back", "type": "help", "message": translate("help screen help") } })
+                        this.setState({ popup: { "show": true, "title": "Instractions", "audio": "ContactUsScreen", "btnTitle": "Back", "type": "help", "message": translate("contact us screen help") } })
                     }}
                     onClickBack={() => {
                         this.props.navigation.goBack()

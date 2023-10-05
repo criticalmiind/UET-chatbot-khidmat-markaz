@@ -157,3 +157,29 @@ export function getItemByName(list = [], name = '', returnIfNull={}) {
   }
   return returnIfNull
 }
+
+export function validatePhoneNumber(phoneNumber) {
+  // Remove any spaces or dashes from the phone number
+  phoneNumber = phoneNumber.replace(/[-\s]/g, '');
+
+  // Check if the phone number starts with "03" and has a length of 11
+  if (/^03\d{9}$/.test(phoneNumber)) {
+    return true;
+  }
+
+  // Check if the phone number starts with "+92" and has a length of 13
+  if (/^\+92\d{10}$/.test(phoneNumber)) {
+    return true;
+  }
+  
+  if (/^92\d{10}$/.test(phoneNumber)) {
+    return true;
+  }
+
+  if (/^0092\d{10}$/.test(phoneNumber)) {
+    return true;
+  }
+
+  // If neither condition is met, the phone number is invalid
+  return false;
+}

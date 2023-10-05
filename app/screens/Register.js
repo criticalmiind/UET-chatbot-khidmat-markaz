@@ -4,7 +4,7 @@ import SelectDropdown from 'react-native-select-dropdown'
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
-import { hp, isNullRetNull, isObjEmpty, wp } from '../utils';
+import { hp, isNullRetNull, isObjEmpty, validatePhoneNumber, wp } from '../utils';
 import { Logo, SvgCPwd, SvgCalenderIcon, SvgCity, SvgGender, SvgMap, SvgPhone, SvgPwd, SvgReg } from '../constants/images';
 import { call_application_manager, method } from '../api';
 import Loader from '../components/Loader';
@@ -34,8 +34,17 @@ class Register extends React.Component {
             'tehsil': {},
             'city': {},
             'gender': {},
-            'dateOfBirth': false
+            'dateOfBirth': false,
+            
+            "maxDate": new Date()
         }
+    }
+
+    
+    UNSAFE_componentWillMount() {
+        const maxDate = new Date();
+        maxDate.setFullYear(maxDate.getFullYear() - 18);
+        this.setStateObj({ "maxDate": maxDate })
     }
 
     async register() {
@@ -53,7 +62,10 @@ class Register extends React.Component {
 
         let error = ''
         if (!isNullRetNull(userName, false)) error += translate("Phone number is required") + '.\n'
-        if (isNullRetNull(userName, false) && isNullRetNull(userName, '').length <= 10) error += translate("Phone Number length should be greater then 10") + '.\n'
+
+        // if (isNullRetNull(userName, false) && isNullRetNull(userName, '').length <= 10) error += translate("Phone Number length should be greater then 10") + '.\n'
+        if(isNullRetNull(userName, false) && !validatePhoneNumber(userName)) error += translate("Phone does not meet the requirements") + '.\n'
+
         if (!isNullRetNull(password, false)) error += translate("Password is required") + '.\n'
         if (isNullRetNull(password, false) && isNullRetNull(password, '').length <= 5) error += translate("Password length should be greater then 5") + '.\n'
         if (isNullRetNull(password, false) && password !== confirm_password) error += translate("Passwords doesn't matched") + '.\n'
@@ -197,6 +209,7 @@ class Register extends React.Component {
                                 buttonTextStyle={styles.txt01}
                                 defaultButtonText={translate('District')}
                                 search={true}
+                                searchBy="eng_name"
                                 defaultValue={district}
                                 onSelect={(selectedItem) => {
                                     this.setStateObj({ 'district': selectedItem })
@@ -218,6 +231,7 @@ class Register extends React.Component {
                                 buttonTextStyle={styles.txt01}
                                 defaultButtonText={translate('Tehsil')}
                                 search={true}
+                                searchBy="eng_name"
                                 defaultValue={tehsil}
                                 onSelect={(selectedItem) => {
                                     this.setStateObj({ 'tehsil': selectedItem })
@@ -239,6 +253,7 @@ class Register extends React.Component {
                                 buttonTextStyle={styles.txt01}
                                 defaultButtonText={translate('City')}
                                 search={true}
+                                searchBy="eng_name"
                                 defaultValue={city}
                                 onSelect={(selectedItem) => {
                                     this.setStateObj({ 'city': selectedItem })
@@ -261,7 +276,8 @@ class Register extends React.Component {
                             value={dateOfBirth ? dateOfBirth : new Date()}
                             mode={"date"}
                             display="spinner"
-                            is24Hour={true}
+                            // is24Hour={true}
+                            maximumDate={this.state.maxDate} // Set the maximum date
                             onChange={(e) => {
                                 this.setState({ "dateOfBirth": e.nativeEvent.timestamp, "showDatePicker": false })
                             }} />

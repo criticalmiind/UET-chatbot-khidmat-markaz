@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, StatusBar, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, StatusBar, SafeAreaView, ScrollView } from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
@@ -34,7 +34,7 @@ class ForgotPassword extends React.Component {
         let error = false
         if (password != confirm_password) error = translate("New password does not match")
         if (isNullRetNull(password, '').length < 6) error = translate("New password does not meet the requirements.")
-        if(error){
+        if (error) {
             this.setStateObj({ "popup": { "show": true, "type": "wrong", "message": translate(error) } })
             return
         }
@@ -85,66 +85,66 @@ class ForgotPassword extends React.Component {
                     }} />
 
                 <View style={styles.mainView}>
-                    <View style={{
-                        width: wp('90'),
-                        backgroundColor: theme.designColor,
-                        alignSelf: 'center',
-                        borderRadius: 10,
-                        zIndex:10
-                    }}>
-                        <Text style={styles.title}>{cameFrom == 'Login' && translate('Forgot Password') || cameFrom == 'Settings' && translate('Change Password')}</Text>
-                        <View style={{ height: hp("1.5") }} />
-                        <Input
-                            viewStyle={{ width: wp('84') }}
-                            Icon={SvgPhone}
-                            placeholder={translate('phone-placeholder')}
-                            value={userName}
-                            disabled={cameFrom == 'Settings'}
-                            onChangeText={(str) => {
-                                this.setState({ "userName": str })
-                            }} />
+                    <ScrollView>
+                        <View style={{ height: hp("18") }} />
 
-                        <View style={{ height: hp("1") }} />
-                        <Input
-                            viewStyle={{ width: wp('84') }}
-                            Icon={SvgPwd}
-                            iconStyle={{ paddingRight: wp('2') }}
-                            placeholder={translate("password")}
-                            value={password}
-                            secureTextEntry
-                            onChangeText={(str) => {
-                                this.setState({ "password": str })
-                            }} />
+                        <View style={styles.v01}>
+                            <Text style={styles.title}>{cameFrom == 'Login' && translate('Forgot Password') || cameFrom == 'Settings' && translate('Change Password')}</Text>
+                            <View style={{ height: hp("1.5") }} />
+                            <Input
+                                viewStyle={{ width: wp('84') }}
+                                Icon={SvgPhone}
+                                placeholder={translate('phone-placeholder')}
+                                value={userName}
+                                disabled={cameFrom == 'Settings'}
+                                onChangeText={(str) => {
+                                    this.setState({ "userName": str })
+                                }} />
 
-                        <View style={{ height: hp("1") }} />
-                        <Input
-                            viewStyle={{ width: wp('84') }}
-                            Icon={SvgPwd}
-                            placeholder={translate("Confirm Password")}
-                            value={confirm_password}
-                            secureTextEntry
-                            onChangeText={(str) => {
-                                this.setState({ "confirm_password": str })
-                            }} />
+                            <View style={{ height: hp("1") }} />
+                            <Input
+                                viewStyle={{ width: wp('84') }}
+                                Icon={SvgPwd}
+                                iconStyle={{ paddingRight: wp('2') }}
+                                placeholder={translate("password")}
+                                value={password}
+                                secureTextEntry
+                                onChangeText={(str) => {
+                                    this.setState({ "password": str })
+                                }} />
 
-                        <View style={{ height: hp("2") }} />
+                            <View style={{ height: hp("1") }} />
+                            <Input
+                                viewStyle={{ width: wp('84') }}
+                                Icon={SvgPwd}
+                                placeholder={translate("Confirm Password")}
+                                value={confirm_password}
+                                secureTextEntry
+                                onChangeText={(str) => {
+                                    this.setState({ "confirm_password": str })
+                                }} />
 
-                        <Button1
-                            title="Update Password"
-                            style={styles.btn}
-                            btnTxt={styles.btnTxt}
-                            onPress={() => {
-                                this.update_passowrd()
-                            }}>
-                            <SvgUpdate />
-                        </Button1>
+                            <View style={{ height: hp("2") }} />
 
-                        <View style={{ height: hp("3") }} />
-                    </View>
-                    <View style={{ height: hp("6") }} />
-                    <View style={{ position: 'absolute', alignSelf: 'center', bottom: hp('6') }}>
-                        <PoweredBy />
-                    </View>
+                            <Button1
+                                title="Update Password"
+                                style={styles.btn}
+                                btnTxt={styles.btnTxt}
+                                onPress={() => {
+                                    this.update_passowrd()
+                                }}>
+                                <SvgUpdate />
+                            </Button1>
+
+                            <View style={{ height: hp("3") }} />
+                        </View>
+                        {/* <View style={{ height: hp("6") }} /> */}
+                        <View style={{ position: 'absolute', alignSelf: 'center', bottom: hp('6') }}>
+                            <PoweredBy />
+                        </View>
+                        <View style={{ height: hp("33") }} />
+
+                    </ScrollView>
                 </View>
             </SafeAreaView>
         </>);
@@ -163,7 +163,14 @@ const styles = StyleSheet.create({
         backgroundColor: theme.tertiary,
         flex: 1,
         justifyContent: 'center',
-        position:'relative'
+        position: 'relative'
+    },
+    v01:{
+        width: wp('90'),
+        backgroundColor: theme.designColor,
+        alignSelf: 'center',
+        borderRadius: 10,
+        zIndex: 10
     },
     btn: {
         backgroundColor: "#ffffff"

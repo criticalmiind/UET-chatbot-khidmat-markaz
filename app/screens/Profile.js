@@ -3,7 +3,7 @@ import { TouchableOpacity, StyleSheet, Text, View, Image, ScrollView, StatusBar,
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
-import { getItemByName, hp, wp } from '../utils';
+import { getItemByName, hp, isNullRetNull, isObjEmpty, validatePhoneNumber, wp } from '../utils';
 import Loader from '../components/Loader';
 import { translate } from '../i18n';
 import Input from '../components/Input';
@@ -34,11 +34,15 @@ class Profile extends React.Component {
             "district": getItemByName(districtList, userData.district),
             "tehsil": getItemByName(tehsilList, userData.tehsil),
             "city": getItemByName(cityList, userData.city),
-            "dateOfBirth": new Date(userData.dateOfBirth)
+            "dateOfBirth": new Date(userData.dateOfBirth),
+            "maxDate": new Date()
         }
     }
 
     UNSAFE_componentWillMount() {
+        const maxDate = new Date();
+        maxDate.setFullYear(maxDate.getFullYear() - 18);
+        this.setStateObj({ "maxDate": maxDate })
         this.get_profile()
     }
 
@@ -56,18 +60,45 @@ class Profile extends React.Component {
 
     async update() {
         const state = this.state
+        const {
+            name,
+            userName,
+            cnic,
+            sessionId,
+            district,
+            tehsil,
+            city,
+            gender,
+            dateOfBirth
+        } = this.state;
+
+
+        let error = ''
+        if (!isNullRetNull(userName, false)) error += translate("Phone number is required") + '.\n'
+        if(isNullRetNull(userName, false) && !validatePhoneNumber(userName)) error += translate("Phone does not meet the requirements") + '.\n'
+        if (isObjEmpty(district)) error += translate("District is required") + '.\n'
+        if (isObjEmpty(tehsil)) error += translate("Tehsil is required") + '.\n'
+        if (isObjEmpty(city)) error += translate("City is required") + '.\n'
+        if (!isNullRetNull(dateOfBirth, false)) error += translate("Date of Birth is required") + '.\n'
+        if (isObjEmpty(gender)) error += translate("Gender is required") + '.\n'
+
+        if (!!isNullRetNull(error, false)) {
+            this.setState({ "popup": { "show": true, "type": "wrong", "message": error } })
+            return
+        }
+
         this.setStateObj({ "loader": true })
         let res = await call_application_manager({
             'function': method['updateUserProfile'],
-            "cnic": state.cnic,
-            "dateOfBirth": state.dateOfBirth,
-            "district": state.district.name,
-            "tehsil": state.tehsil.name,
-            "city": state.city.name,
-            "gender": state.gender.value,
-            "name": state.name,
-            "sessionId": state.sessionId,
-            "userName": state.userName,
+            "cnic": cnic,
+            "dateOfBirth": dateOfBirth,
+            "district": district.name,
+            "tehsil": tehsil.name,
+            "city": city.name,
+            "gender": gender.value,
+            "name": name,
+            "sessionId": sessionId,
+            "userName": userName,
         })
         if (res.resultFlag) {
             this.setStateObj({ "popup": { "show": true, "type": "success", "message": translate("Profile updated!") } })
@@ -166,6 +197,7 @@ class Profile extends React.Component {
                                 selectedRowTextStyle={{ color: "#fff" }}
                                 defaultButtonText={translate('District')}
                                 search={true}
+                                searchBy="eng_name"
                                 defaultValue={district}
                                 onSelect={(selectedItem) => {
                                     this.setStateObj({ 'district': selectedItem })
@@ -187,6 +219,7 @@ class Profile extends React.Component {
                                 selectedRowTextStyle={{ color: "#fff" }}
                                 defaultButtonText={translate('Tehsil')}
                                 search={true}
+                                searchBy="eng_name"
                                 defaultValue={tehsil}
                                 onSelect={(selectedItem) => {
                                     this.setStateObj({ 'tehsil': selectedItem })
@@ -207,6 +240,7 @@ class Profile extends React.Component {
                                 selectedRowTextStyle={{ color: "#fff" }}
                                 defaultButtonText={translate('City')}
                                 search={true}
+                                searchBy="eng_name"
                                 defaultValue={city}
                                 onSelect={(selectedItem) => {
                                     this.setStateObj({ 'city': selectedItem })
@@ -229,7 +263,8 @@ class Profile extends React.Component {
                             display="spinner"
                             value={dateOfBirth ? dateOfBirth : new Date()}
                             mode={"date"}
-                            is24Hour={true}
+                            maximumDate={this.state.maxDate} // Set the maximum date
+                            // is24Hour={true}
                             onChange={(e) => {
                                 this.setState({ "dateOfBirth": e.nativeEvent.timestamp, "showDatePicker": false })
                             }} />
