@@ -21,9 +21,8 @@ class Login extends React.Component {
             "loader": false,
             'userName': "",
             'password': "",
-            "loginData": {},
-            'userName': '03049758182',
-            'password': "12345678",
+            // 'userName': '03049758182',
+            // 'password': "12345678",
         }
     }
 
@@ -36,7 +35,6 @@ class Login extends React.Component {
         if (res.resultFlag) {
             // this.setState({ "loader": false, "popup": { "show": true, "type": "success", "message": translate("Login Successfully!") } })
             let data = await call_application_manager({ 'function': method['getUserProfile'], 'sessionId': res.sessionId })
-            // this.setStateObj({ "loginData": { ...res, ...data.resultFlag ? data : {} } })
             this.props.updateRedux({ "userData": { ...res, ...data.resultFlag ? data : {} } })
         } else {
             this.setState({ "loader": false, "popup": { "show": true, "type": "wrong", "message": translate(res.message ? res.message : res.error) } })
@@ -48,7 +46,7 @@ class Login extends React.Component {
     }
 
     render() {
-        const { loader, userName, password, loginData } = this.state;
+        const { loader, userName, password } = this.state;
         let disabled_login = (isNullRetNull(userName, 1) == 1 || isNullRetNull(password, 1) == 1)
 
         return (<>
@@ -57,7 +55,6 @@ class Login extends React.Component {
                 {...this.state.popup}
                 onClick={() => {
                     this.setStateObj({ "popup": {} })
-                    // this.props.updateRedux({ "userData": loginData })
                 }} />
             <View style={styles.safeArea}>
                 <ScrollView>
