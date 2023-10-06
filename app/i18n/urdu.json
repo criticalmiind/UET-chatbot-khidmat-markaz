@@ -167,5 +167,6 @@
     "New password does not meet the requirements.": "نئے پاس ورڈ کا اندراج درست نہیں",
     "Passwords do not match":"پاس ورڈ مشابه نہیں",
     "Account deleted successfully!":"اکاؤنٹ ڈیلیٹ ہو گیا ہے",
-    "Division": "ڈویژن"
+    "Division": "ڈویژن",
+    "resourceNotAvailable":"کچھ دیر بعد کوشش کریں۔"
 }
