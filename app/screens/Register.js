@@ -207,7 +207,7 @@ class Register extends React.Component {
                                 selectedRowStyle={{ backgroundColor: theme.designColor }}
                                 selectedRowTextStyle={{ color: "#fff" }}
                                 buttonTextStyle={styles.txt01}
-                                defaultButtonText={translate('District')}
+                                defaultButtonText={translate('Division')}
                                 search={true}
                                 searchBy="eng_name"
                                 defaultValue={district}
@@ -229,7 +229,7 @@ class Register extends React.Component {
                                 selectedRowStyle={{ backgroundColor: theme.designColor }}
                                 selectedRowTextStyle={{ color: "#fff" }}
                                 buttonTextStyle={styles.txt01}
-                                defaultButtonText={translate('Tehsil')}
+                                defaultButtonText={translate('District')}
                                 search={true}
                                 searchBy="eng_name"
                                 defaultValue={tehsil}
@@ -251,7 +251,7 @@ class Register extends React.Component {
                                 selectedRowStyle={{ backgroundColor: theme.designColor }}
                                 selectedRowTextStyle={{ color: "#fff" }}
                                 buttonTextStyle={styles.txt01}
-                                defaultButtonText={translate('City')}
+                                defaultButtonText={translate('Tehsil')}
                                 search={true}
                                 searchBy="eng_name"
                                 defaultValue={city}

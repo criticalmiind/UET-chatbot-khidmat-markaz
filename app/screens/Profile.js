@@ -195,7 +195,7 @@ class Profile extends React.Component {
                                 rowTextStyle={{ fontFamily: theme.font01 }}
                                 selectedRowStyle={{ backgroundColor: theme.designColor }}
                                 selectedRowTextStyle={{ color: "#fff" }}
-                                defaultButtonText={translate('District')}
+                                defaultButtonText={translate('Division')}
                                 search={true}
                                 searchBy="eng_name"
                                 defaultValue={district}
@@ -217,7 +217,7 @@ class Profile extends React.Component {
                                 rowTextStyle={{ fontFamily: theme.font01 }}
                                 selectedRowStyle={{ backgroundColor: theme.designColor }}
                                 selectedRowTextStyle={{ color: "#fff" }}
-                                defaultButtonText={translate('Tehsil')}
+                                defaultButtonText={translate('District')}
                                 search={true}
                                 searchBy="eng_name"
                                 defaultValue={tehsil}
@@ -238,7 +238,7 @@ class Profile extends React.Component {
                                 rowTextStyle={{ fontFamily: theme.font01 }}
                                 selectedRowStyle={{ backgroundColor: theme.designColor }}
                                 selectedRowTextStyle={{ color: "#fff" }}
-                                defaultButtonText={translate('City')}
+                                defaultButtonText={translate('Tehsil')}
                                 search={true}
                                 searchBy="eng_name"
                                 defaultValue={city}
