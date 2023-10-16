@@ -34,7 +34,7 @@ export async function onSpeakPress(socket) {
             "last_id": uid()
         })
     } else {
-        Alert.alert("Please Allow audio permission and try again!")
+        Alert.alert(translate("Please Allow audio permission and try again!"))
     }
 }
 
@@ -64,25 +64,27 @@ export async function get_query_answers() {
         this.setState({ "speakBlur": false })
     }
 
-    ids_list.forEach(async (el) => {
+    // ids_list.forEach(async (el) => {
+    for (let i = 0; i < ids_list.length; i++) {
+        const el = ids_list[i];        
+        if(!el.text || el.text == '') continue
         const qs = await this.dialogue_manager({ "textMessage": el.text })
         if (qs.resultFlag) {
             const textArr = qs.textResponse
 
             const { resultFlag, audioResponse, message } = await this.tts_manager({ "textMessage": textArr })
-
             const unique_id = uid();
             chat_list[unique_id] = {
                 "unique_id": unique_id,
                 "is_question": false,
                 "text": textArr,
-                "audio_files": resultFlag ? audioResponse : textArr.map((a) => false)
+                "audio_files": resultFlag && audioResponse.length>0 ? audioResponse : textArr.map((a) => ({ "audio":'', "duration":0.00 }))
             }
             this.setState({ "chat_list": chat_list })
 
             await wait(500)
             if (resultFlag) this.onPlayBack(chat_list[unique_id], -1)
-            else Alert.alert("Error", message)
+            // else Alert.alert("Error", message)
         }
         await this.wait(500)
         this.setState({
@@ -90,7 +92,8 @@ export async function get_query_answers() {
             "last_id": false,
             "temp_text": ""
         })
-    });
+    }
+    // });
 }
 
 export async function onPlayBack(obj, index) {
@@ -122,7 +125,7 @@ export async function onPlayBack(obj, index) {
         for (let j = 0; j < obj['audio_files'].length; j++) {
             const el = obj['audio_files'][j];
             if (!el) {
-                Alert.alert(translate("Audio Issue!"), translate("There is an issue in loading audio from server!"))
+                // Alert.alert(translate("Audio Issue!"), translate("There is an issue in loading audio from server!"))
                 return
             }
             if (i == index) {
@@ -144,7 +147,7 @@ export async function onPlayBack(obj, index) {
         for (let j = 0; j < obj['audio_files'].length; j++) {
             const el = obj['audio_files'][j];
             if (!el) {
-                Alert.alert(translate("Audio Issue!"), translate("There is an issue in loading audio from server!"))
+                // Alert.alert(translate("Audio Issue!"), translate("There is an issue in loading audio from server!"))
                 return
             }
             await wait(500);
@@ -167,7 +170,7 @@ export async function onPlayBack(obj, index) {
 
 export async function play_message_handler(url, is_path = false) {
     if (!url) {
-        Alert.alert(translate("Audio Issue!"), translate("There is an issue in loading audio from server!"))
+        // Alert.alert(translate("Audio Issue!"), translate("There is an issue in loading audio from server!"))
         return
     }
 

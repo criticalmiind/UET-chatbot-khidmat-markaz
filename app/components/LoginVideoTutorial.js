@@ -30,7 +30,7 @@ class LoginVideoTutorial extends React.Component {
                         containerStyle={{ borderWidth: 1, backgroundColor: '#fff' }}
                         allowsFullscreenVideo={true}
                         allowsInlineMediaPlayback={false}
-                        source={{ "uri": "https://bot.cle.org.pk/static/videos/PITB.webm" }} /> :
+                        source={{ "uri": "https://cc.cle.org.pk/static/videos/PITB.webm" }} /> :
                     <>
                         <VideoBg style={{ height: hp('21'), width: wp('76') }} />
                         <TouchableOpacity

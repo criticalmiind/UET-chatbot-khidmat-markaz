@@ -89,8 +89,10 @@ class LetsBegin extends React.PureComponent {
 
         BackHandler.addEventListener('hardwareBackPress', (async function () {
             if (this.props.navigation.isFocused()) {
-                if (this.state.isLoaded) {
+                if (this.state.isLoaded && !this.state.screen_loader) {
                     await this.closeSession()
+                }else{
+                    this.props.navigation.goBack(null)
                 }
                 // BackHandler.exitApp()
                 return true
