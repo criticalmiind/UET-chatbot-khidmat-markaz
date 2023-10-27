@@ -169,5 +169,6 @@
     "Account deleted successfully!":"اکاؤنٹ ڈیلیٹ ہو گیا ہے",
     "Division": "ڈویژن",
     "resourceNotAvailable":"کچھ دیر بعد کوشش کریں۔",
-    "Please Allow audio permission and try again!":"براہ کرم آڈیو کی اجازت دیں اور دوبارہ کوشش کریں!"
+    "Please Allow audio permission and try again!":"براہ کرم آڈیو کی اجازت دیں اور دوبارہ کوشش کریں!",
+    "notClosed": "رابطہ ختم نہیں ہوا۔"
 }
