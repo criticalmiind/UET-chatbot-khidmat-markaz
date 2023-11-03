@@ -14,7 +14,7 @@ import { Logo, SvgCNIC, SvgCalenderIcon, SvgCity, SvgGender, SvgMap, SvgPhone, S
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Header from '../components/Header';
 import Button1 from '../components/Button1';
-import { call_application_manager, method } from '../api';
+import { CONST, call_application_manager, method } from '../api';
 
 
 const GENDER_LIST = [
@@ -55,6 +55,11 @@ class Profile extends React.Component {
             this.props.updateRedux({ "userData": { ...userData, ...res } })
         } else {
             this.setStateObj({ "loader": false, "popup": { "show": true, "type": "wrong", "message": translate(res.message ? res.message : res.error) } })
+            if(res.message == CONST["sessionError"]){
+                setTimeout(() => {
+                    this.props.updateRedux({ "userData": {}, "resources": {} })
+                }, 3000);
+            }
         }
     }
 
@@ -71,7 +76,6 @@ class Profile extends React.Component {
             gender,
             dateOfBirth
         } = this.state;
-
 
         let error = ''
         if (!isNullRetNull(userName, false)) error += translate("Phone number is required") + '.\n'
@@ -105,6 +109,11 @@ class Profile extends React.Component {
             this.get_profile()
         } else {
             this.setStateObj({ "loader": false, "popup": { "show": true, "type": "wrong", "message": translate(res.message ? res.message : res.error) } })
+            if(res.message == CONST["sessionError"]){
+                setTimeout(() => {
+                    this.props.updateRedux({ "userData": {}, "resources": {} })
+                }, 3000);
+            }
         }
     }
 

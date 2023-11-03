@@ -29,7 +29,8 @@ class Slider extends React.Component {
 
     render() {
         const { version } = this.state;
-        const { onClose, onAction } = this.props;
+        const { onClose, onAction, userData={} } = this.props;
+        const { name } = userData
 
         return (<>
             <TouchableOpacity
@@ -44,7 +45,7 @@ class Slider extends React.Component {
                     width: '100%',
                     backgroundColor: theme.designColor
                 }}>
-                    <Text style={styles.userNameTxt}>{translate('Full Name')}</Text>
+                    <Text style={styles.userNameTxt}>{name?name:translate('Full Name')}</Text>
                 </View>
 
                 <TouchableOpacity

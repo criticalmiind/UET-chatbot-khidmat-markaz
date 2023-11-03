@@ -1,6 +1,9 @@
 const main_base_url = "https://cc.cle.org.pk/"
 export const SOCKET_CONFIG = (connection1) => ({ "transportOptions": { "polling": { "extraHeaders": { 'connectionid': connection1 } } } })
 
+export const CONST = {
+    "sessionError": "sessionError"
+}
 export const uri = {
     "asr_manager": "asrManager",
     "app_manager": "applicationManager",
