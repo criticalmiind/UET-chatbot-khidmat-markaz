@@ -1,50 +1,12 @@
 import { Alert, Platform } from "react-native";
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
 
-export function getAsrLink(asrModel, connectionId) {
-  return `${asrModel}content-type=audio/x-raw,+layout=(string)interleaved,+rate=(int)16000,+format=(string)S16LE,+channels=(int)1,+token=${connectionId}`
-}
-export function get_resource(key) {
-  const { asrModel, connectionId, dialogueManager, ttsManager, asrManager } = this.props.resources;
-  // if (key == 'asr') return asrModel ? `${asrModel}?content-type=audio/x-raw,+layout=(string)interleaved,+rate=(int)16000,+format=(string)S16LE,+channels=(int)1,+token=${connectionId}` : ''
-  // if (key == 'asr') return asrModel ? `${asrModel}?content-type=audio/x-raw,+layout=(string)interleaved,+rate=(int)16000,+format=(string)S16LE,+channels=(int)1` : ''
-  if (key == 'asr') return asrModel ? `${asrModel}` : ''
-  if (key == 'dm') return filter_url(dialogueManager)
-  if (key == 'tts') return filter_url(ttsManager)
-  if (key == 'asrm') return filter_url(asrManager)
-  if (key == 'cid') return connectionId
-}
-
-
 export const wait = (time = 100) => {
   return new Promise((resolve) => {
     setTimeout(() => { resolve() }, time)
   });
 }
 
-export function filter_url(str) {
-  let arr = str.split("//")
-  return `https://${arr[1]}`
-}
-
-export function jsonParse(str) {
-  try {
-    return JSON.parse(str)
-  } catch (e) {
-    return {}
-  }
-}
-
-export function platform(ios, android, ipad) {
-  if (Platform.isPad && ipad) {
-    return ipad ? ipad : ios;
-  }
-  if (ios && android) {
-    return Platform.OS === 'ios' ? ios : android;
-  } else {
-    return ios
-  }
-}
 
 export function wp(ios, android, ipad) {
   if (Platform.isPad && ipad) {
@@ -86,56 +48,6 @@ export function isNullRetNull(string, retVal = "") {
   return string !== undefined && string !== null && string !== "" ? string : retVal;
 }
 
-export function padNumber(number, p = '000') {
-  let str = "" + number
-  let pad = p
-  return pad.substring(0, pad.length - str.length) + str;
-}
-
-export function splitArrayIntoChunks(array, lenght) {
-  var chunks = [], i = 0, n = array.length;
-  while (i < n) {
-    chunks.push(array.slice(i, i += lenght));
-  }
-  return chunks;
-}
-
-export async function notify({ title = '', message = '', success }) {
-  Alert.alert(title, message)
-}
-
-export function makeAudioFileObj(text, audio = false, files = {}) {
-  return { ...audio ? { [`${text}`]: audio } : {}, ...files }
-}
-
-// export async function askUser(is, callback) {
-//   if (is) return callback(is)
-//   Alert.alert(
-//     "Cowafera Would like to use your location to find nearest salons!",
-//     "Are you sure want to allow location access on your device?",
-//     [
-//       { text: "No", onPress: () => callback(false) },
-//       { text: "Yes", onPress: async () => callback(true) }
-//     ],
-//     { cancelable: false }
-//   );
-// }
-
-export function search(list, keyword = '', key1 = 'name', key2) {
-  let matched = [];
-  if (keyword !== '') {
-    matched = list.filter(function (obj) {
-      let isTrue = false;
-      if (obj[key1] && simplify(obj[key1]).includes(simplify(keyword))) isTrue = true;
-      if (obj[key2] && simplify(obj[key2]).includes(simplify(keyword))) isTrue = true;
-      return isTrue;
-    })
-  } else {
-    matched = list;
-  }
-  return matched
-}
-
 export function uid() {
   return Date.now().toString(36) + Math.random().toString(36).substr(2);
 };
@@ -146,40 +58,4 @@ export function formatTime(secondsElapsed) {
   minutes = minutes < 10 ? '0' + minutes : minutes;
   seconds = seconds < 10 ? '0' + seconds : seconds;
   return `${minutes || '00'}:${seconds || '00'}`;
-}
-
-export function getItemByName(list = [], name = '', returnIfNull={}) {
-  for (let i = 0; i < list.length; i++) {
-    const el = list[i];
-    if (el.name == name || el.value == name) {
-      return el
-    }
-  }
-  return returnIfNull
-}
-
-export function validatePhoneNumber(phoneNumber) {
-  // Remove any spaces or dashes from the phone number
-  phoneNumber = phoneNumber.replace(/[-\s]/g, '');
-
-  // Check if the phone number starts with "03" and has a length of 11
-  if (/^03\d{9}$/.test(phoneNumber)) {
-    return true;
-  }
-
-  // Check if the phone number starts with "+92" and has a length of 13
-  if (/^\+92\d{10}$/.test(phoneNumber)) {
-    return true;
-  }
-  
-  if (/^92\d{10}$/.test(phoneNumber)) {
-    return true;
-  }
-
-  if (/^0092\d{10}$/.test(phoneNumber)) {
-    return true;
-  }
-
-  // If neither condition is met, the phone number is invalid
-  return false;
 }

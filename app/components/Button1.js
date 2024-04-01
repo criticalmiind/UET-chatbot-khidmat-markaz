@@ -6,7 +6,7 @@ import { hp, wp } from '../utils';
 import { theme } from '../constants/theme';
 import { Text } from 'react-native';
 import { translate } from '../i18n';
-
+ 
 class Button1 extends React.Component {
     constructor(props) {
         super(props)

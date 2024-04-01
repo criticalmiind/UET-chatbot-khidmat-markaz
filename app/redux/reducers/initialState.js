@@ -2,7 +2,10 @@ import { uid } from "../../utils";
 
 export const initialState = { 
     userData:{},
-    resources:{},
+    resources:{
+        "asrModel": "https://csa.cle.org.pk:3000",
+        "connectionId": "557620240329222630539802",
+    },
     cityList: [],
     districtList: [],
     tehsilList: [],

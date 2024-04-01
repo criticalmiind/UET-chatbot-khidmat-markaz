@@ -1,144 +1,44 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, Image, Platform } from 'react-native';
+import { StyleSheet, Text, View, Image, Platform } from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
 import { hp, wp } from '../utils';
-import { Logo, SvgDrawerIcon, SvgHelp, SvgPlay } from '../constants/images';
-import { call_application_manager, method } from '../api';
-import Loader from '../components/Loader';
+import { Logo } from '../constants/images';
 import { translate } from '../i18n';
-import Popup from '../components/Popup';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AudioSetting from '../components/AudioSetting';
-import Slider from '../components/Slider';
 import Button1 from '../components/Button1';
+import Input from '../components/Input';
 
 class Start extends React.Component {
     constructor(props) {
         super(props)
-        this.state = {
-            "loader": false,
-        }
+        this.state = {}
     }
 
-    UNSAFE_componentWillMount() { }
+    UNSAFE_componentWillMount() {
+        let test = {
+            "asrManager": "https://chat.pitb.gov.pk/connectionInterfaceOne/asrManager/",
+            "asrModel": "https://csa.cle.org.pk:3000",
+            "connectionId": "557620240329222630539802",
+            "dialogueManager": "https://chat.pitb.gov.pk/connectionInterfaceOne/dialogueManager/",
+            "message": "success", "resultFlag": true,
+            "sessionId": "1504202403292226224459825905086",
+            "ttsManager": "https://chat.pitb.gov.pk/connectionInterfaceOne/ttsManager/"
+        }
+    }
 
     async componentWillUnmount() { }
 
-    async get_resources(session) {
-        this.setState({ loader: true })
-        let obj = { 'function': method['startService'], 'sessionId': session }
-        let res = await call_application_manager(obj)
-        if (res.resultFlag) {
-            this.props.updateRedux({ "resources": res })
-            setTimeout(() => {
-                this.setState({ loader: false })
-                this.props.navigation.navigate("LetsBegin")
-            }, 300)
-        } else {
-            this.setState({ loader: false, popup: { "show": true, "type": "wrong", "message": translate(res.message) } })
-            setTimeout(() => {
-                this.props.updateRedux({ "userData": {}, "resources": {} })
-            }, 3000);
-        }
-    }
-
-    async logout() {
-        const { sessionId } = this.props.userData
-        this.setState({ "loader": true })
-        let obj = { 'function': method['userLogout'], 'sessionId': sessionId }
-        let res = await call_application_manager(obj)
-        if (res.resultFlag) {
-            this.setState({ "popup": { "show": true, "type": "success", "message": translate("Logout successfully!") } })
-        } else {
-            this.setState({ "popup": { "show": true, "type": "wrong", "message": translate(res.message) } })
-        }
-        this.props.updateRedux({ "userData": {}, "resources": {} })
-    }
-
     render() {
-        const { loader, isSlider, audioSettingPopup } = this.state;
-        const { sessionId } = this.props.userData;
-
-        const renderPanel = (isPopup) => {
-            return (<>
-                <Text style={styles.title01}>{translate('Dear Citizen Welcome!')}</Text>
-                <View style={styles.v01}>
-                    <View style={styles.v03}>
-                        <Text style={styles.txt01}>{translate('start screen instraction 1')}</Text>
-                        <Text style={styles.txt01}>{translate('start screen instraction 2')}</Text>
-                    </View>
-                    <View style={{ height: hp("2") }} />
-
-                    <View style={styles.v02}>
-                        <View style={styles.v04}>
-                            {
-                                translate('services_list_01').split(',').map((t, i) => {
-                                    return <Text style={styles.txt02} key={i}>{t}</Text>
-                                })
-                            }
-                        </View>
-                        <View style={styles.v04}>
-                            {
-                                translate('services_list_02').split(',').map((t, i) => {
-                                    return <Text style={styles.txt02} key={i}>{t}</Text>
-                                })
-                            }
-                        </View>
-                    </View>
-                    <View style={{ height: hp("2") }} />
-
-                    <View style={styles.v03}>
-                        <Text style={styles.txt01}>{translate(`start screen instraction 3`)}</Text>
-                    </View>
-                    <View style={{ height: hp("2") }} />
-                    {!isPopup && <>
-                        <Button1
-                            title="start"
-                            onPress={() => {
-                                this.get_resources(sessionId)
-                            }}>
-                            <SvgPlay />
-                            <View style={{ width: wp('1') }} />
-                        </Button1>
-                        <View style={{ height: hp("2") }} />
-                        <Text>{this.state.test}</Text>
-                    </>
-                    }
-                </View>
-            </>)
-        }
+        const { audioSettingPopup } = this.state;
+        const { resources } = this.props;
 
         return (<>
-            <Loader isShow={loader} />
-            <Popup {...this.state.popup} onClick={() => { this.setState({ popup: {} }) }} >{renderPanel(true)}</Popup>
-            {audioSettingPopup && <AudioSetting onClick={(is) => { this.setState({ "audioSettingPopup": is }) }} />}
             <SafeAreaView style={styles.safeArea} forceInset={{ top: 'always' }}>
-                {isSlider && <Slider
-                    onClose={() => { this.setState({ isSlider: false }) }} navigation={this.props.navigation}
-                    onAction={(state) => {
-                        if (state == 'logs') this.props.navigation.navigate("Logs")
-                        if (state == 'setting') this.setState({ "audioSettingPopup": true })
-                        if (state == 'logout') this.logout()
-                    }} />
-                }
+                {audioSettingPopup && <AudioSetting onClick={(is) => { this.setState({ "audioSettingPopup": is }) }} />}
                 <View style={styles.safeArea}>
-                    <View style={styles.header}>
-                        <TouchableOpacity
-                            style={styles.headHelpBtn}
-                            onPress={() => { this.setState({ isSlider: true }) }}>
-                            <SvgDrawerIcon />
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={styles.headHelpBtn}
-                            onPress={() => {
-                                this.setState({ popup: { "show": true, "title": "Instractions", "audio": "HomeScreen", "btnTitle": "Back", "type": "help" } })
-                            }}>
-                            <SvgHelp />
-                        </TouchableOpacity>
-                    </View>
                     <View style={styles.mainView}>
                         <View style={{ justifyContent: 'center' }}>
                             <Image source={Logo} style={styles.logo_bg} />
@@ -146,9 +46,50 @@ class Start extends React.Component {
                         </View>
                         <View style={{ height: hp("1") }} />
                         <Text style={styles.title}>{translate('e-service')}</Text>
+                        
 
-                        {renderPanel()}
+                        <Text style={styles.title01}>{translate('Dear Citizen Welcome!')}</Text>
+                        <View style={{ height: hp("4") }} />
+                        <View style={styles.v01}>
+                            <View style={{ height: hp("2") }} />
 
+                            <Input
+                                viewStyle={{ width:"90%" }}
+                                textInputStyle={{ textAlign: 'left' }}
+                                placeholder={"ASR MODEL URL"}
+                                value={resources.asrModel}
+                                onChangeText={(str) => {
+                                    this.props.updateRedux({ "resources":{ ...resources, "asrModel":str } })
+                                }} />
+                            <View style={{ height: hp("2") }} />
+
+                            <Input
+                                viewStyle={{ width:"90%" }}
+                                textInputStyle={{ textAlign: 'left' }}
+                                placeholder={"Connection ID"}
+                                value={resources.connectionId}
+                                onChangeText={(str) => {
+                                    this.props.updateRedux({ "resources":{ ...resources, "connectionId":str } })
+                                }} />
+                            <View style={{ height: hp("2") }} />
+
+                            <Button1
+                                title="start"
+                                onPress={() => {
+                                    this.props.navigation.navigate("LetsBegin")
+                                }}>
+                            </Button1>
+
+                            <View style={{ height: hp("1") }} />
+                            <Button1
+                                title="Audio Settings"
+                                onPress={() => {
+                                    this.setState({ "audioSettingPopup":true })
+                                }}>
+                            </Button1>
+                            <View style={{ height: hp("2") }} />
+                        </View>
+                        
                         <View style={{ height: hp("6") }} />
                     </View>
                 </View>

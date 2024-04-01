@@ -1,11 +1,9 @@
 import React from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { hp, uid, wp } from '../utils';
 import { theme } from '../constants/theme';
-import { translate } from '../i18n';
-import { SvgPopupHelpIcon, SvgPopupSuccessIcon, SvgPopupWrongIcon } from '../constants/images';
 
 class AudioSetting extends React.Component {
     constructor(props) {
@@ -47,21 +45,21 @@ class AudioSetting extends React.Component {
 
                         <Text style={{ ...styles.txt }}>Sample Rate</Text>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                            {rates.map((v, i) => <Item field={"sampleRate"} index={i} value={v} isSelected={sampleRate == v} />)}
+                            {rates.map((v, i) => <Item key={i} field={"sampleRate"} index={i} value={v} isSelected={sampleRate == v} />)}
                         </ScrollView>
 
                         <View style={{ height: hp('1') }} />
 
                         <Text style={{ ...styles.txt }}>Channels</Text>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                            {channelsList.map((v, i) => <Item field={"channels"} index={i} value={v} isSelected={channels == v} />)}
+                            {channelsList.map((v, i) => <Item key={i} field={"channels"} index={i} value={v} isSelected={channels == v} />)}
                         </ScrollView>
 
                         <View style={{ height: hp('1') }} />
 
                         <Text style={{ ...styles.txt }}>Bits Per Sample</Text>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                            {bits.map((v, i) => <Item field={"bitsPerSample"} index={i} value={v} isSelected={bitsPerSample == v} />)}
+                            {bits.map((v, i) => <Item key={i} field={"bitsPerSample"} index={i} value={v} isSelected={bitsPerSample == v} />)}
                         </ScrollView>
 
                         <View style={{ height: hp('1') }} />
@@ -69,7 +67,7 @@ class AudioSetting extends React.Component {
                         <Text style={{ ...styles.txt }}>Audio Chunk Size</Text>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                             <View style={{ width:wp('5') }}/>
-                            {chunks.map((v, i) => <Item field={"chunkSize"} index={i} value={v} isSelected={chunkSize == v} />)}
+                            {chunks.map((v, i) => <Item key={i} field={"chunkSize"} index={i} value={v} isSelected={chunkSize == v} />)}
                             <View style={{ width:wp('5') }}/>
                         </ScrollView>
                     </View>

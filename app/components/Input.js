@@ -1,10 +1,9 @@
 import React from 'react';
-import { StyleSheet, TextInput, TouchableOpacity, View, } from 'react-native';
+import { StyleSheet, TextInput, View, } from 'react-native';
 import { mapDispatchToProps, mapStateToProps } from '../redux/actions/userActions';
 import { connect } from 'react-redux';
 import { theme } from '../constants/theme';
 import { hp, wp } from '../utils';
-import { SvgPwdOff, SvgPwdOn } from '../constants/images';
 
 class Input extends React.Component {
     constructor(props) {
@@ -15,12 +14,11 @@ class Input extends React.Component {
     }
 
     render() {
-        const { Icon, iconStyle = {}, secureTextEntry, viewStyle = {}, textInputStyle = {}, disabled, multiline=false, keyboardType } = this.props;
+        const { secureTextEntry, viewStyle = {}, textInputStyle = {}, disabled, multiline=false, keyboardType } = this.props;
         const { showPwd } = this.state;
 
         return (
             <View style={{ ...styles.view, ...viewStyle }}>
-                {Icon && <View style={{ ...styles.icon, ...iconStyle }}><Icon /></View>}
                 <TextInput
                     multiline={multiline}
                     editable={!disabled}
@@ -29,13 +27,6 @@ class Input extends React.Component {
                     placeholderTextColor={"#939393"}
                     {...this.props}
                     {...secureTextEntry ? { "secureTextEntry": !showPwd } : {}} />
-                {secureTextEntry &&
-                    <TouchableOpacity onPress={() => { this.setState({ "showPwd": !showPwd }) }}>
-                        <View style={{ paddingHorizontal: wp('2') }}>
-                            {showPwd ? <SvgPwdOn /> : <SvgPwdOff />}
-                        </View>
-                    </TouchableOpacity>
-                }
             </View>
         );
     }
