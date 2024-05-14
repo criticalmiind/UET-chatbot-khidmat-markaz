@@ -61,8 +61,6 @@ class LetsBegin extends React.PureComponent {
 
         AudioRecord.init(this.props.audioRecordingOptions);
         AudioRecord.on('data', this.onAudioStreaming.bind(this));
-        console.log()
-
     }
 
     componentDidMount() {}
@@ -86,7 +84,7 @@ class LetsBegin extends React.PureComponent {
     };
 
     async onSpeakPress(socket) {
-        let audioPermission = await check_microphone();
+        let audioPermission = await this.check_microphone();
         if (audioPermission) {
             await this.wait(100)
             AudioRecord.start();
@@ -119,8 +117,8 @@ class LetsBegin extends React.PureComponent {
 
     connectSocket = async () => {
         const { resources } = this.props
+        // const socket = io(resources.asrModel, SOCKET_CONFIG('connection1'));
         const socket = io(resources.asrModel, SOCKET_CONFIG(resources.connectionId));
-
         socket.on('connect', ((e) => {
             this.logErrors('socket connected')
 
@@ -137,6 +135,7 @@ class LetsBegin extends React.PureComponent {
         socket.on('response', this.onMessage.bind(this));
         
         socket.on('connect_error', (error) => {
+            console.log(error);
             this.logErrors(`Socket connection error: ${error}`)
         });
         

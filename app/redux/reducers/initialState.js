@@ -4,7 +4,7 @@ export const initialState = {
     userData:{},
     resources:{
         "asrModel": "https://csa.cle.org.pk:3000",
-        "connectionId": "557620240329222630539802",
+        "connectionId": "connection1",
     },
     cityList: [],
     districtList: [],

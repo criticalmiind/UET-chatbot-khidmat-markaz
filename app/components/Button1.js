@@ -14,16 +14,17 @@ class Button1 extends React.Component {
     }
 
     render() {
-        const { title, style, btnTxt, children, onPress } = this.props;
+        const { title, style, btnTxt, children, onPress, disabled=false } = this.props;
 
         return (
             <TouchableOpacity
+                disabled={disabled}
                 style={{ ...styles.btn, ...style }}
                 onPress={async () => {
                     if (onPress) onPress()
                 }}>
                 {children}
-                {title && <Text style={{ ...styles.btnTxt, ...btnTxt }}>{translate(title)}</Text>}
+                {title && <Text style={{ ...styles.btnTxt, ...btnTxt, opacity:disabled?0.5:1 }}>{translate(title)}</Text>}
             </TouchableOpacity>
         );
     }

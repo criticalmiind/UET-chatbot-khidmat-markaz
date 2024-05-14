@@ -10,6 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AudioSetting from '../components/AudioSetting';
 import Button1 from '../components/Button1';
 import Input from '../components/Input';
+import { call_application_manager, method } from '../api';
 
 class Start extends React.Component {
     constructor(props) {
@@ -18,21 +19,50 @@ class Start extends React.Component {
     }
 
     UNSAFE_componentWillMount() {
-        let test = {
-            "asrManager": "https://chat.pitb.gov.pk/connectionInterfaceOne/asrManager/",
-            "asrModel": "https://csa.cle.org.pk:3000",
-            "connectionId": "557620240329222630539802",
-            "dialogueManager": "https://chat.pitb.gov.pk/connectionInterfaceOne/dialogueManager/",
-            "message": "success", "resultFlag": true,
-            "sessionId": "1504202403292226224459825905086",
-            "ttsManager": "https://chat.pitb.gov.pk/connectionInterfaceOne/ttsManager/"
-        }
+        // let test = {
+        //     "asrManager": "https://chat.pitb.gov.pk/connectionInterfaceOne/asrManager/",
+        //     "asrModel": "https://csa.cle.org.pk:3000",
+        //     "connectionId": "557620240329222630539802",
+        //     "dialogueManager": "https://chat.pitb.gov.pk/connectionInterfaceOne/dialogueManager/",
+        //     "message": "success", "resultFlag": true,
+        //     "sessionId": "1504202403292226224459825905086",
+        //     "ttsManager": "https://chat.pitb.gov.pk/connectionInterfaceOne/ttsManager/"
+        // }
     }
 
     async componentWillUnmount() { }
 
+    async login() {
+        this.setState({ loader: true })
+        let obj = { 'function': method['loginUser'], 'userName': '03049758182', 'password': '12345678' }
+        let res = await call_application_manager(obj)
+        if (res.resultFlag) {
+            this.get_resources(res.sessionId)
+            // console.log(res);
+        }
+        this.setState({ loader: false })
+    }
+
+    async get_resources(session) {
+        this.setState({ loader: true })
+        let obj = { 'function': method['startService'], 'sessionId': session }
+        let res = await call_application_manager(obj)
+        if (res.resultFlag) {
+            this.props.updateRedux({ "resources": res })
+            setTimeout(() => {
+                this.props.navigation.navigate("LetsBegin")
+            }, 300)
+        } else {
+            setTimeout(() => {
+                this.props.updateRedux({ "userData": {}, "resources": {} })
+            }, 3000);
+        }
+        this.setState({ loader: false })
+
+    }
+
     render() {
-        const { audioSettingPopup } = this.state;
+        const { audioSettingPopup, loader } = this.state;
         const { resources } = this.props;
 
         return (<>
@@ -74,9 +104,11 @@ class Start extends React.Component {
                             <View style={{ height: hp("2") }} />
 
                             <Button1
+                                disabled={loader}
                                 title="start"
                                 onPress={() => {
-                                    this.props.navigation.navigate("LetsBegin")
+                                    this.login()
+                                    // this.props.navigation.navigate("LetsBegin")
                                 }}>
                             </Button1>
 
